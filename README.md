@@ -19,20 +19,20 @@
       <a href="https://github.com/iamjieunkim"><b>김지은</b></a>
     </td>
     <td align="center">
-      <a href="https://github.com/cba700"><img src="https://github.com/kimsj0970" width="150px"/></a><br/>
-      <a href="https://github.com/cba700"><b>김승중</b></a>
+      <a href="https://github.com/kimsj0970"><img src="https://avatars.githubusercontent.com/u/53886275?v=4" width="150px"/></a><br/>
+      <a href="https://github.com/kimsj0970"><b>김승중</b></a>
     </td>
     <td align="center">
-      <a href="https://github.com/jwh946"><img src="https://github.com/hyunwestpark" width="150px"/></a><br/>
-      <a href="https://github.com/jwh946"><b>박현서</b></a>
+      <a href="https://github.com/hyunwestpark"><img src="https://avatars.githubusercontent.com/u/123967536?v=4" width="150px"/></a><br/>
+      <a href="https://github.com/hyunwestpark"><b>박현서</b></a>
     </td>
     <td align="center">
-      <a href="https://github.com/audwls239"><img src="https://github.com/chw0912" width="150px"/></a><br/>
-      <a href="https://github.com/audwls239"><b>최희웅</b></a>
+      <a href="https://github.com/chw0912"><img src="https://avatars.githubusercontent.com/u/95081400?v=4" width="150px"/></a><br/>
+      <a href="https://github.com/chw0912"><b>최희웅</b></a>
     </td>
     <td align="center">
-      <a href="https://github.com/urinaner"><img src="https://github.com/HwuanPage" width="150px"/></a><br/>
-      <a href="https://github.com/urinaner"><b>황성철</b></a>
+      <a href="https://github.com/HwuanPage"><img src="https://avatars.githubusercontent.com/u/39082854?v=4" width="150px"/></a><br/>
+      <a href="https://github.com/HwuanPage"><b>황성철</b></a>
     </td>
   </tr>
   <tr>
