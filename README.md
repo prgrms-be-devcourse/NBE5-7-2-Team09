@@ -78,7 +78,7 @@
 | JPA 설정 변경 | chore/jpa-config/해당이슈번호 | chore/jpa-config/3 |
 <br>
 
-**📘 브랜치 사용 규칙**
+### **📘 브랜치 사용 규칙**
 
 - 모든 작업은 **develop에서 브랜치 생성**
 - 기능 단위로 브랜치 생성, 기능 완료 후 Pull Request
