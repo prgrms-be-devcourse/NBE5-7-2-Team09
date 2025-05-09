@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.comfig;
+package ninegle.Readio.admin.config;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.admin.Repository.BlackListRepository;

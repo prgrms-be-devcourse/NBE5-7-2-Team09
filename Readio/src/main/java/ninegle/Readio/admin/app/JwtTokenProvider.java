@@ -3,7 +3,7 @@ package ninegle.Readio.admin.app;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import ninegle.Readio.admin.Repository.TokenRepository;
-import ninegle.Readio.admin.comfig.JwtConfiguration;
+import ninegle.Readio.admin.config.JwtConfiguration;
 import ninegle.Readio.admin.domain.RefreshToken;
 import ninegle.Readio.admin.domain.Role;
 import ninegle.Readio.admin.dto.TokenBody;

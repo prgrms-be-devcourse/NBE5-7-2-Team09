@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.comfig;
+package ninegle.Readio.admin.config;
 
 import io.jsonwebtoken.JwtException;
 import ninegle.Readio.admin.Repository.BlackListRepository;
