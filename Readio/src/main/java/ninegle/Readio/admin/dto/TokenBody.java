@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TokenBody {
     private Long userId;
+    private String email;
     private Role role;
 }
