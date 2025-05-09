@@ -1,6 +1,8 @@
 package ninegle.Readio.admin.dto;
 
 
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.admin.domain.Role;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 @Accessors(chain = true)
 @Getter
 @NoArgsConstructor
@@ -32,7 +35,7 @@ public class UserDetail implements UserDetails {
         this.role = role;
     }
 
-    public static UserDetail AdminDetailsMake(User findUser) {
+    public static UserDetail UserDetailsMake(User findUser) {
         UserDetail userDetail = new UserDetail();
         userDetail.id = findUser.getId();
         userDetail.email = findUser.getEmail();
@@ -54,7 +57,7 @@ public class UserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+            return this.email;
     }
 
 
