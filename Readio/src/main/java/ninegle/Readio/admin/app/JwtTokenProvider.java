@@ -51,8 +51,6 @@ public class JwtTokenProvider {
 
     //access & refresh 토큰 생성
     private String issueToken(Long id, Role role, Long expTime, String email) {
-        log.info("이메일{}", email);
-
         String token = Jwts.builder()
                 .subject(id.toString())
                 .claim("role", role.name())
@@ -68,7 +66,6 @@ public class JwtTokenProvider {
 
     // ** 토큰이 유효한지 아닌지 확인 유효성 검사로 access 토큰이 들어오든 refresh 토큰이 들어오든 상관이 없다 그저 형식, 만료 여부만 검샇 **
     public boolean validate(String token) {
-        log.debug("이거 수행하는지 확인 {}", token);
         try {
             //검증용 생성
             JwtParser jwtParser = Jwts.parser()
@@ -113,12 +110,6 @@ public class JwtTokenProvider {
         String role = parserd.getPayload().get("role").toString(); //이렇게 키 값으로 가져오기도 가능
         String email = parserd.getPayload().get("email").toString();
         log.info("정보 꺼내서 이메일 출력{}", email);
-        if (email == null) {
-            log.warn("❌ email claim 누락됨! Claims 전체 = {}", parserd.getPayload());
-        }
-        else log.info("O email이 토큰에 들어있음 = {}", parserd.getPayload().get("email").toString());
-
-
         return new TokenBody(Long.parseLong(adminId),email ,Role.valueOf(role));
     }
 
