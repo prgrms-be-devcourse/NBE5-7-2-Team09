@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.comfig;
+package ninegle.Readio.admin.config;
 
 import io.jsonwebtoken.JwtException;
 import ninegle.Readio.admin.Repository.BlackListRepository;
@@ -12,16 +12,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.global.unit.BaseResponse;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Date;
 
 @Slf4j
+
 
 //필터 체인의 경우 빈으로 자동 등록이 되지 않아서 수동으로 등록한 상태 @RequiredArgsConstructor 불가
 //요청이 들어왔을 때 한번만 동작한다
@@ -43,7 +46,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         // 로그인, 회원가입은 필터에 걸리지 않게 그냥 넘긴다
         // ("/login").equals(url) 형태로 쓰면 url에 null일 시 null 예외 발생 주의
-        if ("/login".equals(uri) || "/signup".equals(uri)) {
+        if ("/user/login".equals(uri) || "/user/signup".equals(uri) || "/user/logout".equals(uri)  ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -66,7 +69,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (userDetail == null) {
                 BaseResponse.error("사용자가 존재하지 않음", HttpStatus.UNAUTHORIZED);
             }
-
 
 
             //사용자가 입력한 ID/PW를 UsernamePasswordAuthenticationToken으로 감쌈

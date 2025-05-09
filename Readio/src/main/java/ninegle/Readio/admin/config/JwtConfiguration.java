@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.comfig;
+package ninegle.Readio.admin.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
