@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.comfig;
+package ninegle.Readio.admin.config;
 
 import ninegle.Readio.admin.Repository.BlackListRepository;
 import ninegle.Readio.admin.app.UserService;
