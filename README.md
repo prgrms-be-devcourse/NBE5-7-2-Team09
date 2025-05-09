@@ -55,6 +55,7 @@
 - ex)[BE] feat: entity 생성
 - 내용: 템플릿에 맞춰서 작성
 - 라벨: `FE`, `BE`, `기능추가`, `리팩토링`, `레이아웃`, `에러`...
+<br>
 
 ### ✅ 브랜치 타입 정리
 
@@ -66,6 +67,7 @@
 | docs | 문서 작업 (README 수정, API 명세 등) |
 | test | 테스트 코드 작성 |
 | chore | 설정, 빌드, 패키지 등 기타 작업 |
+<br>
 
 ### **✏️ 브랜치 네이밍 예시**
 
@@ -74,6 +76,7 @@
 | entity 구현 | feat/entity-add/해당이슈번호 | feat/entity-add/1 |
 | 주문 버그 수정 | fix/order-total-bug/해당이슈번호 | fix/order-total-bug/2 |
 | JPA 설정 변경 | chore/jpa-config/해당이슈번호 | chore/jpa-config/3 |
+<br>
 
 **📘 브랜치 사용 규칙**
 
@@ -96,7 +99,7 @@
 - release : 버전 릴리즈
 - merge : 병합
 
-
+<br>
 
 ### 🙃 PR 규칙
 
