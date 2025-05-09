@@ -48,6 +48,12 @@
 <br>
 
 ## 📏 **프로젝트 규칙**
+### ✅ Issue 규칙
+<img width="796" alt="스크린샷 2025-05-09 오전 11 35 08" src="https://github.com/user-attachments/assets/27e57572-c61c-4958-8f39-e52ae7b3d16f" />
+
+- 제목: [FE/BE] feat : 개발기능 ex)[BE] feat: entity 생성
+- 내용: 템플릿에 맞춰서 작성
+- 라벨: `FE`, `BE`, `기능추가`, `리팩토링`, `레이아웃`, `에러`...
 
 ### ✅ 브랜치 타입 정리
 
