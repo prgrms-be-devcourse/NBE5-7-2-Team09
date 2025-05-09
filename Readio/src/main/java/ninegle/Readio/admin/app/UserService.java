@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,16 +62,16 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    //가져온 객체가 없으면 에러, 있으면 admin 반환
+    //가져온 객체가 없으면 에러, 있으면 user 반환
     public User getById(Long id){
         return findById(id).orElseThrow(
                 ()-> new NoSuchElementException() );
     }
 
-    // admin 객체를 AdminDetail로 변환
+    // user 객체를 UserDetail로 변환
     public UserDetail getDetails(Long id) {
         User findUser = getById(id);
-        return UserDetail.AdminDetailsMake(findUser);
+        return UserDetail.UserDetailsMake(findUser);
     }
 
 
@@ -96,7 +99,7 @@ public class UserService {
             RefreshToken savedToken = optionalSavedToken.get();
             if(!jwtTokenProvider.validate(savedToken.getRefreshToken())){
                 //refresh token이 존재하지만 시간이 만료된 경우 발급 및 갱신
-                refreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole());
+                refreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole(),user.getEmail());
                 savedToken.newSetRefreshToken(refreshToken);
             }else {
                 //refresh token이 존재하며 유효기간도 아직 유효한 경우 기존 토큰 재사용
@@ -104,16 +107,23 @@ public class UserService {
             }
         }else {
             //아예 토큰이 존재하지 않았던 경우로 새로 발급 및 저장
-            refreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole());
+            refreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole(),user.getEmail());
             tokenRepository.save(new RefreshToken(refreshToken, user));
         }
 
-        String accessToken = jwtTokenProvider.issueAccessToken(user.getId(), user.getRole());
+        String accessToken = jwtTokenProvider.issueAccessToken(user.getId(), user.getRole(),user.getEmail());
+
+        // ✅ Spring Security 인증 컨텍스트 설정
+//        UserDetail userDetail = UserDetail.UserDetailsMake(user);
+//        Authentication authentication =
+//                new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+
 
         //재발급 후 다시헤더에 넣어서 반환
         LoginResponseDto loginResponseDto = new LoginResponseDto(accessToken, refreshToken);
         response.setHeader("Authorization", "Bearer " + loginResponseDto.getAccessToken());
-        response.setHeader("Refresh", loginResponseDto.getRefreshToken()); //이름 gpt쪽 보기 x-
+        response.setHeader("Refresh", loginResponseDto.getRefreshToken());
         return BaseResponse.ok("로그인 성공", HttpStatus.OK);
 
     }
@@ -131,21 +141,21 @@ public class UserService {
         }
 
         //요청을 한 사람이 기존에 회원가입이 되어 있는 관리자가 맞는지 검사
-        Long adminId = jwtTokenProvider.parseJwt(refreshToken).getUserId();
-        if(userRepository.findById(adminId).isEmpty()){
+        Long userId = jwtTokenProvider.parseJwt(refreshToken).getUserId();
+        if(userRepository.findById(userId).isEmpty()){
             return BaseResponse.error("관리자 정보를 찾을 수 없습니다.", HttpStatus.UNAUTHORIZED); //401 반환
         }
-        //관리자 정보가 있다면 admin 객체로 가져옴
-        User user = userRepository.findById(adminId).get();
+        //관리자 정보가 있다면 user 객체로 가져옴
+        User user = userRepository.findById(userId).get();
 
 
 
         // DB에 있는 RefreshToken과 일치 여부 확인
         //클라이언트가 서버로 refresh token을 보냈을 때, 이 토큰이 "서버에서 발급한 것이 맞는지" 검증
-        if(tokenRepository.findByUserId(adminId).isEmpty()){
+        if(tokenRepository.findByUserId(userId).isEmpty()){
             return BaseResponse.error("서버에서 발급한 토큰이 아닙니다.", HttpStatus.UNAUTHORIZED); //401 반환
         }
-        RefreshToken serverFindRefreshToken = tokenRepository.findByUserId(adminId).get();
+        RefreshToken serverFindRefreshToken = tokenRepository.findByUserId(userId).get();
 
 
 
@@ -156,8 +166,8 @@ public class UserService {
 
         //Refresh token이 유효하지만 access token 재발급 용도로 사용 후
         //Refresh Token이 노출되었을 수 있기 때문에, 사용 후에는 새로운 것으로 갱신하는 것이 안전하다 하는데 흠
-        String newAccessToken = jwtTokenProvider.issueAccessToken(user.getId(), user.getRole());
-        String newRefreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole());
+        String newAccessToken = jwtTokenProvider.issueAccessToken(user.getId(), user.getRole(),user.getEmail());
+        String newRefreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole(),user.getEmail());
 
         serverFindRefreshToken.newSetRefreshToken(newRefreshToken); // 새로 토큰을 발급 받아 기존 refresh token을 갱신
         LoginResponseDto loginResponseDto = new LoginResponseDto(newAccessToken, newRefreshToken);// 클라이언트에게 보내줄 용도
@@ -178,9 +188,9 @@ public class UserService {
             return BaseResponse.error("유효하지 않는 토큰", HttpStatus.UNAUTHORIZED); //401 반환
         }
 
+        Long userId = jwtTokenProvider.parseJwt(accessToken).getUserId();
 
-        Long adminId = jwtTokenProvider.parseJwt(accessToken).getUserId();
-        Optional<RefreshToken> findrefreshToken = tokenRepository.findByUserId(adminId);
+        Optional<RefreshToken> findrefreshToken = tokenRepository.findByUserId(userId);
         if (findrefreshToken.isEmpty()){
             return BaseResponse.error("토큰이 존재하지 않습니다", HttpStatus.UNAUTHORIZED); // 401 반환
         }
