@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ninegle.Readio.book.dto.BookEsDto;
+import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.service.BookService;
 
 /**
@@ -30,13 +30,13 @@ public class BookController {
 	}
 
 	@PostMapping
-	public BookEsDto save(@RequestBody BookEsDto book) {
+	public BookSearch save(@RequestBody BookSearch book) {
 
 		return bookService.save(book);
 	}
 
 	@GetMapping("/search")
-	public List<BookEsDto> search(@RequestParam String keyword) {
+	public List<BookSearch> search(@RequestParam String keyword) {
 		return bookService.searchBooks(keyword);
 	}
 }
