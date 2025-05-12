@@ -36,12 +36,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -49,10 +43,6 @@ import {
   LogOutIcon,
   PencilIcon,
   TrashIcon,
-  PlusIcon,
-  SearchIcon,
-  FilterIcon,
-  CalendarIcon,
   UploadIcon,
   SaveIcon,
 } from "lucide-react";
@@ -135,7 +125,7 @@ const categories = [
   { id: "5", name: "블록체인" },
 ];
 
-const publishers = [
+const initialPublishers = [
   { id: "1", name: "테크북스" },
   { id: "2", name: "코딩출판사" },
   { id: "3", name: "웹북스" },
@@ -145,8 +135,23 @@ const publishers = [
   { id: "7", name: "미래기술출판" },
 ];
 
+function isValidDateFormat(dateString: string): boolean {
+  // YYYY-MM-DD 형식 검증
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+
+  // 날짜 유효성 검증
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+}
+
 const formatDate = (date: Date): string => {
   return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 반환
+};
+
+type Publisher = {
+  id: string;
+  name: string;
 };
 
 // 도서 폼 인터페이스
@@ -163,6 +168,8 @@ interface BookFormData {
   coverImage: File | null;
   epubFile: File | null;
   coverImageUrl?: string;
+  customPublisher: string;
+  publishedDateString: string;
 }
 
 // 초기 빈 폼 데이터
@@ -174,9 +181,11 @@ const emptyBookForm: BookFormData = {
   description: "",
   isbn: "",
   ecn: "",
+  customPublisher: "",
   publishedDate: undefined,
   coverImage: null,
   epubFile: null,
+  publishedDateString: "",
 };
 
 const AdminDashboard: React.FC = () => {
@@ -193,6 +202,11 @@ const AdminDashboard: React.FC = () => {
   const [editingBookId, setEditingBookId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bookToDelete, setBookToDelete] = useState<string | null>(null);
+  const [publishers, setPublishers] = useState<Publisher[]>(initialPublishers);
+  const [isCustomPublisher, setIsCustomPublisher] = useState(false);
+  const [newPublisherDialogOpen, setNewPublisherDialogOpen] = useState(false);
+  const [newPublisherName, setNewPublisherName] = useState("");
+  const [dateInputError, setDateInputError] = useState("");
 
   useEffect(() => {
     // 실제 환경에서는 API 호출
@@ -223,6 +237,77 @@ const AdminDashboard: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // 날짜 문자열 직접 입력 처리
+  const handleDateStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateString = e.target.value;
+    setBookForm((prev) => ({
+      ...prev,
+      publishedDateString: dateString,
+    }));
+
+    // 날짜 형식 검증
+    if (dateString && !isValidDateFormat(dateString)) {
+      setDateInputError("YYYY-MM-DD 형식으로 입력해주세요.");
+    } else {
+      setDateInputError("");
+      // 유효한 날짜면 Date 객체도 업데이트
+      if (dateString) {
+        setBookForm((prev) => ({
+          ...prev,
+          publishedDate: new Date(dateString),
+        }));
+      }
+    }
+  };
+
+  // 출판사 선택 처리
+  const handlePublisherChange = (value: string) => {
+    if (value === "custom") {
+      setIsCustomPublisher(true);
+      setBookForm((prev) => ({
+        ...prev,
+        publisherId: "custom",
+      }));
+    } else {
+      setIsCustomPublisher(false);
+      setBookForm((prev) => ({
+        ...prev,
+        publisherId: value,
+        customPublisher: "",
+      }));
+    }
+  };
+
+  // 새 출판사 추가
+  const handleAddNewPublisher = () => {
+    if (!newPublisherName.trim()) {
+      toast.error("출판사 이름을 입력해주세요.");
+      return;
+    }
+
+    // 이미 존재하는 출판사인지 확인
+    if (publishers.some((p) => p.name === newPublisherName)) {
+      toast.error("이미 존재하는 출판사입니다.");
+      return;
+    }
+
+    // 새 출판사 추가
+    const newPublisherId = String(Date.now()); // 유니크한 ID 생성
+    const newPublisher = { id: newPublisherId, name: newPublisherName };
+
+    setPublishers([...publishers, newPublisher]);
+    setBookForm((prev) => ({
+      ...prev,
+      publisherId: newPublisherId,
+    }));
+
+    setNewPublisherName("");
+    setNewPublisherDialogOpen(false);
+    setIsCustomPublisher(false);
+
+    toast.success("새 출판사가 추가되었습니다.");
+  };
+
   // 도서 편집 시작
   const handleEditBook = (bookId: string) => {
     const bookToEdit = books.find((book) => book.id === bookId);
@@ -241,12 +326,14 @@ const AdminDashboard: React.FC = () => {
         description: bookToEdit.description,
         isbn: bookToEdit.isbn,
         ecn: "",
+        customPublisher: "",
         publishedDate: bookToEdit.publishedDate
           ? new Date(bookToEdit.publishedDate)
           : undefined,
         coverImage: null,
         epubFile: null,
         coverImageUrl: bookToEdit.coverImageUrl,
+        publishedDateString: "",
       });
 
       setCoverPreview(bookToEdit.coverImageUrl);
@@ -335,12 +422,81 @@ const AdminDashboard: React.FC = () => {
   };
 
   // EPUB 파일 업로드 처리
-  const handleEpubFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // EPUB 파일 업로드 처리
+  const handleEpubFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0] || null;
+    if (!file) return;
+
     setBookForm((prev) => ({
       ...prev,
       epubFile: file,
     }));
+
+    try {
+      // EPUB 파일(ZIP 형식)에서 표지 이미지 추출
+      const JSZip = await import("jszip").then((mod) => mod.default);
+      const zip = new JSZip();
+
+      // EPUB 파일 읽기
+      const epubData = await file.arrayBuffer();
+      const contents = await zip.loadAsync(epubData);
+
+      // EPUB 내부 파일 목록 확인
+      const files = Object.keys(contents.files);
+
+      // 표지 이미지 파일 찾기 (일반적인 패턴)
+      const coverPatterns = [
+        /cover\.(jpe?g|png)/i,
+        /cover-image\.(jpe?g|png)/i,
+        /.*cover.*\.(jpe?g|png)/i,
+        /OPS\/images\/cover\.(jpe?g|png)/i,
+        /OEBPS\/images\/cover\.(jpe?g|png)/i,
+      ];
+
+      let coverFile = null;
+
+      // 표지 이미지 파일 찾기
+      for (const pattern of coverPatterns) {
+        coverFile = files.find((filename) => pattern.test(filename));
+        if (coverFile) break;
+      }
+
+      // 표지 이미지가 발견되면 추출
+      if (coverFile) {
+        const file = contents.file(coverFile);
+        if (file) {
+          try {
+            const imageData = await file.async("blob");
+            const imageUrl = URL.createObjectURL(imageData);
+
+            // 표지 이미지 설정
+            setCoverPreview(imageUrl);
+            setBookForm((prev) => ({
+              ...prev,
+              coverImage: new File([imageData], "cover.jpg", {
+                type: imageData.type,
+              }),
+            }));
+
+            toast.success("EPUB에서 표지 이미지를 추출했습니다.");
+          } catch (error) {
+            console.error("표지 이미지 추출 중 오류 발생:", error);
+            toast.error("표지 이미지 추출에 실패했습니다.");
+          }
+        } else {
+          console.warn(
+            "EPUB에 지정된 표지 파일이 존재하지 않습니다:",
+            coverFile
+          );
+          toast.warning("EPUB에서 표지 이미지를 찾을 수 없습니다.");
+        }
+      }
+    } catch (error) {
+      console.error("EPUB 파싱 중 오류:", error);
+      toast.error("EPUB 파일 처리 중 오류가 발생했습니다.");
+    }
   };
 
   // 도서 폼 제출 처리
@@ -354,8 +510,7 @@ const AdminDashboard: React.FC = () => {
         !bookForm.title ||
         !bookForm.author ||
         !bookForm.publisherId ||
-        !bookForm.categoryId ||
-        !bookForm.isbn
+        !bookForm.categoryId
       ) {
         toast.error("필수 입력 항목을 모두 입력해주세요.");
         setIsSubmitting(false);
@@ -489,7 +644,7 @@ const AdminDashboard: React.FC = () => {
 
           {/* 도서 추가 및 편집 탭 */}
           <TabsContent value="addBook" className="space-y-6">
-            <div className="flex justify-between items-cen">
+            <div className="flex justify-between t">
               <div>
                 <h2 className="text-xl font-bold mb-2">
                   {editingBookId ? "도서 정보 수정" : "새 도서 추가"}
@@ -621,17 +776,8 @@ const AdminDashboard: React.FC = () => {
                           document.getElementById("epubFile")?.click()
                         }
                       >
-                        <div className="py-6">
-                          <BookIcon className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-500">
-                            클릭하여 EPUB 파일 업로드
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            EPUB 파일 (최대 50MB)
-                          </p>
-                        </div>
-                        {bookForm.epubFile && (
-                          <div className="mt-2 p-2 bg-gray-100 rounded-md flex items-center justify-between">
+                        {bookForm.epubFile ? (
+                          <div className="p-2 bg-gray-100 rounded-md flex items-center justify-between">
                             <div className="text-sm truncate">
                               {bookForm.epubFile.name}
                             </div>
@@ -661,6 +807,16 @@ const AdminDashboard: React.FC = () => {
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                               </svg>
                             </button>
+                          </div>
+                        ) : (
+                          <div className="py-6">
+                            <BookIcon className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500">
+                              클릭하여 EPUB 파일 업로드
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              EPUB 파일 (최대 50MB)
+                            </p>
                           </div>
                         )}
                         <input
@@ -713,28 +869,44 @@ const AdminDashboard: React.FC = () => {
 
                     {/* 출판사 및 카테고리 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                      <div className="space-y-2 w-full">
                         <Label htmlFor="publisherId">출판사 (필수)</Label>
-                        <Select
-                          value={bookForm.publisherId}
-                          onValueChange={(value) =>
-                            handleSelectChange("publisherId", value)
-                          }
-                        >
-                          <SelectTrigger id="publisherId">
-                            <SelectValue placeholder="출판사 선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {publishers.map((publisher) => (
-                              <SelectItem
-                                key={publisher.id}
-                                value={publisher.id}
-                              >
-                                {publisher.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex justify-between space-x-2 w-full">
+                          <div className="flex justify-start items-center">
+                            <Select
+                              value={bookForm.publisherId}
+                              onValueChange={handlePublisherChange}
+                            >
+                              <SelectTrigger id="publisherId">
+                                <SelectValue placeholder="출판사 선택" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {publishers.map((publisher) => (
+                                  <SelectItem
+                                    key={publisher.id}
+                                    value={publisher.id}
+                                  >
+                                    {publisher.name}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value="custom">
+                                  직접 입력
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="w-full">
+                            {isCustomPublisher && (
+                              <Input
+                                id="customPublisher"
+                                name="customPublisher"
+                                placeholder="출판사 이름 직접 입력"
+                                value={bookForm.customPublisher}
+                                onChange={handleTextChange}
+                              />
+                            )}
+                          </div>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
@@ -762,14 +934,13 @@ const AdminDashboard: React.FC = () => {
                     {/* ISBN 및 ECN */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="isbn">ISBN (필수)</Label>
+                        <Label htmlFor="isbn">ISBN (선택)</Label>
                         <Input
                           id="isbn"
                           name="isbn"
                           placeholder="ISBN 번호 (예: 9788901234567)"
                           value={bookForm.isbn}
                           onChange={handleTextChange}
-                          required
                         />
                       </div>
 
@@ -787,33 +958,23 @@ const AdminDashboard: React.FC = () => {
 
                     {/* 출판일 */}
                     <div className="space-y-2">
-                      <Label htmlFor="publishedDate">출판일 (필수)</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !bookForm.publishedDate && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {bookForm.publishedDate ? (
-                              formatDate(bookForm.publishedDate)
-                            ) : (
-                              <span>출판일 선택</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={bookForm.publishedDate}
-                            onSelect={handleDateChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="publishedDate">출판일 (필수)</Label>
+                      </div>
+                      <div>
+                        <Input
+                          id="publishedDateString"
+                          name="publishedDateString"
+                          placeholder="YYYY-MM-DD"
+                          value={bookForm.publishedDateString}
+                          onChange={handleDateStringChange}
+                        />
+                        {dateInputError && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {dateInputError}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* 책 설명 */}
@@ -938,6 +1099,45 @@ const AdminDashboard: React.FC = () => {
           </TabsContent>
         </Tabs>
       </main>
+      <Dialog
+        open={newPublisherDialogOpen}
+        onOpenChange={setNewPublisherDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>새 출판사 추가</DialogTitle>
+            <DialogDescription>
+              추가할 출판사 이름을 입력해주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="newPublisherName" className="mb-2 block">
+              출판사 이름
+            </Label>
+            <Input
+              id="newPublisherName"
+              value={newPublisherName}
+              onChange={(e) => setNewPublisherName(e.target.value)}
+              placeholder="출판사 이름 입력"
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setNewPublisherDialogOpen(false)}
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleAddNewPublisher}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              추가
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
