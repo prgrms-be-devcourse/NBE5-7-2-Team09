@@ -23,12 +23,9 @@ import lombok.NoArgsConstructor;
 public class Category {
 
 	@Id
-	@Column(name = "category_id")
 	private Long id;
 
-	@Column(name = "category_major")
 	private String major;
 
-	@Column(name = "category_sub")
 	private String sub;
 }

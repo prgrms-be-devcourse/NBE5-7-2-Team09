@@ -56,9 +56,9 @@ public class Book {
 
 	private LocalDateTime updatedAt;
 
-	private Boolean isDeleted;
+	private Boolean expired;
 
-	private LocalDateTime deletedAt;
+	private LocalDateTime expiredAt;
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")
