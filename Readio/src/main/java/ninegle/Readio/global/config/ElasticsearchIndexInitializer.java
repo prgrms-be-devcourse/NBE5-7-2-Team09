@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.book.dto.BookEsDto;
+import ninegle.Readio.book.domain.BookSearch;
 
 /**
  * Readio - ElasticsearchIndexInitializer
@@ -22,9 +22,9 @@ public class ElasticsearchIndexInitializer {
 
 	@PostConstruct
 	public void createIndex() {
-		if (!operations.indexOps(BookEsDto.class).exists()) {
-			operations.indexOps(BookEsDto.class).create();
-			operations.indexOps(BookEsDto.class).putMapping(operations.indexOps(BookEsDto.class).createMapping());
+		if (!operations.indexOps(BookSearch.class).exists()) {
+			operations.indexOps(BookSearch.class).create();
+			operations.indexOps(BookSearch.class).putMapping(operations.indexOps(BookSearch.class).createMapping());
 		}
 	}
 }

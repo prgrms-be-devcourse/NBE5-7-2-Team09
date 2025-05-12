@@ -29,12 +29,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "book")
 public class Book {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 
 	@Column(nullable = false,length = 255)
 	private String name;
@@ -44,21 +43,21 @@ public class Book {
 
 	private String image;
 
-	private Integer page;
-
-	@Column(length = 20,unique = true)
+	@Column(length = 20, unique = true)
 	private String isbn;
 
-	@Column(length = 50)
+	@Column(length = 50, nullable = false)
 	private String ecn;
 
+	@Column(nullable = false)
 	private LocalDateTime pubDate;
+
 
 	private LocalDateTime updatedAt;
 
-	private Boolean isDeleted;
+	private Boolean expired = false;
 
-	private LocalDateTime deletedAt;
+	private LocalDateTime expiredAt;
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")

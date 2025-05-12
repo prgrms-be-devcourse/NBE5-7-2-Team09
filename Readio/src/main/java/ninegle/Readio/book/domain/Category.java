@@ -18,17 +18,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name="category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 
 	@Id
-	@Column(name = "category_id")
-	private Long id;
+	private long id;
 
-	@Column(name = "category_major")
+	@Column(nullable = false)
 	private String major;
 
-	@Column(name = "category_sub")
+	@Column(nullable = false)
 	private String sub;
 }
