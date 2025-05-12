@@ -9,17 +9,33 @@ import BookReviewsPage from "./pages/book/BookReviewsPage";
 import EpubReaderPage from "./pages/book/EpubReaderPage";
 import LibraryPage from "./pages/library/LibraryPage";
 import LibraryDetailPage from "./pages/library/LibraryDetailPage";
-import { ToastProvider } from "./components/ui/use-toast";
+import { Toaster } from "sonner"; // sonner로 변경
 import MyPage from "./pages/member/MyPage";
 import WishlistPage from "./pages/member/WishlistPage";
+
+// 관리자 페이지 및 인증 관련 컴포넌트
+import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <ToastProvider>
+        <AdminAuthProvider>
+          <Toaster position="top-right" />
           <Routes>
+            {/* 관리자 라우트 */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route element={<AdminProtectedRoute />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Route>
+
+            {/* EPUB 리더 (전체 화면) */}
             <Route path="/read/:id" element={<EpubReaderPage />} />
+
+            {/* 일반 사용자 라우트 (Layout 포함) */}
             <Route
               path="*"
               element={
@@ -45,7 +61,7 @@ function App() {
               }
             />
           </Routes>
-        </ToastProvider>
+        </AdminAuthProvider>
       </AuthProvider>
     </Router>
   );
