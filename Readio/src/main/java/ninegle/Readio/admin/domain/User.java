@@ -5,8 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ninegle.Readio.global.exception.BusinessException;
-import ninegle.Readio.global.exception.domain.ErrorCode;
 
 @Entity
 @Getter
@@ -28,26 +26,27 @@ public class User {
 
     private String nickname;
 
-    private String phone_number;
+    private String phoneNumber;
 
     private int point = 50000;
 
     @Builder
-    public User(String email, String password, String nickname, String phonenumber, int point) {
+    public User(String email, String password, String nickname, String phoneNumber, int point) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.phone_number= phonenumber;
+        this.phoneNumber = phoneNumber;
         this.point = point > 0 ? point : 50000; //point가 0일때 기본값을 사용하도록 구현!
     }
 
-    // setter로 필드를 수정할 수 있도록 추가
-    public void setNickname(String nickname) {
+    // 닉네임 변경 메서드
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    public void setPhoneNumber(String phone_number) {
-        this.phone_number = phone_number;
+    // 핸드폰번호 변경 메서드
+    public void updatePhoneNumber(String phone_number) {
+        this.phoneNumber = phone_number;
     }
 
     // point 수정할 수 있도록 setter 추가

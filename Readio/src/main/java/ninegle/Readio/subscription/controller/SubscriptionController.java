@@ -20,10 +20,12 @@ public class SubscriptionController {
 
 	private final SubscriptionService subscriptionService;
 
+	//구독조회
 	@GetMapping
 	public ResponseEntity<BaseResponse<SubscriptionResponseDto>> getSubscription() {
 		SubscriptionResponseDto response = subscriptionService.getSubscription();
 
+		//구독 정보가 없으면 널을 반환
 		if (response == null) {
 			return BaseResponse.ok("존재하는 구독이 없습니다.", null, HttpStatus.OK);
 		}

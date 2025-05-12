@@ -47,7 +47,7 @@ public class UserService {
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .nickname(dto.getNickname())
-                .phonenumber(dto.getPhone_number())
+                .phoneNumber(dto.getPhoneNumber())
                 .point(dto.getPoint())  // 포인트를 dto에서 받도록 수정
                 .build();
         userRepository.save(user);

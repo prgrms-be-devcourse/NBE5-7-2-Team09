@@ -33,11 +33,13 @@ public class Subscription {
 		this.expDate = expDate;
 	}
 
+	//구독 기간 갱신 메서드
 	public void updatePeriod(LocalDateTime subDate, LocalDateTime expDate) {
 		this.subDate = subDate;
 		this.expDate = expDate;
 	}
 
+	//구독 상태를 확인하는 메서드
 	public boolean isActive() {
 		return expDate.isAfter(LocalDateTime.now());
 	}

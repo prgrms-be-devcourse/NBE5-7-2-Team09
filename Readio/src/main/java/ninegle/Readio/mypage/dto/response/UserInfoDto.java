@@ -1,8 +1,10 @@
 package ninegle.Readio.mypage.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class UserInfoDto {
 	private final String email;
 	private final String nickname;

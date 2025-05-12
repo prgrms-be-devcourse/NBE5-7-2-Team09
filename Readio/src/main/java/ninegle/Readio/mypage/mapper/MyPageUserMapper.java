@@ -9,7 +9,7 @@ public class MyPageUserMapper {
 		return new UserInfoDto(
 			user.getEmail(),
 			user.getNickname(),
-			user.getPhone_number(),
+			user.getPhoneNumber(),
 			user.getPoint()
 		);
 	}

@@ -10,6 +10,6 @@ public class SingUpRequestDto {
     private final String email;
     private final String password;
     private final String nickname;
-    private final String phone_number;
+    private final String phoneNumber;
     private final int point;  // 포인트 필드 추가
 }

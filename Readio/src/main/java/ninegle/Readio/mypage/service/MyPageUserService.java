@@ -7,47 +7,69 @@ import lombok.RequiredArgsConstructor;
 import ninegle.Readio.admin.domain.User;
 import ninegle.Readio.admin.repository.UserRepository;
 import ninegle.Readio.admin.service.UserContextService;
+import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.mypage.dto.request.UserUpdateRequestDto;
 import ninegle.Readio.mypage.dto.response.UserInfoDto;
 import ninegle.Readio.mypage.mapper.MyPageUserMapper;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MyPageUserService {
 
-	private final UserContextService userContextService;
 	private final UserRepository userRepository;
+	private final UserContextService userContextService;
 
+	@Transactional(readOnly = true)
 	public UserInfoDto getUserInfo() {
-		// 인증된 사용자 ID 확인
 		Long userId = userContextService.getCurrentAdminId();
 
-		// 해당 사용자 조회
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-		// User 객체를 UserInfoDto로 변환하여 반환
 		return MyPageUserMapper.toUserInfoDto(user);
 	}
 
-	@Transactional
 	public UserInfoDto updateUserInfo(UserUpdateRequestDto dto) {
 		Long userId = userContextService.getCurrentAdminId();
+
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-		// nickname 수정
-		if (dto.getNickname() != null && !dto.getNickname().isBlank()) {
-			user.setNickname(dto.getNickname()); // nickname 직접 수정
+		// 닉네임 업데이트 로직
+		if (dto.getNickname() != null) {
+			validateNickname(dto.getNickname());
+			user.updateNickname(dto.getNickname());
 		}
 
-		// phone number 수정
-		if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().isBlank()) {
-			user.setPhoneNumber(dto.getPhoneNumber()); // phone number 직접 수정
+		// 전화번호 업데이트 로직
+		if (dto.getPhoneNumber() != null) {
+			validatePhoneNumber(dto.getPhoneNumber());
+			user.updatePhoneNumber(dto.getPhoneNumber());
 		}
 
-		// 수정된 User를 반환
-		return MyPageUserMapper.toUserInfoDto(user);
+		return MyPageUserMapper.toUserInfoDto(userRepository.save(user));
+	}
+
+	//닉네임 검증 메서드
+	private void validateNickname(String nickname) {
+		if (nickname.isBlank()) {
+			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);
+		}
+		if (nickname.length() > 50) {
+			throw new BusinessException(ErrorCode.INVALID_REQUEST_DATA);
+		}
+	}
+
+	//핸드폰번호 검증 메서드
+	private void validatePhoneNumber(String phoneNumber) {
+		if (phoneNumber.isBlank()) {
+			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);
+		}
+		String phoneRegex = "^010-\\d{4}-\\d{4}$";
+		if (!phoneNumber.matches(phoneRegex)) {
+			throw new BusinessException(ErrorCode.INVALID_FORMAT);
+		}
 	}
 }
-

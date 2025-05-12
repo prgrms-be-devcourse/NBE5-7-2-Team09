@@ -90,7 +90,14 @@ public enum ErrorCode {
 	//400
 	NOT_ENOUGH_POINTS(HttpStatus.BAD_REQUEST, "보유 포인트가 부족합니다."),
 	//404
-	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
+
+	/*
+	 * Subscription : 회원정보 수정 예외 처리
+	 */
+	//400
+	INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력 값이 유효하지 않습니다."),
+	INVALID_FORMAT(HttpStatus.BAD_REQUEST, "입력 형식이 올바르지 않습니다.")
 	;
 
 
