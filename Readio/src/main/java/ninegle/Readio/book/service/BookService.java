@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ninegle.Readio.book.dto.BookEsDto;
+import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.repository.BookSearchRepository;
 
 /**
@@ -15,7 +15,6 @@ import ninegle.Readio.book.repository.BookSearchRepository;
  * purpose: 
  */
 @Service
-
 public class BookService {
 	private final BookSearchRepository bookSearchRepository;
 
@@ -23,11 +22,11 @@ public class BookService {
 		this.bookSearchRepository = bookSearchRepository;
 	}
 
-	public List<BookEsDto> searchBooks(String keyword) {
+	public List<BookSearch> searchBooks(String keyword) {
 		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword, keyword);
 	}
 
-	public BookEsDto save(BookEsDto book) {
+	public BookSearch save(BookSearch book) {
 		return bookSearchRepository.save(book);
 	}
 }
