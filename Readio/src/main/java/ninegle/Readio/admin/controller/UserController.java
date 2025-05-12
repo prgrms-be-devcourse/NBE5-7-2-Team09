@@ -1,5 +1,5 @@
-package ninegle.Readio.admin.api;
-import ninegle.Readio.admin.app.UserService;
+package ninegle.Readio.admin.controller;
+import ninegle.Readio.admin.service.UserService;
 import ninegle.Readio.admin.dto.LoginRequestDto;
 import ninegle.Readio.admin.dto.RefreshTokenRequestDto;
 import ninegle.Readio.admin.dto.SingUpRequestDto;

@@ -1,9 +1,9 @@
 package ninegle.Readio.admin.config;
 
 import io.jsonwebtoken.JwtException;
-import ninegle.Readio.admin.Repository.BlackListRepository;
-import ninegle.Readio.admin.app.UserService;
-import ninegle.Readio.admin.app.JwtTokenProvider;
+import ninegle.Readio.admin.repository.BlackListRepository;
+import ninegle.Readio.admin.service.UserService;
+import ninegle.Readio.admin.service.JwtTokenProvider;
 import ninegle.Readio.admin.dto.UserDetail;
 import ninegle.Readio.admin.dto.TokenBody;
 import jakarta.servlet.FilterChain;
@@ -12,12 +12,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.global.unit.BaseResponse;
-import org.springframework.core.annotation.Order;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;

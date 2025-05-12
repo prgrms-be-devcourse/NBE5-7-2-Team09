@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-/src/main/resources/application.yml
-/src/main/resources/application-*.yml
+# src/main/resources 하위의 application.yml 무시
+Readio/src/main/resources/application.yml
+Readio/src/main/resources/application-*.yml

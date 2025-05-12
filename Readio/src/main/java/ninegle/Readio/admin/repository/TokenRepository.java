@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.Repository;
+package ninegle.Readio.admin.repository;
 
 
 import ninegle.Readio.admin.domain.RefreshToken;

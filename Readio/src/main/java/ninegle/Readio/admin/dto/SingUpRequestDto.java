@@ -11,4 +11,5 @@ public class SingUpRequestDto {
     private final String password;
     private final String nickname;
     private final String phone_number;
+    private final int point;  // 포인트 필드 추가
 }

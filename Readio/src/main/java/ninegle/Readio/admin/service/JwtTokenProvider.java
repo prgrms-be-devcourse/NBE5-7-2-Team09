@@ -1,8 +1,8 @@
-package ninegle.Readio.admin.app;
+package ninegle.Readio.admin.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import ninegle.Readio.admin.Repository.TokenRepository;
+import ninegle.Readio.admin.repository.TokenRepository;
 import ninegle.Readio.admin.config.JwtConfiguration;
 import ninegle.Readio.admin.domain.RefreshToken;
 import ninegle.Readio.admin.domain.Role;

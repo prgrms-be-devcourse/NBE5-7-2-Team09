@@ -1,0 +1,11 @@
+package ninegle.Readio.subscription.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import ninegle.Readio.subscription.domain.Subscription;
+
+public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
+	Optional<Subscription> findByUserId(Long userId);
+}

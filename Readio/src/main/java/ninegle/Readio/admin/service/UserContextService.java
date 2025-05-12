@@ -1,4 +1,4 @@
-package ninegle.Readio.admin.app;
+package ninegle.Readio.admin.service;
 
 import ninegle.Readio.admin.dto.UserDetail;
 import org.springframework.security.access.AccessDeniedException;
