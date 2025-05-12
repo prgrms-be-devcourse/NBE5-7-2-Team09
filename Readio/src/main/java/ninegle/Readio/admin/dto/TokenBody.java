@@ -1,15 +1,19 @@
 package ninegle.Readio.admin.dto;
 
-import ninegle.Readio.admin.domain.Role;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import ninegle.Readio.admin.domain.Role;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class TokenBody {
-    private Long userId;
-    private String email;
-    private Role role;
+	private long userId;
+	private String email;
+	private Role role;
+
+	public TokenBody(long userId, String email, Role role) {
+		this.userId = userId;
+		this.email = email;
+		this.role = role;
+	}
 }

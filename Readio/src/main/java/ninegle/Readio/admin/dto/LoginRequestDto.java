@@ -1,13 +1,12 @@
 package ninegle.Readio.admin.dto;
 
-
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class LoginRequestDto {
-    private final String email;
-    private final String password;
+	private String email;
+	private String password;
 
 }

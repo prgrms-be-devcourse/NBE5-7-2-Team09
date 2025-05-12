@@ -1,40 +1,46 @@
 package ninegle.Readio.admin.domain;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 
-    private String refreshToken;
+	private String refreshToken;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "admin_id")
+	//단방향으로 어드민과 연결
+	private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    //단방향으로 어드민과 연결
-    private User user;
+	@UpdateTimestamp
+	private LocalDateTime UpdateTimeAt;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+	@Builder
+	public RefreshToken(String refreshToken, User user) {
+		this.refreshToken = refreshToken;
+		this.user = user;
+	}
 
-
-
-    @Builder
-    public RefreshToken(String refreshToken, User user) {
-        this.refreshToken = refreshToken;
-        this.user = user;
-    }
-
-    public void newSetRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-        this.createdAt = LocalDateTime.now(); // 갱신 시간 업데이트 (옵션)
-    }
+	public void newSetRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;//갱신 시간 업데이트 (옵션)
+	}
 }

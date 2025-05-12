@@ -22,16 +22,16 @@ import lombok.ToString;
 @ToString
 public class BookEsDto {
 	@Id
-	private String id = UUID.randomUUID().toString();
+	private final String id;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String title;
+	private final String title;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String publisher;
+	private final String publisher;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String author;
+	private final String author;
 
 	public BookEsDto(String title, String publisher, String author) {
 		this.id = UUID.randomUUID().toString();

@@ -18,13 +18,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name="category")
+@Table(name = "category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 
 	@Id
 	@Column(name = "category_id")
-	private Long id;
+	private long id;
 
 	@Column(name = "category_major")
 	private String major;
