@@ -22,7 +22,7 @@ public class User {
     @Column(length=100, nullable=false)
     private String password;
 
-    private Role role  = Role.USER;
+    private Role role  = Role.ADMIN;
 
     private String nickname;
 

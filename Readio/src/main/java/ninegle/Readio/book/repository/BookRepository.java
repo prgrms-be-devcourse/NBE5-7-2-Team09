@@ -1,6 +1,10 @@
 package ninegle.Readio.book.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import ninegle.Readio.book.domain.Book;
@@ -13,5 +17,6 @@ import ninegle.Readio.book.domain.Book;
  * purpose: 
  */
 @Repository
-public interface BookRepository extends JpaRepository<Book,Long> {
+public interface BookRepository extends JpaRepository<Book, Long> {
+	Optional<Book> findById(Long id);
 }
