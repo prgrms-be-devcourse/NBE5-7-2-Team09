@@ -3,9 +3,9 @@ package ninegle.Readio.book.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Readio - ReivewResponseDto
@@ -16,12 +16,12 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReviewResponseDto {
-	private long id;
-	private String email;
-	private BigDecimal rating;
-	private String text;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+	private final long id;
+	private final String email;
+	private final BigDecimal rating;
+	private final String text;
+	private final LocalDateTime createdAt;
+	private final LocalDateTime updatedAt;
 }

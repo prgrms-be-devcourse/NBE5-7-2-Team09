@@ -2,9 +2,9 @@ package ninegle.Readio.book.dto;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Readio - ReviewListResponseDto
@@ -15,9 +15,9 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReviewListResponseDto {
-	private List<ReviewResponseDto> reviews;
-	private PaginationDto pagination;
-	private ReviewSummaryDto summary;
+	private final List<ReviewResponseDto> reviews;
+	private final PaginationDto pagination;
+	private final ReviewSummaryDto summary;
 }
