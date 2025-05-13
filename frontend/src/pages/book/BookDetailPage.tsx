@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -24,9 +24,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
-import BookCover from "@/components/book/BookCover";
-import ReviewCard from "@/components/review/ReviewCard"; // 추가된 import
+import { toast } from "sonner";
+import ReviewCard from "@/components/review/ReviewCard";
+import reviewService, { Review } from "@/utils/api/reviewService"; // 추가된 import
 
 const BookDetailPage = () => {
   const { id } = useParams();
@@ -36,6 +36,10 @@ const BookDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
 
   // 스크롤 이벤트 핸들러 추가
   useEffect(() => {
@@ -49,6 +53,32 @@ const BookDetailPage = () => {
     };
   }, []);
 
+  // 책 리뷰 로드
+  useEffect(() => {
+    const loadReviews = async () => {
+      setIsLoadingReviews(true);
+      try {
+        const response = await reviewService.getLatestReviews(id, 3);
+        const { reviews, summary } = response.data;
+
+        setReviews(reviews);
+        setTotalReviews(summary.totalReviews);
+        setAverageRating(summary.averageRating);
+      } catch (error) {
+        console.error("리뷰 로드 중 오류 발생:", error);
+        toast.error("리뷰를 불러오는 데 실패했습니다", {
+          description: "잠시 후 다시 시도해주세요.",
+        });
+      } finally {
+        setIsLoadingReviews(false);
+      }
+    };
+
+    if (id) {
+      loadReviews();
+    }
+  }, [id]);
+
   // 실제 구현에서는 id를 사용하여 서버에서 책 정보를 가져와야 합니다.
   // 여기서는 샘플 데이터를 사용합니다.
   const bookData = {
@@ -59,8 +89,8 @@ const BookDetailPage = () => {
     book_pub_date: "2015-11-24",
     book_image:
       "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788934972464.jpg",
-    rating: 4.8,
-    reviewCount: 1423,
+    rating: averageRating || 4.8, // API에서 가져온 평점 사용
+    reviewCount: totalReviews || 1423, // API에서 가져온 리뷰 수 사용
     genre_name: "인문",
     book_page: 643,
     book_isbn: "9788934972464",
@@ -72,32 +102,6 @@ const BookDetailPage = () => {
     <p>『사피엔스』는 우리가 어떻게 지금의 우리가 되었는지에 대한 이야기이자, 인류 역사 속 거대한 흐름이 현대사회에서 어떤 양상으로 드러나는지를 보여주는 책이다. 호모 사피엔스의 탄생부터 지금까지 단일 종으로서의 인류가 어떻게 진화하고, 역사를 써 내려가고 있는지 일목요연하게 보여 준다.</p>
     <p>저자 유발 하라리는 사피엔스의 역사를 가능케 한 원동력으로 '허구를 믿는 능력'을 꼽는다. 그는 이렇게 말한다. "인간은 자기들이 지어낸 이야기를 왜 믿는가? 그것은 객관적 현실이 아니라 우리 종이 믿는 공통의 신화다. 이것을 이해하지 못하면 역사의 많은 부분을 이해할 수 없다."</p>
     `,
-    reviews: [
-      {
-        id: 1,
-        username: "독서광",
-        rating: 5,
-        date: "2025-04-10",
-        content:
-          "인류의 역사를 이렇게 흥미롭게 풀어낸 책은 처음입니다. 강력 추천합니다!",
-      },
-      {
-        id: 2,
-        username: "책벌레",
-        rating: 4,
-        date: "2025-04-05",
-        content:
-          "인류학을 처음 접하는 사람도 쉽게 읽을 수 있습니다. 다만 중반부가 조금 지루했어요.",
-      },
-      {
-        id: 3,
-        username: "지식탐험가",
-        rating: 5,
-        date: "2025-03-30",
-        content:
-          "인간이란 무엇인지, 우리는 어디서 왔고 어디로 가는지에 대한 통찰을 얻을 수 있는 책입니다.",
-      },
-    ],
     relatedBooks: [
       {
         id: 201,
@@ -154,6 +158,51 @@ const BookDetailPage = () => {
   // 리뷰 페이지로 이동
   const navigateToReviews = () => {
     navigate(`/book/${id}/reviews`);
+  };
+
+  // 리뷰 렌더링 - API에서 받아온 리뷰 사용
+  const renderReviews = () => {
+    if (isLoadingReviews) {
+      return (
+        <div className="text-center py-4">
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-gray-600">리뷰를 불러오는 중...</p>
+        </div>
+      );
+    }
+
+    if (reviews.length === 0) {
+      return (
+        <div className="text-center py-6 bg-gray-50 rounded-lg">
+          <MessageSquare className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+          <p className="text-gray-600">아직 등록된 리뷰가 없습니다.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={navigateToReviews}
+          >
+            첫 리뷰를 작성해보세요!
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {reviews.map((review) => (
+          <ReviewCard
+            key={review.id}
+            id={review.id}
+            username={review.email.split("@")[0]} // 이메일에서 아이디 부분만 표시
+            user_id={review.email}
+            rating={review.rating}
+            date={new Date(review.createdAt).toISOString().split("T")[0]} // 날짜 형식 변환
+            content={review.text}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -329,30 +378,22 @@ const BookDetailPage = () => {
                 </Button>
               </div>
 
-              <div className="space-y-4">
-                {bookData.reviews.slice(0, 3).map((review) => (
-                  <ReviewCard
-                    key={review.id}
-                    id={review.id}
-                    username={review.username}
-                    rating={review.rating}
-                    date={review.date}
-                    content={review.content}
-                  />
-                ))}
-              </div>
+              {/* API에서 가져온 리뷰 렌더링 */}
+              {renderReviews()}
 
               {/* 리뷰 더 보기 버튼 추가 */}
-              <div className="flex justify-center mt-4">
-                <Button
-                  variant="outline"
-                  className="flex items-center"
-                  onClick={navigateToReviews}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  리뷰 {bookData.reviewCount}개 모두 보기
-                </Button>
-              </div>
+              {!isLoadingReviews && reviews.length > 0 && (
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="outline"
+                    className="flex items-center"
+                    onClick={navigateToReviews}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    리뷰 {bookData.reviewCount}개 모두 보기
+                  </Button>
+                </div>
+              )}
 
               <hr className="mt-6" />
               <h3 className="font-medium text-lg mb-4 mt-6">

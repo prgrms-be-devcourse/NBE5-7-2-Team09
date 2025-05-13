@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.book.dto.ReviewListResponseDto;
-import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.dto.BookResponseDto;
+import ninegle.Readio.book.dto.ReviewListResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
-import ninegle.Readio.book.domain.BookSearch;
-
 import ninegle.Readio.book.service.BookService;
 import ninegle.Readio.global.unit.BaseResponse;
 

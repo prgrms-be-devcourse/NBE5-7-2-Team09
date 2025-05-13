@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, CreditCard, Edit2, User, AlertCircle } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 // 타입 정의
 interface UserProfile {
@@ -26,8 +26,6 @@ interface Subscription {
 }
 
 const MyPage: React.FC = () => {
-  const { toast } = useToast();
-
   // 유저 정보 상태
   const [userProfile, setUserProfile] = useState<UserProfile>({
     nickname: "북러버",
@@ -100,15 +98,12 @@ const MyPage: React.FC = () => {
       setUserProfile(editedProfile);
       setIsEditing(false);
 
-      toast({
-        title: "프로필 업데이트 완료",
+      toast.success("프로필 업데이트 완료", {
         description: "회원 정보가 성공적으로 업데이트되었습니다.",
       });
     } catch (error) {
       console.error("프로필 업데이트에 실패했습니다.", error);
-      toast({
-        variant: "destructive",
-        title: "업데이트 실패",
+      toast.error("업데이트 실패", {
         description:
           "회원 정보 업데이트 중 오류가 발생했습니다. 다시 시도해 주세요.",
       });
