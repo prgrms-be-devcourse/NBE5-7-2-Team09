@@ -60,10 +60,11 @@ public class BookController {
 	public ResponseEntity<BaseResponse<?>> update(@RequestBody ReviewRequestDto review,@PathVariable("review_id") Long reviewId){
 		return bookService.update(review,reviewId);
 	}
-	// @GetMapping("/{book_id}/reviews?page={page}&size={size}")
-	// public ResponseEntity<BaseResponse<ReviewListResponseDto>> getReviews(@PathVariable("book_id") Long bookId
-	// 													,@RequestParam("page") int page,
-	// 													@RequestParam("size") int size) {
-	// 	return bookService.getReviewList(bookId,page,size);
-	// }
+
+	@GetMapping("/{book_id}/reviews")
+	public ResponseEntity<BaseResponse<ReviewListResponseDto>> getReviews(@PathVariable("book_id") Long bookId
+														,@RequestParam(defaultValue = "1") int page,
+														@RequestParam(defaultValue = "3") int size) {
+		return bookService.getReviewList(bookId,page,size);
+	}
 }

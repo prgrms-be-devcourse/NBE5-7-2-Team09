@@ -107,7 +107,7 @@ public class BookService {
 		Book book = getBookById(bookId);
 		Pageable pageable = PageRequest.of(page-1,size);
 		long count = reviewRepository.countByBook(book);
-		BigDecimal average = reviewRepository.findAverageRatingByBook(book);
+		BigDecimal average = reviewRepository.findAverageRatingByBook(book.getId());
 
 		List<Review> reviews = reviewRepository.findReviewsByBook(book,pageable).getContent();
 		List<ReviewResponseDto> reviewList=reviewMapper.toResponseDto(reviews);
