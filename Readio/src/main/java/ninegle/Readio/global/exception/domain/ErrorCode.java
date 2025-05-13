@@ -98,8 +98,7 @@ public enum ErrorCode {
 	 */
 	//400
 	INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력 값이 유효하지 않습니다."),
-	INVALID_FORMAT(HttpStatus.BAD_REQUEST, "입력 형식이 올바르지 않습니다.")
-
+	INVALID_FORMAT(HttpStatus.BAD_REQUEST, "입력 형식이 올바르지 않습니다."),
 	;
 
 	private final HttpStatus status;
