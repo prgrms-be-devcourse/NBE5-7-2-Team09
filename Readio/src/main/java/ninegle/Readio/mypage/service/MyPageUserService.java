@@ -74,6 +74,7 @@ public class MyPageUserService {
 		if (phoneNumber.isBlank()) {
 			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);
 		}
+
 		String phoneRegex = "^010-\\d{4}-\\d{4}$";
 		if (!phoneNumber.matches(phoneRegex)) {
 			throw new BusinessException(ErrorCode.INVALID_REQUEST_DATA);

@@ -27,7 +27,6 @@ public class MyPageUserController {
 		return BaseResponse.ok("회원 정보 조회 성공", data, HttpStatus.OK);
 	}
 
-
 	@PostMapping
 	public ResponseEntity<BaseResponse<UserInfoDto>> updateUserInfo(@RequestBody UserUpdateRequestDto dto) {
 		UserInfoDto data = myPageUserService.updateUserInfo(dto);

@@ -80,6 +80,9 @@ public enum ErrorCode {
 	// 409
 	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 출판사입니다."),
 
+	/*
+	 * mypage : 관련 예외 처리
+	 */
 	//400
 	ALREADY_SUBSCRIBED(HttpStatus.BAD_REQUEST, "이미 구독중인 구독권이 있습니다."),
 	//400
