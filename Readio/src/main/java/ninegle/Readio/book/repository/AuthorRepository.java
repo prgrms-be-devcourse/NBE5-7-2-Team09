@@ -13,5 +13,9 @@ import ninegle.Readio.book.domain.Author;
  * purpose: 
  */
 @Repository
+<<<<<<< HEAD
 public interface AuthorRepository extends JpaRepository<Author,Long> {
+=======
+public interface AuthorRepository extends JpaRepository<Author, Long> {
+>>>>>>> refactor-dto
 }

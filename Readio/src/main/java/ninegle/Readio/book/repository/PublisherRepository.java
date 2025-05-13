@@ -13,5 +13,9 @@ import ninegle.Readio.book.domain.Publisher;
  * purpose: 
  */
 @Repository
+<<<<<<< HEAD
 public interface PublisherRepository extends JpaRepository<Publisher,Long> {
+=======
+public interface PublisherRepository extends JpaRepository<Publisher, Long> {
+>>>>>>> refactor-dto
 }

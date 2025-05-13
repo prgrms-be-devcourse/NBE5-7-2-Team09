@@ -22,16 +22,20 @@ import lombok.ToString;
 @ToString
 public class BookSearch {
 	@Id
+<<<<<<< HEAD:Readio/src/main/java/ninegle/Readio/book/domain/BookSearch.java
 	private String id;
+=======
+	private final String id;
+>>>>>>> refactor-dto:Readio/src/main/java/ninegle/Readio/book/dto/BookEsDto.java
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String title;
+	private final String title;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String publisher;
+	private final String publisher;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String author;
+	private final String author;
 
 	public BookSearch(String title, String publisher, String author) {
 		this.id = UUID.randomUUID().toString();

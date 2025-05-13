@@ -12,7 +12,7 @@ import ninegle.Readio.book.repository.BookSearchRepository;
  * create date:    25. 5. 8.
  * last update:    25. 5. 8.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @Service
 public class BookService {
@@ -22,8 +22,14 @@ public class BookService {
 		this.bookSearchRepository = bookSearchRepository;
 	}
 
+<<<<<<< HEAD
 	public List<BookSearch> searchBooks(String keyword) {
 		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword, keyword);
+=======
+	public List<BookEsDto> searchBooks(String keyword) {
+		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword,
+			keyword);
+>>>>>>> refactor-dto
 	}
 
 	public BookSearch save(BookSearch book) {

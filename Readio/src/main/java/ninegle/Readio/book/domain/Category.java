@@ -18,6 +18,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+<<<<<<< HEAD
+=======
+@Table(name = "category")
+>>>>>>> refactor-dto
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 

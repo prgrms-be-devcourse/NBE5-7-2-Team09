@@ -15,6 +15,12 @@ import ninegle.Readio.book.domain.BookSearch;
  * purpose: 
  */
 @Repository
+<<<<<<< HEAD
 public interface BookSearchRepository extends ElasticsearchRepository<BookSearch,Long> {
 	List<BookSearch> findByTitleContainingOrPublisherContainingOrAuthorContaining(String title,String publisher,String author);
+=======
+public interface BookSearchRepository extends ElasticsearchRepository<BookEsDto, Long> {
+	List<BookEsDto> findByTitleContainingOrPublisherContainingOrAuthorContaining(String title, String publisher,
+		String author);
+>>>>>>> refactor-dto
 }

@@ -17,7 +17,7 @@ import ninegle.Readio.book.service.BookService;
  * create date:    25. 5. 8.
  * last update:    25. 5. 8.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @RestController
 @RequestMapping("/books")
