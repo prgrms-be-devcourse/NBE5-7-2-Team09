@@ -78,6 +78,9 @@ public class LibraryBookService {
 			BaseResponse.error("라이브러리가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
 		}
 		Optional<LibraryBook> libraryBoook = libraryBookRepository.findLibraryBoook(libraryId, libraryBookId);
+		if (libraryBoook.isEmpty()) {
+			BaseResponse.error("라이브러리가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+		}
 		libraryBookRepository.delete(libraryBoook.get());
 
 		return BaseResponse.ok("라이브러리에 책이 삭제 되었습니다", null, HttpStatus.OK);
