@@ -2,6 +2,7 @@ package ninegle.Readio.subscription.domain;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,12 +27,17 @@ public class Subscription {
 
 	private LocalDateTime expDate;
 
+	@Column(nullable = false)
+	private boolean isCanceled;
+
 	@Builder
-	public Subscription(Long userId, LocalDateTime subDate, LocalDateTime expDate) {
+	public Subscription(Long userId, LocalDateTime subDate, LocalDateTime expDate, boolean isCanceled) {
 		this.userId = userId;
 		this.subDate = subDate;
 		this.expDate = expDate;
+		this.isCanceled = false; // 직접 초기화
 	}
+
 
 	//구독 기간 갱신 메서드
 	public void updatePeriod(LocalDateTime subDate, LocalDateTime expDate) {
@@ -39,9 +45,14 @@ public class Subscription {
 		this.expDate = expDate;
 	}
 
+	// 구독 취소
+	public void cancel() {
+		this.isCanceled = true;
+	}
+
 	//구독 상태를 확인하는 메서드
 	public boolean isActive() {
-		return expDate.isAfter(LocalDateTime.now());
+		return !isCanceled && expDate.isAfter(LocalDateTime.now());
 	}
 }
 

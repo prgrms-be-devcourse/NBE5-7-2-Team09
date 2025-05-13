@@ -16,6 +16,7 @@ public class SubscriptionMapper {
 			.subDate(subscription.getSubDate())
 			.expDate(subscription.getExpDate())
 			.isActive(subscription.isActive())
+			.isCanceled(subscription.isCanceled())
 			.build();
 	}
 }

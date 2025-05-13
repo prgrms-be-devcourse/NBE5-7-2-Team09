@@ -51,6 +51,12 @@ public class SubscriptionService {
 			if (subscription.isActive()) {
 				throw new BusinessException(ErrorCode.ALREADY_SUBSCRIBED);
 			}
+
+			// 취소된 구독 상태에서 재결제 시 예외 처리
+			if (subscription.isCanceled()) {
+				throw new BusinessException(ErrorCode.SUBSCRIPTION_CANCELED);
+			}
+
 			// 구독이 만료된 경우 → 갱신
 			if (user.getPoint() < SUBSCRIPTION_COST) {
 				throw new BusinessException(ErrorCode.NOT_ENOUGH_POINTS);
@@ -78,6 +84,7 @@ public class SubscriptionService {
 				.userId(userId)
 				.subDate(LocalDateTime.now())
 				.expDate(LocalDateTime.now().plusMonths(1))
+				.isCanceled(false) // 신규 구독은 활성 상태
 				.build()
 		);
 	}
@@ -90,9 +97,8 @@ public class SubscriptionService {
 		Subscription subscription = subscriptionRepository.findByUserId(userId)
 			.orElseThrow(() -> new NoSuchElementException("존재하지 않는 구독입니다."));
 
-		// 구독 즉시 만료 처리 (현재 시간으로 만료일 설정)
-		LocalDateTime now = LocalDateTime.now();
-		subscription.updatePeriod(subscription.getSubDate(), now);
+		// 구독 취소 상태로만 변경 (expDate는 그대로 유지)
+		subscription.cancel();
 		subscriptionRepository.save(subscription);
 	}
 }

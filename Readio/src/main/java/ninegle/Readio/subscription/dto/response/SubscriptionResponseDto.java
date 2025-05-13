@@ -12,13 +12,15 @@ public class SubscriptionResponseDto {
 	private final LocalDateTime subDate;
 	private final LocalDateTime expDate;
 	private final boolean isActive;
+	private final boolean isCanceled;
 
 	@Builder
-	public SubscriptionResponseDto(Long userId, LocalDateTime subDate, LocalDateTime expDate, boolean isActive) {
+	public SubscriptionResponseDto(Long userId, LocalDateTime subDate, LocalDateTime expDate, boolean isActive, boolean isCanceled) {
 		this.userId = userId;
 		this.subDate = subDate;
 		this.expDate = expDate;
 		this.isActive = isActive;
+		this.isCanceled = isCanceled;
 	}
 }
 
