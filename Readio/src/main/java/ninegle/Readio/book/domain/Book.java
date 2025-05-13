@@ -1,5 +1,6 @@
 package ninegle.Readio.book.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -49,9 +50,9 @@ public class Book {
 	private String ecn;
 
 	@Column(nullable = false)
-	private LocalDateTime pubDate;
+	private LocalDate pubDate;
 
-	private LocalDateTime updatedAt;
+	private LocalDate updatedAt;
 
 	private Boolean expired = false;
 

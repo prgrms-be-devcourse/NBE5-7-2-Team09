@@ -1,6 +1,6 @@
 package ninegle.Readio.book.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +21,6 @@ public class BookRequestDto {
 	private String image;
 	private String isbn;
 	private String ecn;
-	private LocalDateTime pubDate;
+	private LocalDate pubDate;
 
 }

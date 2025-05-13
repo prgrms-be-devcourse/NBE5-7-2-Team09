@@ -1,11 +1,51 @@
 package ninegle.Readio.library.mapper;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+
+import ninegle.Readio.book.domain.Book;
+import ninegle.Readio.library.domain.Library;
+import ninegle.Readio.library.dto.book.AllLibraryBooksDto;
+import ninegle.Readio.library.dto.book.LibraryBookListResponseDto;
+import ninegle.Readio.library.dto.book.LibraryDto;
 import ninegle.Readio.library.dto.book.NewLibraryBookRequestDto;
 
 public class LibraryBookMapper {
 
+	//라이브러리에 책 추가
 	public static Long toNewLibraryBook(NewLibraryBookRequestDto libraryBookRequestDto) {
 		return libraryBookRequestDto.getBookId();
 	}
+
+	//라이브러리에 책 목록 가져오기
+	public static LibraryBookListResponseDto libraryBookListResponseDto(Library library, Page<Book> books) {
+		List<AllLibraryBooksDto> allLibraryBooksDtos = books.getContent().stream()
+			.map(book -> AllLibraryBooksDto.builder()
+				.bookId(book.getId())
+				.bookName(book.getName())
+				.bookImage(book.getImage())
+				.bookIsbn(book.getIsbn())
+				.bookEcn(book.getEcn())
+				.bookPubDate(book.getPubDate())
+				.bookUpdateAt(book.getUpdatedAt()).build()
+			).toList();
+
+		LibraryDto libraryDto = LibraryDto.builder()
+			.libraryId(library.getId())
+			.libraryName(library.getLibraryName())
+			.createdAt(library.getCreatedAt())
+			.updatedAt(library.getUpdatedAt()).build();
+
+		LibraryBookListResponseDto libraryBookResponseDto = LibraryBookListResponseDto.builder()
+			.allLibraryBooks(allLibraryBooksDtos)
+			.libraryDto(libraryDto)
+			.totalCount(books.getTotalElements())
+			.size(books.getSize())
+			.page(books.getNumber() + 1).build();
+		return libraryBookResponseDto;
+	}
+
+	//라이브러리에 책 삭제
 
 }
