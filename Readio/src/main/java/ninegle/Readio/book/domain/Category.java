@@ -18,14 +18,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name="category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 
 	@Id
 	private Long id;
 
+	@Column(nullable = false)
 	private String major;
 
+	@Column(nullable = false)
 	private String sub;
 }

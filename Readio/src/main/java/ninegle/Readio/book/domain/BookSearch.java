@@ -1,4 +1,4 @@
-package ninegle.Readio.book.dto;
+package ninegle.Readio.book.domain;
 
 import java.util.UUID;
 
@@ -20,9 +20,9 @@ import lombok.ToString;
 @Getter
 @Document(indexName = "books")
 @ToString
-public class BookEsDto {
+public class BookSearch {
 	@Id
-	private String id = UUID.randomUUID().toString();
+	private String id;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
 	private String title;
@@ -33,7 +33,7 @@ public class BookEsDto {
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
 	private String author;
 
-	public BookEsDto(String title, String publisher, String author) {
+	public BookSearch(String title, String publisher, String author) {
 		this.id = UUID.randomUUID().toString();
 		this.title = title;
 		this.publisher = publisher;

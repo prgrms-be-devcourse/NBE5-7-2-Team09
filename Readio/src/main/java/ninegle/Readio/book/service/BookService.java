@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+
 import ninegle.Readio.admin.app.UserContextService;
 import ninegle.Readio.admin.app.UserService;
 import ninegle.Readio.admin.domain.User;
@@ -26,6 +27,9 @@ import ninegle.Readio.book.dto.ReviewRequestDto;
 import ninegle.Readio.book.dto.ReviewResponseDto;
 import ninegle.Readio.book.dto.ReviewSummaryDto;
 import ninegle.Readio.book.repository.BookRepository;
+
+import ninegle.Readio.book.domain.BookSearch;
+
 import ninegle.Readio.book.repository.BookSearchRepository;
 import ninegle.Readio.book.repository.ReviewRepository;
 import ninegle.Readio.global.unit.BaseResponse;
@@ -38,7 +42,6 @@ import ninegle.Readio.global.unit.BaseResponse;
  * purpose: 
  */
 @Service
-
 public class BookService {
 	private final BookSearchRepository bookSearchRepository;
 	private final BookRepository bookRepository;
@@ -59,14 +62,11 @@ public class BookService {
 	}
 
 
-
-
-	public List<BookEsDto> searchBooks(String keyword) {
-		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword,
-			keyword);
+	public List<BookSearch> searchBooks(String keyword) {
+		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword, keyword);
 	}
 
-	public BookEsDto save(BookEsDto book) {
+	public BookSearch save(BookSearch book) {
 		return bookSearchRepository.save(book);
 	}
 
