@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import ninegle.Readio.admin.domain.User;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Preference;
 import ninegle.Readio.book.dto.BookPreferenceDto;
 import ninegle.Readio.book.dto.BookPreferenceListDto;
 import ninegle.Readio.book.dto.PaginationDto;
+import ninegle.Readio.user.domain.User;
 
 /**
  * Readio - PreferenceMapper

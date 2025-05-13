@@ -9,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.admin.app.UserContextService;
-import ninegle.Readio.admin.app.UserService;
-import ninegle.Readio.admin.domain.User;
+
 import ninegle.Readio.book.dto.BookPreferenceDto;
 import ninegle.Readio.book.dto.BookPreferenceListDto;
 import ninegle.Readio.book.dto.PaginationDto;
@@ -21,6 +19,9 @@ import ninegle.Readio.book.domain.Preference;
 import ninegle.Readio.book.dto.BookIdRequestDto;
 import ninegle.Readio.book.repository.PreferencesRepository;
 import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.user.domain.User;
+import ninegle.Readio.user.service.UserContextService;
+import ninegle.Readio.user.service.UserService;
 
 /**
  * Readio - PreferenceService
@@ -47,7 +48,7 @@ public class PreferenceService {
 	public ResponseEntity<BaseResponse<?>> save(BookIdRequestDto dto) {
 
 		Book book =bookService.getBookById(dto.getId());
-		User user = userService.getById(userContextService.getCurrentAdminId());
+		User user = userService.getById(userContextService.getCurrentUserId());
 
 		preferencesRepository.save(preferenceMapper.toEntity(user,book));
 		return BaseResponse.ok("관심도서 추가가 정상적으로 수행되었습니다.", HttpStatus.CREATED);
@@ -55,7 +56,7 @@ public class PreferenceService {
 
 	public ResponseEntity<BaseResponse<?>> delete(Long bookId) {
 		Book book =bookService.getBookById(bookId);
-		User user = userService.getById(userContextService.getCurrentAdminId());
+		User user = userService.getById(userContextService.getCurrentUserId());
 		Preference preference = getPreferenceByBookAndUser(book, user);
 
 		preferencesRepository.delete(preference);
@@ -63,7 +64,7 @@ public class PreferenceService {
 	}
 
 	public ResponseEntity<BaseResponse<BookPreferenceListDto>> getPreferenceList(int page, int size) {
-		User user = userService.getById(userContextService.getCurrentAdminId());
+		User user = userService.getById(userContextService.getCurrentUserId());
 		Pageable pageable = PageRequest.of(page-1,size);
 		long count = preferencesRepository.countByUser(user);
 

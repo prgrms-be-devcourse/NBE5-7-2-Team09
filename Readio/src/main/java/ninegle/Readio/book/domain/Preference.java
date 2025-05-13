@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ninegle.Readio.admin.domain.User;
+import ninegle.Readio.user.domain.User;
 
 /**
  * Readio - Preferences

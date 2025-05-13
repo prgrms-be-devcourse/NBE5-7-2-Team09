@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.dto.ReviewListResponseDto;
+import lombok.RequiredArgsConstructor;
+import ninegle.Readio.book.domain.BookSearch;
+import ninegle.Readio.book.dto.BookResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
 import ninegle.Readio.book.domain.BookSearch;
 
@@ -26,23 +29,15 @@ import ninegle.Readio.global.unit.BaseResponse;
  * create date:    25. 5. 8.
  * last update:    25. 5. 8.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/books")
 public class BookController {
 
 	private final BookService bookService;
 
-	public BookController(BookService bookService) {
-		this.bookService = bookService;
-	}
-
-	@PostMapping
-	public BookSearch save(@RequestBody BookSearch book) {
-
-		return bookService.save(book);
-	}
 
 	@GetMapping("/search")
 	public List<BookSearch> search(@RequestParam String keyword) {

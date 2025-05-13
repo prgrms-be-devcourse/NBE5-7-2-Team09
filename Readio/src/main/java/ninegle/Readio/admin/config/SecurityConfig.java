@@ -1,9 +1,11 @@
 package ninegle.Readio.admin.config;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.admin.Repository.BlackListRepository;
-import ninegle.Readio.admin.app.UserService;
-import ninegle.Readio.admin.app.JwtTokenProvider;
+import ninegle.Readio.user.config.JwtAuthFilter;
+import ninegle.Readio.user.repository.BlackListRepository;
+import ninegle.Readio.user.service.JwtTokenProvider;
+import ninegle.Readio.user.service.UserService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

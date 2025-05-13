@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.admin.app.UserContextService;
-import ninegle.Readio.admin.app.UserService;
-import ninegle.Readio.admin.domain.User;
 import ninegle.Readio.book.mapper.ReviewMapper;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Review;
@@ -29,6 +26,9 @@ import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.repository.BookSearchRepository;
 import ninegle.Readio.book.repository.ReviewRepository;
 import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.user.domain.User;
+import ninegle.Readio.user.service.UserContextService;
+import ninegle.Readio.user.service.UserService;
 
 /**
  * Readio - BookService
@@ -67,7 +67,7 @@ public class BookService {
 
 	// Review Create
 	public ResponseEntity<BaseResponse<?>> save(ReviewRequestDto reviewRequestDto, long book_id) {
-		User user = userService.getById(userContextService.getCurrentAdminId());
+		User user = userService.getById(userContextService.getCurrentUserId());
 		Book book = getBookById(book_id);
 		reviewRepository.save(reviewMapper.toEntity(reviewRequestDto,user,book));
 		return BaseResponse.ok("후기 등록이 정상적으로 수행되었습니다.", HttpStatus.CREATED);

@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import ninegle.Readio.admin.domain.User;
+
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Review;
 import ninegle.Readio.book.dto.PaginationDto;
@@ -14,6 +14,7 @@ import ninegle.Readio.book.dto.ReviewListResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
 import ninegle.Readio.book.dto.ReviewResponseDto;
 import ninegle.Readio.book.dto.ReviewSummaryDto;
+import ninegle.Readio.user.domain.User;
 
 /**
  * Readio - ReviewMapper

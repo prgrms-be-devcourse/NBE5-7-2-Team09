@@ -6,10 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import ninegle.Readio.admin.domain.User;
+
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Preference;
 import ninegle.Readio.book.domain.Review;
+import ninegle.Readio.user.domain.User;
 
 /**
  * Readio - PreferencesRepository
