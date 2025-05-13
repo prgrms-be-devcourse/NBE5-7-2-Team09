@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
  * create date:    25. 5. 8.
  * last update:    25. 5. 8.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @Entity
 @Getter
@@ -30,7 +30,7 @@ public class Book {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 
 	@Column(nullable = false, length = 255)
 	private String name;
@@ -67,7 +67,7 @@ public class Book {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-
+	
 	@Builder
 	public Book(String name, String description, String image, Integer page, String isbn, String ecn,
 		LocalDateTime pubDate,

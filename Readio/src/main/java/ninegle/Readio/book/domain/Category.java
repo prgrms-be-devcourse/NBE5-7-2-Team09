@@ -24,7 +24,7 @@ public class Category {
 
 	@Id
 	@Column(name = "category_id")
-	private long id;
+	private Long id;
 
 	@Column(name = "category_major")
 	private String major;
