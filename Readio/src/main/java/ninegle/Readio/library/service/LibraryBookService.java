@@ -2,6 +2,7 @@ package ninegle.Readio.library.service;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,9 +52,9 @@ public class LibraryBookService {
 		return BaseResponse.ok("읽고 있는 책이 추가되었습니다", HttpStatus.OK);
 	}
 
-	// //라이브러리에 책들 불러오기
-	// public ResponseEntity<BaseResponse<?>> getAllLibraryBooks(Pageable pageable) {
-	//
-	// }
+	//라이브러리에 책들 불러오기
+	public ResponseEntity<BaseResponse<?>> getAllLibraryBooks(Pageable pageable) {
+		
+	}
 
 }
