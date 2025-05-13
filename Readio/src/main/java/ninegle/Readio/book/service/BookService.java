@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ninegle.Readio.book.Mapper.ReviewMapper;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.domain.Review;
@@ -19,6 +18,7 @@ import ninegle.Readio.book.dto.ReviewListResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
 import ninegle.Readio.book.dto.ReviewResponseDto;
 import ninegle.Readio.book.dto.ReviewSummaryDto;
+import ninegle.Readio.book.mapper.ReviewMapper;
 import ninegle.Readio.book.repository.BookRepository;
 import ninegle.Readio.book.repository.BookSearchRepository;
 import ninegle.Readio.book.repository.ReviewRepository;

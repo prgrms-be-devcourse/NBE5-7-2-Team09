@@ -1,4 +1,4 @@
-package ninegle.Readio.book.Mapper;
+package ninegle.Readio.book.mapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
