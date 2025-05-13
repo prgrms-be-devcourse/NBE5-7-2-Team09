@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ninegle.Readio.book.dto.BookRequestDto;
 
 /**
  * Readio - Book
@@ -36,15 +37,15 @@ public class Book {
 	@Column(nullable = false, length = 255)
 	private String name;
 
-	@Column(length = 1000)
+	@Column(length = 1000, nullable = false)
 	private String description;
 
 	private String image;
 
-	@Column(length = 20, unique = true)
+	@Column(length = 20)
 	private String isbn;
 
-	@Column(length = 50, nullable = false)
+	@Column(length = 50)
 	private String ecn;
 
 	@Column(nullable = false)
@@ -68,4 +69,17 @@ public class Book {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
+	public void update(BookRequestDto dto, Category category, Author author, Publisher publisher) {
+		this.name = dto.getName();
+		this.description = dto.getDescription();
+		this.image = dto.getImage();
+		this.isbn = dto.getIsbn();
+		this.ecn = dto.getEcn();
+		this.pubDate = dto.getPubDate();
+		this.category = category;
+		this.author = author;
+		this.publisher = publisher;
+	}
+
 }
+

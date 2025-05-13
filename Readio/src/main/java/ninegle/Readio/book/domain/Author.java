@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Readio - Author
@@ -28,6 +29,7 @@ public class Author {
 
 	@Column(nullable = false)
 	private String name;
+
 
 	@Builder
 	public Author(String name) {

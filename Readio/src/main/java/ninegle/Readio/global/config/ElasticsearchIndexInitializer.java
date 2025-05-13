@@ -22,9 +22,10 @@ public class ElasticsearchIndexInitializer {
 
 	@PostConstruct
 	public void createIndex() {
-		if (!operations.indexOps(BookSearch.class).exists()) {
-			operations.indexOps(BookSearch.class).create();
-			operations.indexOps(BookSearch.class).putMapping(operations.indexOps(BookSearch.class).createMapping());
+		if (operations.indexOps(BookSearch.class).exists()) {
+			operations.indexOps(BookSearch.class).delete();
 		}
+		operations.indexOps(BookSearch.class).create();
+		operations.indexOps(BookSearch.class).putMapping(operations.indexOps(BookSearch.class).createMapping());
 	}
 }

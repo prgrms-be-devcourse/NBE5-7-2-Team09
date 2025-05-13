@@ -30,18 +30,18 @@ public class GlobalExceptionHandler {
 			.build());
 	}
 
-	/**
-	 * 정의되지 않은 예외 처리 (서버 내부 오류 등)
-	 */
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResponse> handleUnknownException(Exception e) {
-		ErrorCode code = ErrorCode.INTERNAL_SERVER_ERROR;
-
-		return ResponseEntity.status(code.getStatus()).body(ErrorResponse.builder()
-			.status(code.getStatus().value())
-			.code(code.name())
-			.message(code.getMessage())
-			.build());
-	}
+	// /**
+	//  * 정의되지 않은 예외 처리 (서버 내부 오류 등)
+	//  */
+	// @ExceptionHandler(Exception.class)
+	// public ResponseEntity<ErrorResponse> handleUnknownException(Exception e) {
+	// 	ErrorCode code = ErrorCode.INTERNAL_SERVER_ERROR;
+	//
+	// 	return ResponseEntity.status(code.getStatus()).body(ErrorResponse.builder()
+	// 		.status(code.getStatus().value())
+	// 		.code(code.name())
+	// 		.message(code.getMessage())
+	// 		.build());
+	// }
 
 }
