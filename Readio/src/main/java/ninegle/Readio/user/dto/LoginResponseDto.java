@@ -1,5 +1,4 @@
-package ninegle.Readio.admin.dto;
-
+package ninegle.Readio.user.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LoginResponseDto {
 
-    private final String accessToken;
-    private final String refreshToken;
+	private final String accessToken;
+	private final String refreshToken;
 }

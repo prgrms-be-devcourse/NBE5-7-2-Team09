@@ -4,9 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.admin.domain.User;
-import ninegle.Readio.admin.repository.UserRepository;
-import ninegle.Readio.admin.service.UserContextService;
+import ninegle.Readio.user.domain.User;
+import ninegle.Readio.user.repository.UserRepository;
+import ninegle.Readio.user.service.UserContextService;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.mypage.dto.request.UserUpdateRequestDto;
@@ -23,7 +23,7 @@ public class MyPageUserService {
 
 	@Transactional(readOnly = true)
 	public UserInfoDto getUserInfo() {
-		Long userId = userContextService.getCurrentAdminId();
+		Long userId = userContextService.getCurrentUserId();
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -32,7 +32,7 @@ public class MyPageUserService {
 	}
 
 	public UserInfoDto updateUserInfo(UserUpdateRequestDto dto) {
-		Long userId = userContextService.getCurrentAdminId();
+		Long userId = userContextService.getCurrentUserId();
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));

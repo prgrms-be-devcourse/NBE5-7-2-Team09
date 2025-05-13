@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/springboot.iml" filepath="$PROJECT_DIR$/.idea/springboot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Readio.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Readio.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/readio.iml" filepath="$PROJECT_DIR$/.idea/readio.iml" />
     </modules>
   </component>
 </project>

@@ -1,14 +1,14 @@
-package ninegle.Readio.admin.repository;
+package ninegle.Readio.user.repository;
 
+import java.util.Optional;
 
-import ninegle.Readio.admin.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import ninegle.Readio.user.domain.RefreshToken;
 
 @Repository
 public interface TokenRepository extends JpaRepository<RefreshToken, Long> {
 
-    Optional<RefreshToken> findByUserId(long adminId);
+	Optional<RefreshToken> findByUserId(long adminId);
 }

@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.admin.domain.User;
-import ninegle.Readio.admin.repository.UserRepository;
-import ninegle.Readio.admin.service.UserContextService;
+import ninegle.Readio.user.domain.User;
+import ninegle.Readio.user.repository.UserRepository;
+import ninegle.Readio.user.service.UserContextService;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.subscription.domain.Subscription;
@@ -28,14 +28,14 @@ public class SubscriptionService {
 	private static final int SUBSCRIPTION_COST = 24900;
 	//구독조회
 	public SubscriptionResponseDto getSubscription() {
-		Long userId = userContextService.getCurrentAdminId();
+		Long userId = userContextService.getCurrentUserId();
 		return subscriptionRepository.findByUserId(userId)
 			.map(subscriptionMapper::toDto)
 			.orElse(null);
 	}
 	// 구독 결제 및 갱신
 	public void createSubscription() {
-		Long userId = userContextService.getCurrentAdminId();
+		Long userId = userContextService.getCurrentUserId();
 
 		// 사용자 조회
 		User user = userRepository.findById(userId)

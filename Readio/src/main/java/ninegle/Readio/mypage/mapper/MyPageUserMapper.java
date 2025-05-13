@@ -1,6 +1,6 @@
 package ninegle.Readio.mypage.mapper;
 
-import ninegle.Readio.admin.domain.User;
+import ninegle.Readio.user.domain.User;
 import ninegle.Readio.mypage.dto.response.UserInfoDto;
 
 public class MyPageUserMapper {
