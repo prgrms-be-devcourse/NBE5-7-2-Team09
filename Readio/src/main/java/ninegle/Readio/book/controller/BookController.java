@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
-import ninegle.Readio.book.dto.BookEsDto;
 import ninegle.Readio.book.dto.ReviewListResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
 import ninegle.Readio.book.domain.BookSearch;

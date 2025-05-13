@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Readio - ReviewSummaryDto
@@ -15,8 +16,8 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReviewSummaryDto {
-	private BigDecimal averageRating;
-	private int totalReviews;
+	private final BigDecimal averageRating;
+	private final int totalReviews;
 }

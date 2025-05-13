@@ -3,6 +3,7 @@ package ninegle.Readio.book.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Readio - PaginationDto
@@ -13,10 +14,10 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PaginationDto {
-	private long totalElements;
-	private int totalPages;
-	private int currentPage;
-	private int size;
+	private final long totalElements;
+	private final int totalPages;
+	private final int currentPage;
+	private final int size;
 }

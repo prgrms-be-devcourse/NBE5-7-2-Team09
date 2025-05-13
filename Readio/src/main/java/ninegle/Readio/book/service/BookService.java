@@ -3,24 +3,20 @@ package ninegle.Readio.book.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-
+import lombok.RequiredArgsConstructor;
 import ninegle.Readio.admin.app.UserContextService;
 import ninegle.Readio.admin.app.UserService;
 import ninegle.Readio.admin.domain.User;
-import ninegle.Readio.book.Mapper.ReviewMapper;
+import ninegle.Readio.book.mapper.ReviewMapper;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Review;
-import ninegle.Readio.book.dto.BookEsDto;
 import ninegle.Readio.book.dto.PaginationDto;
 import ninegle.Readio.book.dto.ReviewListResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
@@ -42,6 +38,7 @@ import ninegle.Readio.global.unit.BaseResponse;
  * purpose: 
  */
 @Service
+@RequiredArgsConstructor
 public class BookService {
 	private final BookSearchRepository bookSearchRepository;
 	private final BookRepository bookRepository;
@@ -49,18 +46,6 @@ public class BookService {
 	private final UserService userService;
 	private final ReviewRepository reviewRepository;
 	private final ReviewMapper reviewMapper;
-
-	public BookService(BookSearchRepository bookSearchRepository, BookRepository bookRepository,
-		UserContextService userContextService, UserService userService, ReviewRepository reviewRepository,
-		ReviewMapper reviewMapper) {
-		this.bookSearchRepository = bookSearchRepository;
-		this.bookRepository = bookRepository;
-		this.userContextService = userContextService;
-		this.userService = userService;
-		this.reviewRepository = reviewRepository;
-		this.reviewMapper = reviewMapper;
-	}
-
 
 	public List<BookSearch> searchBooks(String keyword) {
 		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword, keyword);

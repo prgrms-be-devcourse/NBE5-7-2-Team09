@@ -1,4 +1,4 @@
-package ninegle.Readio.book.Mapper;
+package ninegle.Readio.book.mapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class ReviewMapper {
 
 	public PaginationDto toPaginationDto(Long count,int page,int size){
 		 return PaginationDto.builder()
-			.totalPages(count.intValue()/size)
+			.totalPages((count.intValue()/size)+1)
 			.size(size)
 			.currentPage(page)
 			.totalElements(count)
