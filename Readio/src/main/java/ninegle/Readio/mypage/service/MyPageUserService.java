@@ -34,6 +34,13 @@ public class MyPageUserService {
 	public UserInfoDto updateUserInfo(UserUpdateRequestDto dto) {
 		Long userId = userContextService.getCurrentUserId();
 
+		// 닉네임, 전화번호 둘 다 비어있는 경우
+		if ((dto.getNickname() == null || dto.getNickname().isBlank()) &&
+			(dto.getPhoneNumber() == null || dto.getPhoneNumber().isBlank())) {
+			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);
+		}
+
+
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
@@ -69,7 +76,7 @@ public class MyPageUserService {
 		}
 		String phoneRegex = "^010-\\d{4}-\\d{4}$";
 		if (!phoneNumber.matches(phoneRegex)) {
-			throw new BusinessException(ErrorCode.INVALID_FORMAT);
+			throw new BusinessException(ErrorCode.INVALID_REQUEST_DATA);
 		}
 	}
 }
