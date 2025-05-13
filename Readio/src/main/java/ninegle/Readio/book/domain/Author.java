@@ -6,10 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
-<<<<<<< HEAD
-import lombok.AllArgsConstructor;
-=======
->>>>>>> refactor-dto
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,10 +18,6 @@ import lombok.NoArgsConstructor;
  * purpose: 
  */
 @Entity
-<<<<<<< HEAD
-=======
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
->>>>>>> refactor-dto
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Author {

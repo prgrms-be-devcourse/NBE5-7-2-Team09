@@ -22,11 +22,7 @@ import lombok.ToString;
 @ToString
 public class BookSearch {
 	@Id
-<<<<<<< HEAD:Readio/src/main/java/ninegle/Readio/book/domain/BookSearch.java
-	private String id;
-=======
 	private final String id;
->>>>>>> refactor-dto:Readio/src/main/java/ninegle/Readio/book/dto/BookEsDto.java
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
 	private final String title;

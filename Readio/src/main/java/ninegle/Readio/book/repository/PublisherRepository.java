@@ -10,12 +10,8 @@ import ninegle.Readio.book.domain.Publisher;
  * create date:    25. 5. 9.
  * last update:    25. 5. 9.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @Repository
-<<<<<<< HEAD
-public interface PublisherRepository extends JpaRepository<Publisher,Long> {
-=======
 public interface PublisherRepository extends JpaRepository<Publisher, Long> {
->>>>>>> refactor-dto
 }
