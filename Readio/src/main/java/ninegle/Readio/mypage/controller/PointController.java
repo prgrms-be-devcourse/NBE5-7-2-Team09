@@ -18,10 +18,8 @@ public class PointController {
 
 	@GetMapping("/points")
 	public ResponseEntity<BaseResponse<PointResponseDto>> getPoints() {
-		long currentPoint = pointService.getUserPoints();
 
-		// DTO 객체 생성
-		PointResponseDto responseDto = new PointResponseDto(currentPoint);
+		PointResponseDto responseDto = pointService.getUserPoints();
 
 		return BaseResponse.ok("포인트 조회 성공", responseDto, HttpStatus.OK);
 	}

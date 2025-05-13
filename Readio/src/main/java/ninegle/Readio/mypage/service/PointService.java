@@ -3,6 +3,7 @@ package ninegle.Readio.mypage.service;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import ninegle.Readio.mypage.dto.response.PointResponseDto;
 import ninegle.Readio.user.domain.User;
 import ninegle.Readio.user.repository.UserRepository;
 import ninegle.Readio.user.service.UserContextService;
@@ -16,12 +17,12 @@ public class PointService {
 	private final UserContextService userContextService;
 	private final UserRepository userRepository;
 
-	public long getUserPoints() {
+	public PointResponseDto getUserPoints() {
 		Long userId = userContextService.getCurrentUserId();
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED));
 
-		return user.getPoint();
+		return new PointResponseDto(user.getPoint());
 	}
 }
