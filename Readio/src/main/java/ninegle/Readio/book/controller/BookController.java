@@ -26,7 +26,7 @@ import ninegle.Readio.global.unit.BaseResponse;
  * create date:    25. 5. 8.
  * last update:    25. 5. 8.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @RestController
 @RequiredArgsConstructor
@@ -46,22 +46,26 @@ public class BookController {
 	}
 
 	@PostMapping("/{book_id}/reviews")
-	public ResponseEntity<BaseResponse<?>> save(@RequestBody ReviewRequestDto review,@PathVariable("book_id") Long bookId){
-		return bookService.save(review,bookId);
+	public ResponseEntity<BaseResponse<?>> save(@RequestBody ReviewRequestDto review,
+		@PathVariable("book_id") Long bookId) {
+		return bookService.save(review, bookId);
 	}
+
 	@DeleteMapping("/{book_id}/reviews/{review_id}")
-	public ResponseEntity<BaseResponse<?>> delete(@PathVariable("review_id") Long reviewId){
+	public ResponseEntity<BaseResponse<?>> delete(@PathVariable("review_id") Long reviewId) {
 		return bookService.delete(reviewId);
 	}
+
 	@PutMapping("/{book_id}/reviews/{review_id}")
-	public ResponseEntity<BaseResponse<?>> update(@RequestBody ReviewRequestDto review,@PathVariable("review_id") Long reviewId){
-		return bookService.update(review,reviewId);
+	public ResponseEntity<BaseResponse<?>> update(@RequestBody ReviewRequestDto review,
+		@PathVariable("review_id") Long reviewId) {
+		return bookService.update(review, reviewId);
 	}
 
 	@GetMapping("/{book_id}/reviews")
 	public ResponseEntity<BaseResponse<ReviewListResponseDto>> getReviews(@PathVariable("book_id") Long bookId
-														,@RequestParam(defaultValue = "1") int page,
-														@RequestParam(defaultValue = "3") int size) {
-		return bookService.getReviewList(bookId,page,size);
+		, @RequestParam(defaultValue = "1") int page,
+		@RequestParam(defaultValue = "3") int size) {
+		return bookService.getReviewList(bookId, page, size);
 	}
 }

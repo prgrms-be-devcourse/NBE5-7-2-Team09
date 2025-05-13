@@ -2,13 +2,11 @@ package ninegle.Readio.book.mapper;
 
 import ninegle.Readio.book.domain.Author;
 import ninegle.Readio.book.domain.Book;
-import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.domain.Category;
 import ninegle.Readio.book.domain.Publisher;
 import ninegle.Readio.book.dto.AuthorDto;
 import ninegle.Readio.book.dto.BookRequestDto;
 import ninegle.Readio.book.dto.BookResponseDto;
-import ninegle.Readio.book.dto.BookSearchResponseDto;
 import ninegle.Readio.book.dto.CategoryDto;
 import ninegle.Readio.book.dto.PublisherDto;
 

@@ -13,11 +13,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ninegle.Readio.admin.domain.User;
+import ninegle.Readio.user.domain.User;
 
 /**
  * Readio - Review
@@ -29,8 +30,8 @@ import ninegle.Readio.admin.domain.User;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor //얘도
 @Builder(toBuilder = true)
 @Table(name = "review")
 public class Review {
@@ -49,22 +50,21 @@ public class Review {
 	private LocalDateTime updatedAt;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id",nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "book_id",nullable = false)
+	@JoinColumn(name = "book_id", nullable = false)
 	private Book book;
 
-
 	@PrePersist
-	public void onCreate(){
+	public void onCreate() {
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = this.createdAt;
 	}
 
 	@PreUpdate
-	public void onUpdate(){
+	public void onUpdate() {
 		this.updatedAt = LocalDateTime.now();
 	}
 }

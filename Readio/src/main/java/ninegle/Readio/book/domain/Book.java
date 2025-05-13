@@ -3,15 +3,13 @@ package ninegle.Readio.book.domain;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,12 +21,12 @@ import ninegle.Readio.book.dto.BookRequestDto;
  * create date:    25. 5. 8.
  * last update:    25. 5. 8.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor // 얘 지우고 빌더 만들어주세요
 @Builder
 public class Book {
 
@@ -36,7 +34,7 @@ public class Book {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false,length = 255)
+	@Column(nullable = false, length = 255)
 	private String name;
 
 	@Column(length = 1000, nullable = false)
@@ -55,9 +53,7 @@ public class Book {
 
 	private LocalDateTime updatedAt;
 
-
 	private Boolean expired = false;
-
 
 	private LocalDateTime expiredAt;
 
@@ -86,3 +82,4 @@ public class Book {
 	}
 
 }
+
