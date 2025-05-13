@@ -55,7 +55,9 @@ public class Book {
 
 	private LocalDateTime updatedAt;
 
+
 	private Boolean expired = false;
+
 
 	private LocalDateTime expiredAt;
 

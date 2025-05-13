@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Category {
 
 	@Id
-	private long id;
+	private Long id;
 
 	@Column(nullable = false)
 	private String major;
