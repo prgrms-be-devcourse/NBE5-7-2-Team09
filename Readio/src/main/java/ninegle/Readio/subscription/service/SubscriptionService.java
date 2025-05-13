@@ -1,6 +1,7 @@
 package ninegle.Readio.subscription.service;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -79,5 +80,19 @@ public class SubscriptionService {
 				.expDate(LocalDateTime.now().plusMonths(1))
 				.build()
 		);
+	}
+
+	//취소 처리
+	public void cancelSubscription() {
+		Long userId = userContextService.getCurrentUserId();
+
+		// 현재 사용자의 구독 정보 조회
+		Subscription subscription = subscriptionRepository.findByUserId(userId)
+			.orElseThrow(() -> new NoSuchElementException("존재하지 않는 구독입니다."));
+
+		// 구독 즉시 만료 처리 (현재 시간으로 만료일 설정)
+		LocalDateTime now = LocalDateTime.now();
+		subscription.updatePeriod(subscription.getSubDate(), now);
+		subscriptionRepository.save(subscription);
 	}
 }
