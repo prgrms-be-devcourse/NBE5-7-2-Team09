@@ -10,5 +10,4 @@ public class SingUpRequestDto {
 	private final String password;
 	private final String nickname;
 	private final String phoneNumber;
-	private long point = 50000L;
 }

@@ -50,7 +50,6 @@ public class UserService {
 			.password(passwordEncoder.encode(dto.getPassword()))
 			.nickname(dto.getNickname())
 			.phoneNumber(dto.getPhoneNumber())
-			.point(dto.getPoint())
 			.build();
 		userRepository.save(user);
 		return BaseResponse.ok("회원가입을 성공하셨습니다", HttpStatus.CREATED); //201 반환
