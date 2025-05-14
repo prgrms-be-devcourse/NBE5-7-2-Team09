@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -22,17 +23,18 @@ import lombok.ToString;
 @ToString
 public class BookSearch {
 	@Id
-	private String id;
+	private final String id;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String title;
+	private final String title;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String publisher;
+	private final String publisher;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String author;
+	private final String author;
 
+	@Builder
 	public BookSearch(String title, String publisher, String author) {
 		this.id = UUID.randomUUID().toString();
 		this.title = title;
