@@ -14,13 +14,14 @@ import LibraryPage from "./pages/library/LibraryPage";
 import LibraryDetailPage from "./pages/library/LibraryDetailPage";
 import { Toaster } from "sonner";
 import MyPage from "./pages/member/MyPage";
-import WishlistPage from "./pages/member/WishlistPage";
+import WishlistPage from "./pages/member/PreferencePage";
 
 // 관리자 페이지 및 인증 관련 컴포넌트
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
+import PreferencePage from "./pages/member/PreferencePage";
 
 function App() {
   return (
@@ -72,7 +73,7 @@ function App() {
 
                     {/* 유저 관련 라우트 */}
                     <Route path="/my-page" element={<MyPage />} />
-                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/preference" element={<PreferencePage />} />
                   </Routes>
                 </Layout>
               }
