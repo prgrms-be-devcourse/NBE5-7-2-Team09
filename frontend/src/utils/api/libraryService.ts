@@ -111,6 +111,7 @@ export const libraryService = {
           },
         }
       );
+      console.log(response);
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch books for library ${libraryId}:`, error);
@@ -169,6 +170,7 @@ export const libraryService = {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
       return response.data;
     } catch (error) {
       console.error(`Failed to delete library ${libraryId}:`, error);

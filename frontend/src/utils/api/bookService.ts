@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BookDetailResponse, BookSearchResponse } from "@/types/book";
+import preferenceService from "./preferenceService";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -61,12 +62,12 @@ export const bookService = {
   },
 
   // 책 찜하기/찜 취소
+  // bookService.ts에서 toggleWishlist 메서드 수정
   toggleWishlist: async (bookId: number | string) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/books/${bookId}/wishlist`
-      );
-      return response.data;
+      // preferenceService를 사용하여 관심도서 추가
+      const response = await preferenceService.addToPreference(bookId);
+      return response;
     } catch (error) {
       console.error("Error in toggleWishlist:", error);
       throw error;

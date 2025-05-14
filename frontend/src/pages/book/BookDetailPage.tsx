@@ -5,7 +5,6 @@ import {
   Bookmark,
   Heart,
   Calendar,
-  Book,
   Hash,
   Star,
   User,
@@ -32,7 +31,7 @@ import ReviewCard from "@/components/review/ReviewCard";
 import bookService from "@/utils/api/bookService";
 import reviewService from "@/utils/api/reviewService";
 import { libraryService, Library } from "@/utils/api/libraryService";
-import { BookDetail, BookDetailResponse } from "@/types/book";
+import { BookDetail } from "@/types/book";
 import { Review } from "@/utils/api/reviewService"; // 리뷰 타입 import
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

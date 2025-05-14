@@ -1,9 +1,8 @@
 // src/pages/library/LibraryDetailPage.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit, Book, Trash2, MoreVertical } from "lucide-react";
+import { ArrowLeft, Edit, Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -14,15 +13,9 @@ import {
   DialogClose,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Pagination } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import { libraryService } from "@/utils/api/libraryService";
+import BookCover from "@/components/book/BookCover";
 
 // 타입 정의
 interface LibraryBook {
@@ -73,6 +66,9 @@ const LibraryDetailPage: React.FC = () => {
   const [bookToDelete, setBookToDelete] = useState<LibraryBook | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
+  // 기본 이미지 경로
+  const defaultCoverImage = "/placeholder-book.png";
+
   // 라이브러리 책 목록 조회
   const fetchLibraryBooks = async (page: number = 0) => {
     if (!libraryId) return;
@@ -114,6 +110,35 @@ const LibraryDetailPage: React.FC = () => {
     }
   };
 
+  // BookCover 컴포넌트에 필요한 형태로 책 데이터 변환
+  const mapLibraryBookToBookCoverProps = (book: LibraryBook) => {
+    return {
+      id: book.bookId,
+      title: book.bookName,
+      author: "저자 정보", // LibraryBook에는 저자 정보가 없으므로 임시 데이터
+      // 이미지가 null이거나 빈 문자열이면 기본 이미지 사용
+      cover:
+        book.bookImage && book.bookImage.trim() !== ""
+          ? book.bookImage
+          : defaultCoverImage,
+      category: "분류", // LibraryBook에는 카테고리 정보가 없으므로 임시 데이터
+      rating: 4.5, // 임시 평점
+      publishDate: book.bookPubDate,
+      isNew: false,
+      isBestseller: false,
+    };
+  };
+
+  // 삭제 버튼 클릭 핸들러
+  const handleDeleteClick = (bookId: number, e: React.MouseEvent) => {
+    // 삭제할 책 찾기
+    const bookToDelete = books.find((book) => book.bookId === bookId);
+    if (bookToDelete) {
+      setBookToDelete(bookToDelete);
+      setOpenDeleteDialog(true);
+    }
+  };
+
   // 라이브러리에서 책 삭제
   const handleDeleteBook = async () => {
     if (!libraryId || !bookToDelete) return;
@@ -131,21 +156,14 @@ const LibraryDetailPage: React.FC = () => {
         description: "라이브러리에서 책이 삭제되었습니다.",
       });
 
-      // 페이지 완전히 새로고침하여 모든 상태 초기화
-      window.location.reload();
+      // 현재 책 목록에서 삭제된 책 제거
+      setBooks(books.filter((book) => book.bookId !== bookToDelete.bookId));
     } catch (error) {
       console.error("Error deleting book:", error);
       toast.error("책 삭제 실패", {
         description: "책 삭제 중 오류가 발생했습니다.",
       });
     }
-  };
-
-  // 책 삭제 다이얼로그 열기
-  const openDeleteBookDialog = (book: LibraryBook, e: React.MouseEvent) => {
-    e.stopPropagation(); // 이벤트 버블링 방지 (책 상세 페이지로 이동하지 않도록)
-    setBookToDelete(book);
-    setOpenDeleteDialog(true);
   };
 
   // 페이지 로드 시 책 목록 조회
@@ -196,8 +214,15 @@ const LibraryDetailPage: React.FC = () => {
   };
 
   // 책 상세 페이지로 이동
-  const navigateToBookDetail = (bookId: number) => {
+  const handleBookClick = (bookId: number) => {
     navigate(`/read/${bookId}`);
+  };
+
+  // 책 우클릭 메뉴 (컨텍스트 메뉴)
+  const handleContextMenu = (e: React.MouseEvent, book: LibraryBook) => {
+    e.preventDefault();
+    setBookToDelete(book);
+    setOpenDeleteDialog(true);
   };
 
   // 라이브러리 목록 페이지로 돌아가기
@@ -214,21 +239,8 @@ const LibraryDetailPage: React.FC = () => {
     );
   }
 
-  // 기본 이미지 - 책 이미지가 없을 경우 사용할 이미지 목록
-  const placeholderImages = [
-    "https://placehold.co/400x600/e8eaf2/4a6fa5?text=No+Cover+Available&font=montserrat",
-    "https://placehold.co/400x600/f5e6e8/9e3f3f?text=Cover+Coming+Soon&font=montserrat",
-    "https://placehold.co/400x600/e8f0e6/3e733f?text=No+Image+Available&font=montserrat",
-  ];
-
-  // 책 ID를 기반으로 일관된 플레이스홀더 이미지 선택
-  const getPlaceholderImage = (bookId: number) => {
-    const index = bookId % placeholderImages.length;
-    return placeholderImages[index];
-  };
-
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto px-4 py-6">
       {/* 헤더 섹션 */}
       <div className="mb-8">
         <Button
@@ -265,77 +277,50 @@ const LibraryDetailPage: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {books.map((book) => (
-            <Card
+            <div
               key={book.bookId}
-              className="overflow-hidden relative hover:shadow-md transition-shadow"
+              className="relative"
+              onContextMenu={(e) => handleContextMenu(e, book)}
             >
-              <CardContent
-                className="p-0 cursor-pointer"
-                onClick={() => navigateToBookDetail(book.bookId)}
-              >
-                <div className="relative aspect-[2/3]">
-                  <img
-                    src={book.bookImage || getPlaceholderImage(book.bookId)}
-                    alt={book.bookName}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = getPlaceholderImage(
-                        book.bookId
-                      );
-                    }}
-                  />
-
-                  {/* 더보기 메뉴 (삭제) */}
-                  <div className="absolute top-2 right-2 z-10">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 bg-white/80 hover:bg-white rounded-full"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          className="text-red-600 cursor-pointer"
-                          onClick={(e) => openDeleteBookDialog(book, e)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          삭제
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter
-                className="px-3 py-2 bg-white cursor-pointer"
-                onClick={() => navigateToBookDetail(book.bookId)}
-              >
-                <div className="w-full">
-                  <h3 className="font-medium text-sm line-clamp-2">
-                    {book.bookName}
-                  </h3>
-                </div>
-              </CardFooter>
-            </Card>
+              <BookCover
+                book={mapLibraryBookToBookCoverProps(book)}
+                onClick={handleBookClick}
+                className="w-full"
+                // 삭제 버튼 관련 props 추가
+                showDeleteButton={true}
+                onDelete={handleDeleteClick}
+              />
+            </div>
           ))}
         </div>
       )}
 
       {/* 페이지네이션 */}
       {books.length > 0 && totalPages > 1 && (
-        <div className="mt-8 flex justify-center">
-          <Pagination
-            pageCount={totalPages}
-            onPageChange={handlePageChange}
-            currentPage={currentPage}
-          />
+        <div className="flex justify-center mt-8">
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              이전
+            </Button>
+            <span className="py-2 px-4 bg-gray-100 rounded-md">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              다음
+            </Button>
+          </div>
         </div>
       )}
 

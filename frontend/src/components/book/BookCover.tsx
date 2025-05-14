@@ -1,7 +1,8 @@
 // src/components/book/BookCover.tsx
 import React from "react";
-import { Star, Clock } from "lucide-react";
+import { Star, Clock, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface BookCoverProps {
   book: {
@@ -18,6 +19,9 @@ interface BookCoverProps {
   isNewRelease?: boolean;
   onClick?: (id: number) => void;
   className?: string;
+  // 삭제 버튼 관련 props 추가
+  showDeleteButton?: boolean;
+  onDelete?: (id: number, e: React.MouseEvent) => void;
 }
 
 const BookCover: React.FC<BookCoverProps> = ({
@@ -25,6 +29,9 @@ const BookCover: React.FC<BookCoverProps> = ({
   isNewRelease = false,
   onClick,
   className = "",
+  // 삭제 버튼 기본값 설정
+  showDeleteButton = false,
+  onDelete,
 }) => {
   const handleClick = () => {
     if (onClick) {
@@ -32,21 +39,69 @@ const BookCover: React.FC<BookCoverProps> = ({
     }
   };
 
+  // 삭제 버튼 클릭 핸들러
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 부모 요소의 클릭 이벤트가 발생하지 않도록 방지
+    if (onDelete) {
+      onDelete(book.id, e);
+    }
+  };
+
+  // 플레이스홀더 이미지 옵션
+  const placeholderOptions = [
+    // 책 스타일 플레이스홀더 (푸른색)
+    "https://placehold.co/400x600/e8eaf2/4a6fa5?text=No+Cover+Available&font=montserrat",
+    // 책 스타일 플레이스홀더 (빨간색)
+    "https://placehold.co/400x600/f5e6e8/9e3f3f?text=Cover+Coming+Soon&font=montserrat",
+    // 책 스타일 플레이스홀더 (녹색)
+    "https://placehold.co/400x600/e8f0e6/3e733f?text=No+Image+Available&font=montserrat",
+  ];
+
+  // 책 ID를 기반으로 일관된 플레이스홀더 이미지 선택 (같은 책은 항상 같은 플레이스홀더 사용)
+  const getPlaceholderImage = (bookId: number) => {
+    const index = bookId % placeholderOptions.length;
+    return placeholderOptions[index];
+  };
+
+  // 커버 이미지 URL 결정
+  // 유효한 URL이 아니거나 '/placeholder-book.png'이면 플레이스홀더 사용
+  const coverImage =
+    !book.cover ||
+    book.cover === "/placeholder-book.png" ||
+    book.cover.trim() === ""
+      ? getPlaceholderImage(book.id)
+      : book.cover;
+
   return (
     <div
-      className={`flex-shrink-0 w-40 md:w-64 cursor-pointer ${className}`}
+      className={`flex-shrink-0 w-40 md:w-64 cursor-pointer group ${className}`}
       onClick={handleClick}
     >
-      <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 relative">
         <div className="relative">
           <img
-            src={book.cover}
+            src={coverImage}
             alt={book.title}
             className="w-full h-96 object-cover"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "/placeholder-book.png"; // 이미지 로드 실패 시 대체 이미지
+              (e.target as HTMLImageElement).src = getPlaceholderImage(book.id);
             }}
           />
+
+          {/* 삭제 버튼 - showDeleteButton이 true일 때만 표시 */}
+          {showDeleteButton && (
+            <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 bg-white/80 hover:bg-white rounded-full shadow-sm"
+                onClick={handleDeleteClick}
+                title="삭제"
+              >
+                <Trash2 className="h-4 w-4 text-red-500" />
+              </Button>
+            </div>
+          )}
         </div>
         <div className="p-3">
           <div className="flex items-center justify-between mb-1">

@@ -54,8 +54,8 @@ const Navbar = () => {
   };
 
   // 관심 도서로 이동하는 함수
-  const navigateToWishlist = () => {
-    navigate("/wishlist");
+  const navigateToPreference = () => {
+    navigate("/preference");
   };
 
   // 마이페이지로 이동하는 함수
@@ -241,7 +241,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center"
-                onClick={navigateToWishlist}
+                onClick={navigateToPreference}
               >
                 <Heart className="h-5 w-5" />
                 <span>관심 도서</span>
@@ -275,7 +275,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={navigateToWishlist}
+                  onClick={navigateToPreference}
                 >
                   <Heart className="h-5 w-5" />
                 </Button>
