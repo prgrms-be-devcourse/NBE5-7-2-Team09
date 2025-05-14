@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -39,7 +39,6 @@ const LibraryPage: React.FC = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
   // 테스트용 데이터
@@ -97,10 +96,8 @@ const LibraryPage: React.FC = () => {
       setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching libraries:", error);
-      toast({
-        title: "라이브러리 목록 조회 실패",
+      toast.error("라이브러리 목록 조회 실패", {
         description: "라이브러리 목록을 불러오는 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -131,17 +128,14 @@ const LibraryPage: React.FC = () => {
       await libraryService.createLibrary(newLibraryName);
       setOpenCreateDialog(false);
       setNewLibraryName("");
-      toast({
-        title: "라이브러리 생성 완료",
+      toast.success("라이브러리 생성 완료", {
         description: "새로운 라이브러리가 생성되었습니다.",
       });
       fetchLibraries(currentPage);
     } catch (error) {
       console.error("Error creating library:", error);
-      toast({
-        title: "라이브러리 생성 실패",
+      toast.error("라이브러리 생성 실패", {
         description: "라이브러리 생성 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };
@@ -160,17 +154,14 @@ const LibraryPage: React.FC = () => {
     try {
       await libraryService.updateLibraryName(editLibraryId, editLibraryName);
       setOpenEditDialog(false);
-      toast({
-        title: "라이브러리 수정 완료",
+      toast.success("라이브러리 수정 완료", {
         description: "라이브러리 이름이 수정되었습니다.",
       });
       fetchLibraries(currentPage);
     } catch (error) {
       console.error("Error updating library:", error);
-      toast({
-        title: "라이브러리 수정 실패",
+      toast.error("라이브러리 수정 실패", {
         description: "라이브러리 이름 수정 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };
@@ -188,17 +179,14 @@ const LibraryPage: React.FC = () => {
     try {
       await libraryService.deleteLibrary(deleteLibraryId);
       setOpenDeleteDialog(false);
-      toast({
-        title: "라이브러리 삭제 완료",
+      toast.success("라이브러리 삭제 완료", {
         description: "라이브러리가 삭제되었습니다.",
       });
       fetchLibraries(currentPage);
     } catch (error) {
       console.error("Error deleting library:", error);
-      toast({
-        title: "라이브러리 삭제 실패",
+      toast.error("라이브러리 삭제 실패", {
         description: "라이브러리 삭제 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };

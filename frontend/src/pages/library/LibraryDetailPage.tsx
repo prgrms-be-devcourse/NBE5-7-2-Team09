@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit, Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,6 @@ const LibraryDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const libraryId = parseInt(id || "0");
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [books, setBooks] = useState<BookType[]>([]);
   const [libraryName, setLibraryName] = useState<string>("");
@@ -133,10 +132,8 @@ const LibraryDetailPage: React.FC = () => {
       setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching library books:", error);
-      toast({
-        title: "책 목록 조회 실패",
+      toast.error("책 목록 조회 실패", {
         description: "라이브러리 책 목록을 불러오는 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -169,16 +166,13 @@ const LibraryDetailPage: React.FC = () => {
 
       setLibraryName(editLibraryName);
       setOpenEditDialog(false);
-      toast({
-        title: "라이브러리 수정 완료",
+      toast.success("라이브러리 수정 완료", {
         description: "라이브러리 이름이 수정되었습니다.",
       });
     } catch (error) {
       console.error("Error updating library:", error);
-      toast({
-        title: "라이브러리 수정 실패",
+      toast.error("라이브러리 수정 실패", {
         description: "라이브러리 이름 수정 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };

@@ -18,6 +18,44 @@ export interface Book {
   price?: number;
 }
 
+// API 응답에 맞는 타입 정의
+export interface Category {
+  id: number;
+  major: string;
+  sub: string;
+}
+
+export interface Publisher {
+  id: number;
+  name: string;
+}
+
+export interface Author {
+  id: number;
+  name: string;
+}
+
+export interface BookDetail {
+  id: number;
+  name: string;
+  description: string;
+  image: string | null;
+  isbn: string;
+  ecn: string | null;
+  pubDate: string;
+  category: Category;
+  publisher: Publisher;
+  author: Author;
+  rating?: number; // 리뷰 평점 (API에 없는 경우 프론트에서 처리)
+  reviewCount?: number; // 리뷰 수 (API에 없는 경우 프론트에서 처리)
+}
+
+export interface BookDetailResponse {
+  status: number;
+  message: string;
+  data: BookDetail;
+}
+
 export interface BookCategory {
   id: string;
   name: string;
