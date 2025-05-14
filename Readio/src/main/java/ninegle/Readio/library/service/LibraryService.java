@@ -60,6 +60,12 @@ public class LibraryService {
 	@Transactional(readOnly = true)
 	public ResponseEntity<BaseResponse<LibraryListResponseDto>> getAllLibraries(Pageable pageable) {
 		Long userId = userContextService.getCurrentUserId();
+		Optional<User> finduser = userRepository.findById(userId);
+
+		if (finduser.isEmpty()) {
+			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+		}
+
 		Page<Library> libraries = libraryRepository.findAllByUserId(userId, pageable);
 		LibraryListResponseDto libraryListResponseDto = LibraryMapper.fromLibraryListResponseDto(libraries);
 		return BaseResponse.ok("전체 라이브러리 조회 완료", libraryListResponseDto, HttpStatus.OK);
@@ -69,6 +75,12 @@ public class LibraryService {
 	@Transactional
 	public ResponseEntity<BaseResponse<Void>> deleteLibrary(Long libraryId) {
 		Long userId = userContextService.getCurrentUserId();
+		Optional<User> finduser = userRepository.findById(userId);
+
+		if (finduser.isEmpty()) {
+			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+		}
+
 		Library library = libraryRepository.findByIdAndUserId(libraryId, userId);
 		libraryRepository.delete(library);
 		return BaseResponse.ok("라이브러리 삭제 완료", null, HttpStatus.OK);
@@ -80,6 +92,12 @@ public class LibraryService {
 		UpdateLibraryRequestDto updateLibraryRequestDto) {
 		//param으로 들어온 id, body로 들어온 변경된 라이브러리 Name
 		Long userId = userContextService.getCurrentUserId();
+		Optional<User> finduser = userRepository.findById(userId);
+
+		if (finduser.isEmpty()) {
+			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+		}
+
 		//바꿀 라이브러리를 가져온다
 		Library searchlibrary = libraryRepository.findByIdAndUserId(libraryId, userId);
 		//새로 바꿔줄 이름
