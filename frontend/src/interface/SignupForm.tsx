@@ -1,7 +1,7 @@
 export default interface SignupForm {
   nickname: string;
   email: string;
-  phone_number: string;
+  phoneNumber: string;
   password: string;
   confirmPassword: string;
 }
