@@ -36,12 +36,12 @@ public class PreferenceController {
 
 
 	@PostMapping("/")
-	public ResponseEntity<BaseResponse<?>> save(@RequestBody BookIdRequestDto dto){
+	public ResponseEntity<BaseResponse<Void>> save(@RequestBody BookIdRequestDto dto){
 		return service.save(dto);
 	}
 
 	@DeleteMapping("/{book_id}")
-	public ResponseEntity<BaseResponse<?>> delete(@PathVariable("book_id") Long bookId){
+	public ResponseEntity<BaseResponse<Void>> delete(@PathVariable("book_id") Long bookId){
 		return service.delete(bookId);
 	}
 
