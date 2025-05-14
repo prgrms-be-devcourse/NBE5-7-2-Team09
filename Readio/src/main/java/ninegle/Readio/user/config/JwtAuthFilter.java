@@ -53,7 +53,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		// 로그인, 회원가입은 필터에 걸리지 않게 그냥 넘긴다
 		// ("/login").equals(url) 형태로 쓰면 url에 null일 시 null 예외 발생 주의
 		if ("/user/login".equals(uri) || "/user/signup".equals(uri) || "/user/logout".equals(uri) ||
-		(HttpMethod.GET.matches(method)&& pathMatcher.match("/books/*/reviews", uri))) {
+		(HttpMethod.GET.matches(method)&& pathMatcher.match("/books/**", uri))) {
 			filterChain.doFilter(request, response);
 			return;
 		}
