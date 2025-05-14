@@ -13,14 +13,15 @@ import ninegle.Readio.mypage.dto.request.UserUpdateRequestDto;
 import ninegle.Readio.mypage.dto.response.UserInfoDto;
 import ninegle.Readio.mypage.mapper.MyPageUserMapper;
 
+
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MyPageUserService {
 
 	private final UserRepository userRepository;
 	private final UserContextService userContextService;
 
+	// 읽기 전용 트랜잭션
 	@Transactional(readOnly = true)
 	public UserInfoDto getUserInfo() {
 		Long userId = userContextService.getCurrentUserId();
@@ -31,6 +32,8 @@ public class MyPageUserService {
 		return MyPageUserMapper.toUserInfoDto(user);
 	}
 
+	// 데이터 수정하는 메서드
+	@Transactional
 	public UserInfoDto updateUserInfo(UserUpdateRequestDto dto) {
 		Long userId = userContextService.getCurrentUserId();
 
@@ -39,7 +42,6 @@ public class MyPageUserService {
 			(dto.getPhoneNumber() == null || dto.getPhoneNumber().isBlank())) {
 			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);
 		}
-
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -59,7 +61,7 @@ public class MyPageUserService {
 		return MyPageUserMapper.toUserInfoDto(userRepository.save(user));
 	}
 
-	//닉네임 검증 메서드
+	// 닉네임 검증 메서드
 	private void validateNickname(String nickname) {
 		if (nickname.isBlank()) {
 			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);
@@ -69,7 +71,7 @@ public class MyPageUserService {
 		}
 	}
 
-	//핸드폰번호 검증 메서드
+	// 핸드폰번호 검증 메서드
 	private void validatePhoneNumber(String phoneNumber) {
 		if (phoneNumber.isBlank()) {
 			throw new BusinessException(ErrorCode.MISSING_REQUIRED_FIELD);

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
@@ -44,14 +43,13 @@ public class SubscriptionManager {
 			return;
 		}
 
-		// 신규 구독 생성
 		chargePoints(user);
 		subscriptionRepository.save(
 			Subscription.builder()
 				.userId(userId)
 				.subDate(LocalDateTime.now())
 				.expDate(LocalDateTime.now().plusMonths(1))
-				.isCanceled(false)
+				.canceled(false)
 				.build()
 		);
 	}

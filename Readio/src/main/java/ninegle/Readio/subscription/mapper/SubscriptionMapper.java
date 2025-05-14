@@ -1,7 +1,5 @@
 package ninegle.Readio.subscription.mapper;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Component;
 
 import ninegle.Readio.subscription.domain.Subscription;
@@ -15,8 +13,8 @@ public class SubscriptionMapper {
 			.userId(subscription.getUserId())
 			.subDate(subscription.getSubDate())
 			.expDate(subscription.getExpDate())
-			.isActive(subscription.isActive())
-			.isCanceled(subscription.isCanceled())
+			.active(subscription.isActive())
+			.canceled(subscription.isCanceled())
 			.build();
 	}
 }

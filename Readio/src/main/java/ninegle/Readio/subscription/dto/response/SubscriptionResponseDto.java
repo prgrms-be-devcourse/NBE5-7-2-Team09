@@ -4,23 +4,16 @@ import java.time.LocalDateTime;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@Builder
+@RequiredArgsConstructor
 public class SubscriptionResponseDto {
 
 	private final Long userId;
 	private final LocalDateTime subDate;
 	private final LocalDateTime expDate;
-	private final boolean isActive;
-	private final boolean isCanceled;
-
-	@Builder
-	public SubscriptionResponseDto(Long userId, LocalDateTime subDate, LocalDateTime expDate, boolean isActive, boolean isCanceled) {
-		this.userId = userId;
-		this.subDate = subDate;
-		this.expDate = expDate;
-		this.isActive = isActive;
-		this.isCanceled = isCanceled;
-	}
+	private final boolean active;
+	private final boolean canceled;
 }
-
