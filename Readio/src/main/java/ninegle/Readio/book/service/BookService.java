@@ -69,7 +69,7 @@ public class BookService {
 		return bookSearchRepository.findByTitleContainingOrPublisherContainingOrAuthorContaining(keyword, keyword, keyword);
 	}
 
-	public ResponseEntity<BaseResponse<?>> save(BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) {
 
 		Category category = getCategory(request.getCategorySub());
 		Author author = getAuthor(request.getAuthorName());
@@ -79,7 +79,7 @@ public class BookService {
 		// ElasticSearch Repository에 저장
 		bookSearchRepository.save(BookSearchMapper.toEntity(request));
 
-		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.", HttpStatus.CREATED);
+		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
 	}
 
 	// 카테고리가 존재하면 Get, 존재하지 않다면 Throw 발생
@@ -109,7 +109,7 @@ public class BookService {
 		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", BookMapper.toDto(bookOptional.get()) ,HttpStatus.OK);
 	}
 
-	public ResponseEntity<BaseResponse<?>> updateBook(Long id, BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> updateBook(Long id, BookRequestDto request) {
 
 		Book targetBook = bookRepository.findById(id)
 			.orElseThrow(()->new BusinessException(ErrorCode.BOOK_NOT_FOUND));
@@ -120,7 +120,7 @@ public class BookService {
 
 		targetBook.update(request, category, author, publisher);
 
-		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.", HttpStatus.OK);
+		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.",null, HttpStatus.OK);
 	}
 
 	public Book getBookById(long id) {
@@ -134,25 +134,25 @@ public class BookService {
 	}
 
 	// Review Create
-	public ResponseEntity<BaseResponse<?>> save(ReviewRequestDto reviewRequestDto, long book_id) {
+	public ResponseEntity<BaseResponse<Void>> save(ReviewRequestDto reviewRequestDto, long book_id) {
 		User user = userService.getById(userContextService.getCurrentUserId());
 		Book book = getBookById(book_id);
 		reviewRepository.save(reviewMapper.toEntity(reviewRequestDto, user, book));
-		return BaseResponse.ok("후기 등록이 정상적으로 수행되었습니다.", HttpStatus.CREATED);
+		return BaseResponse.ok("후기 등록이 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
 	}
 
 	// Review Delete
-	public ResponseEntity<BaseResponse<?>> delete(Long reviewId) {
+	public ResponseEntity<BaseResponse<Void>> delete(Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.delete(review);
-		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.", HttpStatus.OK);
+		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.", null,HttpStatus.OK);
 	}
 
 	// Review Update
-	public ResponseEntity<BaseResponse<?>> update(ReviewRequestDto reviewRequestDto, Long reviewId) {
+	public ResponseEntity<BaseResponse<Void>> update(ReviewRequestDto reviewRequestDto, Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.save(reviewMapper.updateEntity(review, reviewRequestDto));
-		return BaseResponse.ok("후기 수정이 정상적으로 수행되었습니다.", HttpStatus.OK);
+		return BaseResponse.ok("후기 수정이 정상적으로 수행되었습니다.", null,HttpStatus.OK);
 	}
 
 	public ResponseEntity<BaseResponse<ReviewListResponseDto>> getReviewList(Long bookId, int page, int size) {

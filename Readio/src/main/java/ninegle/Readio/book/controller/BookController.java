@@ -46,18 +46,18 @@ public class BookController {
 	}
 
 	@PostMapping("/{book_id}/reviews")
-	public ResponseEntity<BaseResponse<?>> save(@RequestBody ReviewRequestDto review,
+	public ResponseEntity<BaseResponse<Void>> save(@RequestBody ReviewRequestDto review,
 		@PathVariable("book_id") Long bookId) {
 		return bookService.save(review, bookId);
 	}
 
 	@DeleteMapping("/{book_id}/reviews/{review_id}")
-	public ResponseEntity<BaseResponse<?>> delete(@PathVariable("review_id") Long reviewId) {
+	public ResponseEntity<BaseResponse<Void>> delete(@PathVariable("review_id") Long reviewId) {
 		return bookService.delete(reviewId);
 	}
 
 	@PutMapping("/{book_id}/reviews/{review_id}")
-	public ResponseEntity<BaseResponse<?>> update(@RequestBody ReviewRequestDto review,
+	public ResponseEntity<BaseResponse<Void>> update(@RequestBody ReviewRequestDto review,
 		@PathVariable("review_id") Long reviewId) {
 		return bookService.update(review, reviewId);
 	}

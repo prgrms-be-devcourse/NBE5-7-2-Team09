@@ -45,22 +45,22 @@ public class PreferenceService {
 	}
 
 
-	public ResponseEntity<BaseResponse<?>> save(BookIdRequestDto dto) {
+	public ResponseEntity<BaseResponse<Void>> save(BookIdRequestDto dto) {
 
 		Book book =bookService.getBookById(dto.getId());
 		User user = userService.getById(userContextService.getCurrentUserId());
 
 		preferencesRepository.save(preferenceMapper.toEntity(user,book));
-		return BaseResponse.ok("관심도서 추가가 정상적으로 수행되었습니다.", HttpStatus.CREATED);
+		return BaseResponse.ok("관심도서 추가가 정상적으로 수행되었습니다.", null,HttpStatus.CREATED);
 	}
 
-	public ResponseEntity<BaseResponse<?>> delete(Long bookId) {
+	public ResponseEntity<BaseResponse<Void>> delete(Long bookId) {
 		Book book =bookService.getBookById(bookId);
 		User user = userService.getById(userContextService.getCurrentUserId());
 		Preference preference = getPreferenceByBookAndUser(book, user);
 
 		preferencesRepository.delete(preference);
-		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.",HttpStatus.OK);
+		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.",null,HttpStatus.OK);
 	}
 
 	public ResponseEntity<BaseResponse<BookPreferenceListDto>> getPreferenceList(int page, int size) {
