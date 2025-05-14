@@ -2,8 +2,7 @@ version: '3.7'  # Docker Compose 파일 형식 버전
 
 services:
   elasticsearch:
-    build:
-      context: ./elasticsearch  # 위에서 만든 Dockerfile 경로
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10  # 공식 이미지 사용
     container_name: es  # 생성될 컨테이너 이름
     environment:
       - discovery.type=single-node  # 단일 노드 모드 (클러스터 구성 아님)

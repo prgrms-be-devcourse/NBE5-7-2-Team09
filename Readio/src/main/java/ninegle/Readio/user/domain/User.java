@@ -40,6 +40,21 @@ public class User {
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
+		this.point = 50000L;
+	}
+
+	// 닉네임 변경 메서드
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	// 핸드폰번호 변경 메서드
+	public void updatePhoneNumber(String phone_number) {
+		this.phoneNumber = phone_number;
+	}
+
+	// point 수정할 수 있도록 setter 추가
+	public void setPoint(Long point) {
 		this.point = point;
 	}
 
