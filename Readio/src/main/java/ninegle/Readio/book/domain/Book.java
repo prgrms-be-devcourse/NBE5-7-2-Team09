@@ -3,6 +3,8 @@ package ninegle.Readio.book.domain;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,8 +29,7 @@ import ninegle.Readio.book.dto.BookRequestDto;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor // 얘 지우고 빌더 만들어주세요
-@Builder
+@SQLDelete(sql = "UPDATE book SET expired = true, expired_at= CURRENT_TIMESTAMP WHERE id = ?")
 public class Book {
 
 	@Id
@@ -56,7 +57,7 @@ public class Book {
 
 	private Boolean expired = false;
 
-	private LocalDateTime expiredAt;
+	private LocalDate expiredAt;
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")
@@ -70,7 +71,21 @@ public class Book {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
-	public void update(BookRequestDto dto, Category category, Author author, Publisher publisher) {
+	@Builder
+	public Book(String name, String description, String image, String isbn, String ecn, LocalDate pubDate,
+		Author author, Publisher publisher, Category category) {
+		this.name = name;
+		this.description = description;
+		this.image = image;
+		this.isbn = isbn;
+		this.ecn = ecn;
+		this.pubDate = pubDate;
+		this.author = author;
+		this.publisher = publisher;
+		this.category = category;
+	}
+
+	public Book update(BookRequestDto dto, Category category, Author author, Publisher publisher) {
 		this.name = dto.getName();
 		this.description = dto.getDescription();
 		this.image = dto.getImage();
@@ -80,6 +95,8 @@ public class Book {
 		this.category = category;
 		this.author = author;
 		this.publisher = publisher;
+
+		return this;
 	}
 
 }

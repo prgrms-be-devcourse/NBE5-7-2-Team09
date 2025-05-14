@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.domain.BookSearch;
+import ninegle.Readio.book.dto.BookListResponseDto;
 import ninegle.Readio.book.dto.BookResponseDto;
+import ninegle.Readio.book.dto.BookSearchResponseDto;
 import ninegle.Readio.book.dto.ReviewListResponseDto;
 import ninegle.Readio.book.dto.ReviewRequestDto;
 import ninegle.Readio.book.service.BookService;
@@ -40,9 +42,20 @@ public class BookController {
 		return bookService.getBookDetail(id);
 	}
 
+	@GetMapping
+	public ResponseEntity<BaseResponse<BookListResponseDto>> getBooksByCategoryMajor(
+		@RequestParam(name = "category_major", defaultValue = "null") String categoryMajor
+		, @RequestParam(defaultValue = "1") int page
+		, @RequestParam(defaultValue = "3") int size
+	) {
+		return bookService.getBookByCategory(categoryMajor,page,size);
+	}
+
 	@GetMapping("/search")
-	public List<BookSearch> search(@RequestParam String keyword) {
-		return bookService.searchBooks(keyword);
+	public ResponseEntity<BaseResponse<BookListResponseDto>> search(@RequestParam(name = "keyword") String keyword,
+		@RequestParam(defaultValue = "1") int page,
+		@RequestParam(defaultValue = "3") int size) {
+		return bookService.searchBooks(keyword, page, size);
 	}
 
 	@PostMapping("/{book_id}/reviews")

@@ -1,13 +1,20 @@
 package ninegle.Readio.book.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ninegle.Readio.book.domain.Author;
 import ninegle.Readio.book.domain.Book;
+import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.domain.Category;
 import ninegle.Readio.book.domain.Publisher;
 import ninegle.Readio.book.dto.AuthorDto;
+import ninegle.Readio.book.dto.BookListResponseDto;
 import ninegle.Readio.book.dto.BookRequestDto;
 import ninegle.Readio.book.dto.BookResponseDto;
+import ninegle.Readio.book.dto.BookSearchResponseDto;
 import ninegle.Readio.book.dto.CategoryDto;
+import ninegle.Readio.book.dto.PaginationDto;
 import ninegle.Readio.book.dto.PublisherDto;
 
 public class BookMapper {
@@ -63,6 +70,45 @@ public class BookMapper {
 			.build();
 	}
 
+	public static PaginationDto toPaginationDto(Long count,int page,int size){
+		return PaginationDto.builder()
+			.totalPages((count.intValue()/size)+1)
+			.size(size)
+			.currentPage(page)
+			.totalElements(count)
+			.build();
+	}
 
+	public static BookSearchResponseDto toSearchResponseDto(Book book) {
+		return BookSearchResponseDto.builder()
+			.id(book.getId())
+			.name(book.getName())
+			.description(book.getDescription())
+			.image(book.getImage())
+			.isbn(book.getIsbn())
+			.ecn(book.getEcn())
+			.pubDate(book.getPubDate())
+			.categoryId(book.getCategory().getId())
+			.categoryMajor(book.getCategory().getMajor())
+			.categorySub(book.getCategory().getSub())
+			.publisherName(book.getPublisher().getName())
+			.authorName(book.getAuthor().getName())
+			.build();
+	}
+
+	public static List<BookSearchResponseDto> toResponseDto(List<Book> books){
+		ArrayList<BookSearchResponseDto> bookResponseDtos = new ArrayList<>();
+		for (Book book : books) {
+			bookResponseDtos.add(toSearchResponseDto(book));
+		}
+		return bookResponseDtos;
+	}
+
+	public static BookListResponseDto toBookListResponseDto(List<BookSearchResponseDto> bookList, PaginationDto paginationDto) {
+		return BookListResponseDto.builder()
+			.books(bookList)
+			.pagination(paginationDto)
+			.build();
+	}
 
 }
