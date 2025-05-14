@@ -3,21 +3,15 @@ package ninegle.Readio.library.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ninegle.Readio.user.domain.User;
 
+@Table(name = "`library`")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,7 +34,7 @@ public class Library {
 
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
-
+	
 	public Library(String libraryname, User user) {
 		this.createdAt = LocalDateTime.now();
 		this.libraryName = libraryname;

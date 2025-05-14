@@ -1,7 +1,7 @@
 // src/pages/library/LibraryDetailPage.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit, Book } from "lucide-react";
+import { ArrowLeft, Edit, Book, Trash2, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -12,124 +12,98 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Pagination } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
-import { libraryService, Book as BookType } from "@/utils/api/libraryService";
+import { libraryService } from "@/utils/api/libraryService";
+
+// 타입 정의
+interface LibraryBook {
+  bookId: number;
+  bookName: string;
+  bookImage: string | null;
+  bookIsbn: string;
+  bookEcn: string | null;
+  bookPubDate: string;
+  bookUpdateAt: string;
+}
+
+interface LibraryDetail {
+  libraryId: number;
+  libraryName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface LibraryBooksResponse {
+  status: number;
+  message: string;
+  data: {
+    libraryDto: LibraryDetail;
+    allLibraryBooks: LibraryBook[];
+    totalCount: number;
+    page: number;
+    size: number;
+  };
+}
 
 const LibraryDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const libraryId = parseInt(id || "0");
   const navigate = useNavigate();
 
-  const [books, setBooks] = useState<BookType[]>([]);
-  const [libraryName, setLibraryName] = useState<string>("");
+  const [books, setBooks] = useState<LibraryBook[]>([]);
+  const [libraryInfo, setLibraryInfo] = useState<LibraryDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [editLibraryName, setEditLibraryName] = useState<string>("");
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
+  const [pageSize] = useState<number>(12); // 페이지당 표시할 책 수
 
-  // 테스트용 데이터
-  const mockBooks = [
-    {
-      book_id: 1,
-      book_name: "사피엔스",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788934972464.jpg",
-    },
-    {
-      book_id: 2,
-      book_name: "코스모스",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/200x0/pdt/9788983711892.jpg",
-    },
-    {
-      book_id: 3,
-      book_name: "도둑맞은 집중력",
-      book_image: "https://image.yes24.com/goods/118579613/XL",
-    },
-    {
-      book_id: 4,
-      book_name: "아몬드",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788936434267.jpg",
-    },
-    {
-      book_id: 5,
-      book_name: "소크라테스 익스프레스",
-      book_image:
-        "https://item.elandrs.com/upload/prd/orgimg/159/2108491159_0000001.jpg?w=750&h=&q=100",
-    },
-    {
-      book_id: 6,
-      book_name: "디지털 미니멀리즘",
-      book_image: "https://image.yes24.com/goods/74031339/XL",
-    },
-    {
-      book_id: 7,
-      book_name: "인생의 마지막 순간에서",
-      book_image: "https://image.yes24.com/goods/74644329/XL",
-    },
-    {
-      book_id: 8,
-      book_name: "파피용",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788932923864.jpg",
-    },
-    {
-      book_id: 9,
-      book_name: "꿀벌의 민주주의",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788962630671.jpg",
-    },
-    {
-      book_id: 10,
-      book_name: "내가 틀릴 수도 있습니다",
-      book_image: "https://image.yes24.com/goods/108850617/XL",
-    },
-    {
-      book_id: 11,
-      book_name: "하늘과 바람과 별과 시",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788936307073.jpg",
-    },
-    {
-      book_id: 12,
-      book_name: "지적 대화를 위한 넓고 얕은 지식",
-      book_image:
-        "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788958285243.jpg",
-    },
-  ];
-
-  // 테스트용 라이브러리 이름
-  const mockLibraryNames = {
-    1: "내 첫 번째 라이브러리",
-    2: "소설 모음",
-    3: "자기계발 서적",
-    4: "역사책 컬렉션",
-    5: "과학 도서",
-    6: "철학 도서",
-  };
+  // 책 삭제 관련 상태
+  const [bookToDelete, setBookToDelete] = useState<LibraryBook | null>(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   // 라이브러리 책 목록 조회
-  const fetchLibraryBooks = async (page: number = 1) => {
+  const fetchLibraryBooks = async (page: number = 0) => {
     if (!libraryId) return;
 
     setIsLoading(true);
     try {
-      // API 연동 시 아래 주석 해제
-      // const response = await libraryService.getLibraryBooks(libraryId, page, 12);
-      // setBooks(response.data.books);
-      // setLibraryName(response.message.replace('"라이브러리를 성공적으로 불러왔습니다.', '')); // 응답 메시지에서 라이브러리 이름 추출
-      // setTotalPages(response.data.totalPages || 1);
+      // libraryService 사용하여 API 호출
+      const response = await libraryService.getLibraryBooks(
+        libraryId,
+        page,
+        pageSize
+      );
 
-      // 테스트용 데이터 사용
-      setBooks(mockBooks);
-      // TODO: 수정해야할 것
-      setLibraryName(mockLibraryNames[libraryId] || `라이브러리 ${libraryId}`);
-      setTotalPages(2); // 테스트용 페이지 수
-      setCurrentPage(page);
+      console.log(response);
+
+      if (response.status === 200) {
+        setBooks(response.data.allLibraryBooks);
+        setLibraryInfo(response.data.libraryDto);
+        setTotalCount(response.data.totalCount);
+
+        // 총 페이지 수 계산
+        const calculatedTotalPages = Math.ceil(
+          response.data.totalCount / response.data.size
+        );
+        setTotalPages(calculatedTotalPages || 1);
+        setCurrentPage(response.data.page);
+      } else {
+        throw new Error(
+          response.message || "책 목록을 불러오는데 실패했습니다."
+        );
+      }
     } catch (error) {
       console.error("Error fetching library books:", error);
       toast.error("책 목록 조회 실패", {
@@ -140,10 +114,44 @@ const LibraryDetailPage: React.FC = () => {
     }
   };
 
+  // 라이브러리에서 책 삭제
+  const handleDeleteBook = async () => {
+    if (!libraryId || !bookToDelete) return;
+
+    try {
+      await libraryService.removeBookFromLibrary(
+        libraryId,
+        bookToDelete.bookId
+      );
+
+      setOpenDeleteDialog(false);
+      setBookToDelete(null);
+
+      toast.success("책 삭제 완료", {
+        description: "라이브러리에서 책이 삭제되었습니다.",
+      });
+
+      // 페이지 완전히 새로고침하여 모든 상태 초기화
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      toast.error("책 삭제 실패", {
+        description: "책 삭제 중 오류가 발생했습니다.",
+      });
+    }
+  };
+
+  // 책 삭제 다이얼로그 열기
+  const openDeleteBookDialog = (book: LibraryBook, e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지 (책 상세 페이지로 이동하지 않도록)
+    setBookToDelete(book);
+    setOpenDeleteDialog(true);
+  };
+
   // 페이지 로드 시 책 목록 조회
   useEffect(() => {
     if (libraryId) {
-      fetchLibraryBooks(1);
+      fetchLibraryBooks(0);
     }
   }, [libraryId]);
 
@@ -154,17 +162,27 @@ const LibraryDetailPage: React.FC = () => {
 
   // 라이브러리 이름 수정 다이얼로그 열기
   const openEditLibraryDialog = () => {
-    setEditLibraryName(libraryName);
-    setOpenEditDialog(true);
+    if (libraryInfo) {
+      setEditLibraryName(libraryInfo.libraryName);
+      setOpenEditDialog(true);
+    }
   };
 
-  // 라이브러리 이름 수정 (테스트용)
+  // 라이브러리 이름 수정
   const handleUpdateLibraryName = async () => {
-    try {
-      // 테스트 구현 - 실제 API 호출 대신 로컬 상태 업데이트
-      // await libraryService.updateLibraryName(libraryId, editLibraryName);
+    if (!libraryId) return;
 
-      setLibraryName(editLibraryName);
+    try {
+      await libraryService.updateLibraryName(libraryId, editLibraryName);
+
+      // 라이브러리 정보 업데이트
+      if (libraryInfo) {
+        setLibraryInfo({
+          ...libraryInfo,
+          libraryName: editLibraryName,
+        });
+      }
+
       setOpenEditDialog(false);
       toast.success("라이브러리 수정 완료", {
         description: "라이브러리 이름이 수정되었습니다.",
@@ -196,6 +214,19 @@ const LibraryDetailPage: React.FC = () => {
     );
   }
 
+  // 기본 이미지 - 책 이미지가 없을 경우 사용할 이미지 목록
+  const placeholderImages = [
+    "https://placehold.co/400x600/e8eaf2/4a6fa5?text=No+Cover+Available&font=montserrat",
+    "https://placehold.co/400x600/f5e6e8/9e3f3f?text=Cover+Coming+Soon&font=montserrat",
+    "https://placehold.co/400x600/e8f0e6/3e733f?text=No+Image+Available&font=montserrat",
+  ];
+
+  // 책 ID를 기반으로 일관된 플레이스홀더 이미지 선택
+  const getPlaceholderImage = (bookId: number) => {
+    const index = bookId % placeholderImages.length;
+    return placeholderImages[index];
+  };
+
   return (
     <div className="container mx-auto">
       {/* 헤더 섹션 */}
@@ -210,7 +241,9 @@ const LibraryDetailPage: React.FC = () => {
         </Button>
 
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">{libraryName}</h1>
+          <h1 className="text-xl font-bold">
+            {libraryInfo?.libraryName || "라이브러리"}
+          </h1>
           <Button
             variant="outline"
             onClick={openEditLibraryDialog}
@@ -235,27 +268,58 @@ const LibraryDetailPage: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {books.map((book) => (
             <Card
-              key={book.book_id}
-              className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => navigateToBookDetail(book.book_id)}
+              key={book.bookId}
+              className="overflow-hidden relative hover:shadow-md transition-shadow"
             >
-              <CardContent className="p-0">
+              <CardContent
+                className="p-0 cursor-pointer"
+                onClick={() => navigateToBookDetail(book.bookId)}
+              >
                 <div className="relative aspect-[2/3]">
                   <img
-                    src={book.book_image}
-                    alt={book.book_name}
+                    src={book.bookImage || getPlaceholderImage(book.bookId)}
+                    alt={book.bookName}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/placeholder-book.png"; // 이미지 로드 실패 시 대체 이미지
+                      (e.target as HTMLImageElement).src = getPlaceholderImage(
+                        book.bookId
+                      );
                     }}
                   />
+
+                  {/* 더보기 메뉴 (삭제) */}
+                  <div className="absolute top-2 right-2 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 bg-white/80 hover:bg-white rounded-full"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-red-600 cursor-pointer"
+                          onClick={(e) => openDeleteBookDialog(book, e)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          삭제
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </CardContent>
-              <CardFooter className="px-3 py-2 bg-white">
+              <CardFooter
+                className="px-3 py-2 bg-white cursor-pointer"
+                onClick={() => navigateToBookDetail(book.bookId)}
+              >
                 <div className="w-full">
                   <h3 className="font-medium text-sm line-clamp-2">
-                    {book.book_name}
+                    {book.bookName}
                   </h3>
                 </div>
               </CardFooter>
@@ -298,6 +362,27 @@ const LibraryDetailPage: React.FC = () => {
               className="bg-blue-600 hover:bg-blue-700"
             >
               수정하기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 책 삭제 확인 다이얼로그 */}
+      <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>책 삭제</DialogTitle>
+            <DialogDescription>
+              "{bookToDelete?.bookName}"을(를) 라이브러리에서 삭제하시겠습니까?
+              이 작업은 되돌릴 수 없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <DialogClose asChild>
+              <Button variant="outline">취소</Button>
+            </DialogClose>
+            <Button onClick={handleDeleteBook} variant="destructive">
+              삭제하기
             </Button>
           </DialogFooter>
         </DialogContent>
