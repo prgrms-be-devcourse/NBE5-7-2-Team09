@@ -23,12 +23,12 @@ public class AdminBookController {
 	private final BookService bookService;
 
 	@PostMapping
-	public ResponseEntity<BaseResponse<?>> save(@RequestBody BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> save(@RequestBody BookRequestDto request) {
 		return bookService.save(request);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<BaseResponse<?>> updateBook(@PathVariable Long id, @RequestBody BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> updateBook(@PathVariable Long id, @RequestBody BookRequestDto request) {
 		return bookService.updateBook(id,request);
 	}
 
