@@ -56,7 +56,7 @@ public class Book {
 
 	private Boolean expired = false;
 
-	private LocalDateTime expiredAt;
+	private LocalDate expiredAt;
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")

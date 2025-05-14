@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.domain.BookSearch;
@@ -68,4 +69,12 @@ public class BookController {
 		@RequestParam(defaultValue = "3") int size) {
 		return bookService.getReviewList(bookId, page, size);
 	}
+
+
+	//파일 받아오기 예시 코드
+	@GetMapping("/download/{book_id}")
+	public ResponseEntity<byte[]> getBookFile(@PathVariable("book_id") Long bookId){
+		return bookService.getBookFile(bookId);
+	}
+
 }
