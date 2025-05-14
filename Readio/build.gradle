@@ -47,6 +47,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
+	// 이메일 전송 기능
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 }
 
