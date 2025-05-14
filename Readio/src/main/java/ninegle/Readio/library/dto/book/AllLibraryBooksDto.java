@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Builder
 public class AllLibraryBooksDto {
-	private final Long BookId;
-	private final String BookName;
+	private final Long bookId;
+	private final String bookName;
 	private final String bookImage;
 	private final String bookIsbn;
 	private final String bookEcn;

@@ -41,7 +41,7 @@ public class LibraryMapper {
 		return LibraryListResponseDto.builder()
 			.allLibraries(libraryList)
 			.totalCount(librarypage.getTotalElements())
-			.page(librarypage.getNumber())
+			.page(librarypage.getNumber() + 1)
 			.size(librarypage.getSize())
 			.build();
 	}

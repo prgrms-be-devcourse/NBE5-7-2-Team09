@@ -1,7 +1,5 @@
 package ninegle.Readio.book.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.dto.BookRequestDto;
-import ninegle.Readio.book.dto.BookResponseDto;
 import ninegle.Readio.book.service.BookService;
 import ninegle.Readio.global.unit.BaseResponse;
 
