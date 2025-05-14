@@ -93,8 +93,6 @@ public enum ErrorCode {
 	SUBSCRIPTION_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 구독입니다."),
 	;
 
-	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 출판사입니다.");
-
 
 	private final HttpStatus status;
 	private final String message;
