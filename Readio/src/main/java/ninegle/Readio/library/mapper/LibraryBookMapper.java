@@ -20,7 +20,7 @@ public class LibraryBookMapper {
 
 	//라이브러리에 책 목록 가져오기
 	public static LibraryBookListResponseDto libraryBookListResponseDto(Library library, Page<Book> books) {
-		List<AllLibraryBooksDto> allLibraryBooksDtos = books.getContent().stream()
+		List<AllLibraryBooksDto> allLibraryBooksDto = books.getContent().stream()
 			.map(book -> AllLibraryBooksDto.builder()
 				.bookId(book.getId())
 				.bookName(book.getName())
@@ -38,14 +38,12 @@ public class LibraryBookMapper {
 			.updatedAt(library.getUpdatedAt()).build();
 
 		LibraryBookListResponseDto libraryBookResponseDto = LibraryBookListResponseDto.builder()
-			.allLibraryBooks(allLibraryBooksDtos)
+			.allLibraryBooks(allLibraryBooksDto)
 			.libraryDto(libraryDto)
 			.totalCount(books.getTotalElements())
 			.size(books.getSize())
 			.page(books.getNumber() + 1).build();
 		return libraryBookResponseDto;
 	}
-
-	//라이브러리에 책 삭제
 
 }

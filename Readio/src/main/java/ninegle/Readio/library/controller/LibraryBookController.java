@@ -32,7 +32,7 @@ public class LibraryBookController {
 	}
 
 	//라이브러리에 책들 불러오기
-	@GetMapping("/library/{library_id}/library-books")
+	@GetMapping("/library/{libraryId}/library-books")
 	public ResponseEntity<BaseResponse<LibraryBookListResponseDto>> listAllBooks(
 		@PathVariable Long libraryId,
 		@RequestParam(defaultValue = "0") int page,
@@ -48,4 +48,5 @@ public class LibraryBookController {
 		@PathVariable Long libraryBookId) {
 		return libraryBookService.deleteLibraryBook(libraryId, libraryBookId);
 	}
+
 }

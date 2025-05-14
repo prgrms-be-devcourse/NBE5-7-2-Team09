@@ -19,6 +19,7 @@ import ninegle.Readio.library.dto.book.NewLibraryBookRequestDto;
 import ninegle.Readio.library.mapper.LibraryBookMapper;
 import ninegle.Readio.library.repository.LibraryBookRepository;
 import ninegle.Readio.library.repository.LibraryRepository;
+import ninegle.Readio.user.service.UserContextService;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class LibraryBookService {
 	private final BookRepository bookRepository;
 	private final LibraryRepository libraryRepository;
 	private final LibraryBookRepository libraryBookRepository;
+	private final UserContextService userContextService;
 
 	//라이브러리에 책 저장
 	public ResponseEntity<BaseResponse<Void>> newLibraryBook(Long libraryId, NewLibraryBookRequestDto bookRequestDto) {
@@ -59,12 +61,12 @@ public class LibraryBookService {
 		Pageable pageable) {
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
-			BaseResponse.error("라이브러리가 존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
+			return BaseResponse.error("라이브러리가 존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
 		}
 		//조회한 라이브러리
 		Library library = libraryOptional.get();
 
-		//조회한 책
+		//조회한 책들
 		Page<Book> books = libraryBookRepository.findBookByLibraryId(library.getId(), pageable);
 		LibraryBookListResponseDto libraryBookListResponseDto = LibraryBookMapper.libraryBookListResponseDto(library,
 			books);
@@ -75,13 +77,14 @@ public class LibraryBookService {
 	public ResponseEntity<BaseResponse<Void>> deleteLibraryBook(Long libraryId, Long libraryBookId) {
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
-			BaseResponse.error("라이브러리가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+			return BaseResponse.error("존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
 		}
 		Optional<LibraryBook> libraryBoook = libraryBookRepository.findLibraryBoook(libraryId, libraryBookId);
 		if (libraryBoook.isEmpty()) {
-			BaseResponse.error("라이브러리가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+			return BaseResponse.error("존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
 		}
-		libraryBookRepository.delete(libraryBoook.get());
+		LibraryBook libraryBook = libraryBoook.get();
+		libraryBookRepository.delete(libraryBook);
 
 		return BaseResponse.ok("라이브러리에 책이 삭제 되었습니다", null, HttpStatus.OK);
 
