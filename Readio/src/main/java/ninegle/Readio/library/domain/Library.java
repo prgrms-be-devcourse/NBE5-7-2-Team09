@@ -34,7 +34,7 @@ public class Library {
 
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
-	
+
 	public Library(String libraryname, User user) {
 		this.createdAt = LocalDateTime.now();
 		this.libraryName = libraryname;
