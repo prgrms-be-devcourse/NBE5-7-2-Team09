@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User } from "@/interface/User";
 import { AuthContextType } from "@/interface/AuthContextType";
 import { authService } from "@/utils/api/authService";
 
@@ -10,34 +9,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    const userStr = localStorage.getItem("user");
+    const storedEmail = localStorage.getItem("email");
 
-    if (token && userStr) {
+    if (token && storedEmail) {
       try {
-        const userData = JSON.parse(userStr);
-        setUser(userData);
+        setEmail(storedEmail);
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Failed to parse user data:", error);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        localStorage.removeItem("email");
       }
     }
     setIsLoading(false);
   }, []);
 
-  const login = (token: string, refreshToken: string, userData: User) => {
+  const login = (token: string, refreshToken: string, userEmail: string) => {
     localStorage.setItem("accessToken", token);
     localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
+    localStorage.setItem("email", userEmail);
+    setEmail(userEmail);
     setIsAuthenticated(true);
   };
 
@@ -54,8 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      setUser(null);
+      localStorage.removeItem("email");
+      setEmail(null);
       setIsAuthenticated(false);
       navigate("/");
     }
@@ -63,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, isLoading }}
+      value={{ isAuthenticated, email, login, logout, isLoading }}
     >
       {children}
     </AuthContext.Provider>

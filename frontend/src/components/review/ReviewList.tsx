@@ -21,6 +21,9 @@ interface ReviewListProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
+  currentUserEmail: string | null; // 현재 로그인한 사용자의 이메일
+  onEditReview?: (reviewId: number) => void; // 리뷰 수정 핸들러
+  onDeleteReview?: (reviewId: number) => void; // 리뷰 삭제 핸들러
 }
 
 const ReviewList: React.FC<ReviewListProps> = ({
@@ -31,6 +34,9 @@ const ReviewList: React.FC<ReviewListProps> = ({
   totalPages,
   currentPage,
   onPageChange,
+  currentUserEmail,
+  onEditReview,
+  onDeleteReview,
 }) => {
   // 로딩 메시지
   const LoadingIndicator = () => (
@@ -72,6 +78,11 @@ const ReviewList: React.FC<ReviewListProps> = ({
             rating={review.rating}
             date={new Date(review.createdAt).toISOString().split("T")[0]} // 날짜 형식 변환
             content={review.text}
+            isOwner={
+              currentUserEmail !== null && currentUserEmail === review.email
+            } // 현재 사용자가 작성자인지 확인
+            onEdit={onEditReview}
+            onDelete={onDeleteReview}
           />
         ))}
       </div>

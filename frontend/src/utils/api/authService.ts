@@ -23,7 +23,7 @@ export const authService = {
     return {
       accessToken: accessToken?.replace("Bearer ", ""),
       refreshToken,
-      user: response.data.user || response.data,
+      email: credentials.email,
     };
   },
 
@@ -44,7 +44,7 @@ export const authService = {
         console.warn("로그아웃 시 토큰이 없습니다.");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+        localStorage.removeItem("email");
         return { success: true };
       }
 
@@ -66,7 +66,7 @@ export const authService = {
       // 로그아웃 성공 시 로컬 스토리지 토큰 제거
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      localStorage.removeItem("email");
 
       return response.data;
     } catch (error) {
@@ -74,7 +74,7 @@ export const authService = {
       // 로그아웃 실패해도 로컬 토큰은 제거
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      localStorage.removeItem("email");
       throw error;
     }
   },

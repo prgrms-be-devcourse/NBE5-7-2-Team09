@@ -41,20 +41,6 @@ export const validateZipCode = (
   return { isValid: true, message: "" };
 };
 
-export const validateName = (
-  name: string
-): { isValid: boolean; message: string } => {
-  if (!name.trim()) {
-    return { isValid: false, message: "이름을 입력해주세요." };
-  }
-
-  if (name.trim().length < 2) {
-    return { isValid: false, message: "이름은 2자 이상이어야 합니다." };
-  }
-
-  return { isValid: true, message: "" };
-};
-
 export const validatePassword = (
   password: string
 ): { isValid: boolean; message: string } => {
@@ -209,7 +195,6 @@ export const formatPhoneNumber = (value: string): string => {
 
 // 회원가입 폼 유효성 검사 함수 업데이트
 export const validateSignupForm = (
-  name: string,
   nickname: string,
   email: string,
   phone_number: string,
@@ -226,7 +211,6 @@ export const validateSignupForm = (
     confirmPassword?: string;
   };
 } => {
-  const nameValidation = validateName(name);
   const nicknameValidation = validateNickname(nickname);
   const emailValidation = validateEmail(email);
   const phoneNumberValidation = validatePhoneNumber(phone_number);
@@ -237,7 +221,6 @@ export const validateSignupForm = (
   );
 
   const isValid =
-    nameValidation.isValid &&
     nicknameValidation.isValid &&
     emailValidation.isValid &&
     phoneNumberValidation.isValid &&
@@ -252,10 +235,6 @@ export const validateSignupForm = (
     password?: string;
     confirmPassword?: string;
   } = {};
-
-  if (!nameValidation.isValid) {
-    errors.name = nameValidation.message;
-  }
 
   if (!nicknameValidation.isValid) {
     errors.nickname = nicknameValidation.message;
