@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AuthorDto {
+public class PublisherResponseDto {
 
 	private long id;
 	private String name;
