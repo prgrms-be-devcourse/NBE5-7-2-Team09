@@ -3,7 +3,7 @@ import { Heart, Trash2, Star, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 // 책 타입 정의
 interface Book {
@@ -16,8 +16,6 @@ interface Book {
 }
 
 const WishlistPage = () => {
-  const { toast } = useToast();
-
   // 상태 관리
   const [books, setBooks] = useState<Book[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
@@ -164,16 +162,14 @@ const WishlistPage = () => {
   // 책 삭제
   const removeBook = (id: number) => {
     setBooks(books.filter((book) => book.id !== id));
-    toast({
-      title: "도서 삭제",
+    toast.success("도서 삭제", {
       description: "관심 도서에서 삭제되었습니다.",
     });
   };
 
   // 책 상세보기
   const viewBookDetail = (id: number) => {
-    toast({
-      title: "도서 상세보기",
+    toast.info("도서 상세보기", {
       description: `도서 ID: ${id}`,
     });
     // 실제 구현에서는 페이지 이동

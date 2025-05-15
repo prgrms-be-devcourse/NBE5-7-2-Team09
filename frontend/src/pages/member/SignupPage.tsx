@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -12,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import {
-  validateName,
   validateNickname,
   validateEmail,
   validatePhoneNumber,
@@ -28,7 +26,6 @@ import { authService } from "@/utils/api/authService";
 export default function SignupPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<SignupForm>({
-    name: "",
     nickname: "",
     email: "",
     phone_number: "",
@@ -42,7 +39,6 @@ export default function SignupPage() {
 
   const checkFormValidity = () => {
     const { isValid } = validateSignupForm(
-      formData.name,
       formData.nickname,
       formData.email,
       formData.phone_number,
@@ -75,9 +71,6 @@ export default function SignupPage() {
 
     let validation;
     switch (id) {
-      case "name":
-        validation = validateName(value);
-        break;
       case "nickname":
         validation = validateNickname(value);
         break;
@@ -121,7 +114,6 @@ export default function SignupPage() {
     setApiError("");
 
     const { isValid, errors: formErrors } = validateSignupForm(
-      formData.name,
       formData.nickname,
       formData.email,
       formData.phone_number,
@@ -138,11 +130,10 @@ export default function SignupPage() {
 
     try {
       const response = await authService.signup({
-        name: formData.name,
-        nickname: formData.nickname,
         email: formData.email,
-        phone_number: formData.phone_number,
         password: formData.password,
+        nickname: formData.nickname,
+        phone_number: formData.phone_number,
       });
 
       console.log(response);
@@ -189,21 +180,6 @@ export default function SignupPage() {
         </CardHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <CardContent className="space-y-3">
-            <div className="space-y-2">
-              <Label htmlFor="name">이름</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="홍길동"
-                value={formData.name}
-                onChange={handleInputChange}
-                className={errors.name ? "border-red-500" : ""}
-              />
-              {errors.name && (
-                <p className="text-sm text-red-500">{errors.name}</p>
-              )}
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="nickname">닉네임</Label>
               <Input

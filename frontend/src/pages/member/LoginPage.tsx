@@ -43,10 +43,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { accessToken, refreshToken, user } = await authService.login(
+      const { accessToken, refreshToken, email } = await authService.login(
         formData
       );
-      login(accessToken, refreshToken, user);
+      login(accessToken, refreshToken, email);
       navigate("/");
     } catch (e) {
       console.log(e);
