@@ -123,7 +123,7 @@ public class BookService {
 		}
 
 		// 3. epubUri 생성
-		String epubUri = nCloudStorageService.getFileUrl(fileName);
+		String epubUrl = nCloudStorageService.getFileUrl(fileName);
 
 		// 4. 연관 엔티티 조회
 		Category category = getCategory(request.getCategorySub());
@@ -131,7 +131,7 @@ public class BookService {
 		Publisher publisher = getPublisher(request.getPublisherName());
 
 		// 5. Book 저장
-		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category, epubUri));
+		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category, epubUrl));
 
 		// 6. ElasticSearch Repository에 저장
 		bookSearchRepository.save(BookSearchMapper.toEntity(savedBook));

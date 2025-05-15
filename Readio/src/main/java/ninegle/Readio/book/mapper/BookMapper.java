@@ -56,7 +56,7 @@ public class BookMapper {
 	}
 
 	public static Book toEntity (BookRequestDto dto, Publisher publisher,
-		Author author, Category category, String epubUri) {
+		Author author, Category category, String epubUrl) {
 		return Book.builder()
 			.name(dto.getName())
 			.description(dto.getDescription())
@@ -64,7 +64,7 @@ public class BookMapper {
 			.isbn(dto.getIsbn())
 			.ecn(dto.getEcn())
 			.pubDate(dto.getPubDate())
-			.epubUri(epubUri)
+			.epubUrl(epubUrl)
 			.category(category)
 			.publisher(publisher)
 			.author(author)
