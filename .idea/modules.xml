@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Readio.iml" filepath="$PROJECT_DIR$/.idea/modules/Readio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/NBE5-7-2-Team09.iml" filepath="$PROJECT_DIR$/.idea/NBE5-7-2-Team09.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Readio.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Readio.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Readio.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Readio.test.iml" />
     </modules>
   </component>
 </project>
