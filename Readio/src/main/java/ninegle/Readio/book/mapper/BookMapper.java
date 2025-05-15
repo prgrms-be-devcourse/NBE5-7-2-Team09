@@ -5,7 +5,6 @@ import java.util.List;
 
 import ninegle.Readio.book.domain.Author;
 import ninegle.Readio.book.domain.Book;
-import ninegle.Readio.book.domain.BookSearch;
 import ninegle.Readio.book.domain.Category;
 import ninegle.Readio.book.domain.Publisher;
 import ninegle.Readio.book.dto.AuthorDto;

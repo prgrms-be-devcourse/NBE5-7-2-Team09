@@ -35,12 +35,19 @@ import ninegle.Readio.book.dto.BookRequestDto;
 public class BookSearch {
 
 	@Id
+	@Field(type = FieldType.Keyword)
 	private Long id;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
 	private String name;
+
+	@Field(type = FieldType.Text)
 	private String image;
+
+	@Field(type = FieldType.Keyword) // 정확한 매칭용
 	private String categoryMajor;
+
+	@Field(type = FieldType.Text)
 	private String categorySub;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
@@ -49,6 +56,7 @@ public class BookSearch {
 	@Field(type = FieldType.Double)
 	private BigDecimal rating;
 
+	@Field(type = FieldType.Boolean)
 	private Boolean expired;
 
 	public void softDelete() {
