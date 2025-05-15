@@ -34,6 +34,21 @@ public class SubscriptionMailSender {
 		send(user.getEmail(), subject, body);
 	}
 
+	@Async
+	public void sendExpirationSoonMail(User user, Subscription subscription) {
+		String subject = "[Readio] 구독이 곧 만료됩니다 (1일 전)";
+		String body = templateProvider.buildExpirationSoonMailBody(user.getNickname(), subscription);
+		send(user.getEmail(), subject, body);
+	}
+
+	@Async
+	public void sendExpirationTodayMail(User user, Subscription subscription) {
+		String subject = "[Readio] 구독이 오늘 만료됩니다";
+		String body = templateProvider.buildExpirationTodayMailBody(user.getNickname(), subscription);
+		send(user.getEmail(), subject, body);
+	}
+
+
 	//공통 메일 전송 메서드
 	private void send(String to, String subject, String body) {
 		try {
