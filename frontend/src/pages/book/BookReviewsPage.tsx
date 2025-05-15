@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+// 수정된 BookReviewsPage.tsx
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,29 +9,31 @@ import BookCover from "@/components/book/BookCover";
 import ReviewList from "@/components/review/ReviewList";
 import ReviewFilters from "@/components/review/ReviewFilters";
 import ReviewForm from "@/components/review/ReviewForm";
-import reviewService, { Review } from "@/utils/api/reviewService"; // 수정된 import
-
-// 책 인터페이스 정의
-interface Book {
-  book_id: string;
-  book_name: string;
-  author: string;
-  book_image: string;
-  rating: number;
-  reviewCount: number;
-  genre_name?: string;
-}
+import reviewService, { Review } from "@/utils/api/reviewService";
+import bookService from "@/utils/api/bookService";
+import { BookDetail } from "@/types/book";
+import {
+  Dialog,
+  DialogFooter,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const BookReviewsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, email } = useAuth();
 
   // 상태 관리
-  const [book, setBook] = useState<Book | null>(null);
+  const [book, setBook] = useState<BookDetail | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [filteredReviews, setFilteredReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingBook, setIsLoadingBook] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -41,25 +44,34 @@ const BookReviewsPage: React.FC = () => {
   const [reviewContent, setReviewContent] = useState("");
   const [userRating, setUserRating] = useState<number | null>(null);
   const [pageSize] = useState(6);
-  const [loadingRequest, setLoadingRequest] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editReviewId, setEditReviewId] = useState<number | null>(null);
+  const [editRating, setEditRating] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState("");
 
-  // 테스트용 책 데이터 - 실제로는 API로 대체 예정
-  const mockBook: Book = {
-    book_id: id || "",
-    book_name: "사피엔스",
-    author: "유발 하라리",
-    book_image:
-      "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788934972464.jpg",
-    rating: 4.8,
-    reviewCount: 1423,
-    genre_name: "인문",
-  };
+  // 요청 상태 관리용 Refs
+  const loadingRequestRef = useRef(false);
+  const submitRequestRef = useRef(false);
+  const requestControllerRef = useRef<AbortController | null>(null);
 
-  // 리뷰 데이터 로드 함수 - 수정된 부분: reviewService 사용
+  // 리뷰 데이터 로드 함수 - 중복 요청 방지 로직 추가
   const loadReviews = async (page = 1) => {
-    if (loadingRequest) return; // 이미 요청 중이면 중복 요청 방지
+    // 이미 요청 중이면 중복 요청 방지
+    if (loadingRequestRef.current) {
+      console.log("이미 요청 진행 중입니다.");
+      return;
+    }
 
-    setLoadingRequest(true);
+    // 이전 요청이 있으면 취소
+    if (requestControllerRef.current) {
+      requestControllerRef.current.abort();
+    }
+
+    // 새 요청을 위한 AbortController 생성
+    requestControllerRef.current = new AbortController();
+
+    loadingRequestRef.current = true;
     setIsLoading(true);
 
     try {
@@ -73,44 +85,70 @@ const BookReviewsPage: React.FC = () => {
       setTotalReviews(summary.totalReviews);
       setAverageRating(summary.averageRating);
     } catch (error) {
+      // AbortError는 무시 (페이지 전환 등으로 인한 정상적인 취소)
+      if (error instanceof Error && error.name === "AbortError") {
+        console.log("리뷰 요청이 취소되었습니다.");
+        return;
+      }
+
       console.error("리뷰 데이터 로드 중 오류 발생:", error);
       toast.error("리뷰를 불러오는 데 실패했습니다", {
         description: "잠시 후 다시 시도해주세요.",
       });
     } finally {
+      // 요청 상태 초기화
+      loadingRequestRef.current = false;
       setIsLoading(false);
-      setLoadingRequest(false);
     }
   };
 
   // 책 정보 로드 함수
   const loadBookInfo = async () => {
-    try {
-      // 실제 구현에서는 API로 책 정보를 가져옵니다
-      // const response = await axios.get(`${API_BASE_URL}/books/${id}`);
-      // setBook(response.data.data);
+    if (!id) return;
 
-      // 현재는 mock 데이터를 사용합니다
-      setBook(mockBook);
+    setIsLoadingBook(true);
+    try {
+      // bookService를 사용해 책 정보 가져오기
+      const response = await bookService.getBookDetail(id);
+      setBook(response.data.data);
     } catch (error) {
       console.error("책 정보 로드 중 오류 발생:", error);
+      setError(
+        "책 정보를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요."
+      );
       toast.error("책 정보를 불러오는 데 실패했습니다", {
         description: "잠시 후 다시 시도해주세요.",
       });
+    } finally {
+      setIsLoadingBook(false);
     }
   };
 
-  // 초기 데이터 로드
+  // 컴포넌트 마운트/언마운트 관리
   useEffect(() => {
+    let isMounted = true;
+
+    // 초기 데이터 로드
     if (id) {
       loadBookInfo();
       loadReviews(1);
     }
+
+    // 클린업 함수
+    return () => {
+      isMounted = false;
+
+      // 진행 중인 요청 취소
+      if (requestControllerRef.current) {
+        requestControllerRef.current.abort();
+      }
+    };
   }, [id]);
 
   // 현재 페이지가 변경되면 리뷰 데이터를 다시 로드
   useEffect(() => {
-    if (id && !isLoading) {
+    // 최초 로딩 시에는 중복 호출 방지
+    if (id && !isLoading && currentPage > 0) {
       loadReviews(currentPage);
     }
   }, [currentPage]);
@@ -168,8 +206,13 @@ const BookReviewsPage: React.FC = () => {
     }
   };
 
-  // 리뷰 제출 - 수정된 부분: reviewService 사용
+  // 리뷰 제출 - 중복 제출 방지 추가
   const handleSubmitReview = async () => {
+    // 이미 제출 중이면 중복 요청 방지
+    if (submitRequestRef.current) {
+      return;
+    }
+
     const accessToken = localStorage.getItem("accessToken");
 
     if (!isAuthenticated || !accessToken) {
@@ -192,6 +235,8 @@ const BookReviewsPage: React.FC = () => {
       });
       return;
     }
+
+    submitRequestRef.current = true;
 
     try {
       const reviewData = {
@@ -218,8 +263,123 @@ const BookReviewsPage: React.FC = () => {
       toast.error("리뷰 등록에 실패했습니다", {
         description: "잠시 후 다시 시도해주세요.",
       });
+    } finally {
+      submitRequestRef.current = false;
     }
   };
+
+  // 리뷰 수정 모달 열기
+  const handleEditReview = (reviewId: number) => {
+    // 해당 리뷰 찾기
+    const reviewToEdit = reviews.find((review) => review.id === reviewId);
+
+    if (reviewToEdit) {
+      setEditReviewId(reviewId);
+      setEditRating(reviewToEdit.rating);
+      setEditContent(reviewToEdit.text);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  // 리뷰 수정 제출
+  const handleUpdateReview = async () => {
+    if (!editReviewId || !editRating) return;
+
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      toast.error("로그인이 필요합니다");
+      return;
+    }
+
+    try {
+      const reviewData = {
+        rating: editRating,
+        text: editContent,
+      };
+
+      await reviewService.updateReview(
+        id,
+        editReviewId,
+        reviewData,
+        accessToken
+      );
+
+      // 수정 후 리뷰 목록 새로고침
+      loadReviews(currentPage);
+
+      // 모달 닫기 및 상태 초기화
+      setIsEditModalOpen(false);
+      setEditReviewId(null);
+      setEditRating(null);
+      setEditContent("");
+
+      toast.success("리뷰가 수정되었습니다");
+    } catch (error) {
+      console.error("리뷰 수정 중 오류 발생:", error);
+      toast.error("리뷰 수정에 실패했습니다", {
+        description: "잠시 후 다시 시도해주세요.",
+      });
+    }
+  };
+
+  // 리뷰 삭제
+  const handleDeleteReview = async (reviewId: number) => {
+    if (!window.confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
+      return;
+    }
+
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      toast.error("로그인이 필요합니다");
+      return;
+    }
+
+    try {
+      await reviewService.deleteReview(id, reviewId, accessToken);
+
+      // 삭제 후 리뷰 목록 새로고침
+      loadReviews(currentPage);
+
+      toast.success("리뷰가 삭제되었습니다");
+    } catch (error) {
+      console.error("리뷰 삭제 중 오류 발생:", error);
+      toast.error("리뷰 삭제에 실패했습니다", {
+        description: "잠시 후 다시 시도해주세요.",
+      });
+    }
+  };
+
+  // 책 이미지 플레이스홀더
+  const bookImage =
+    book?.image ||
+    "https://placehold.co/400x600/e8eaf2/4a6fa5?text=No+Cover+Available&font=montserrat";
+
+  // 로딩 중 표시
+  if (isLoadingBook) {
+    return (
+      <div className="container mx-auto py-12 flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-600">책 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  // 에러 표시
+  if (error || !book) {
+    return (
+      <div className="container mx-auto py-12 flex flex-col items-center justify-center">
+        <div className="bg-red-100 p-6 rounded-lg text-center max-w-md">
+          <h2 className="text-xl font-semibold text-red-700 mb-2">오류 발생</h2>
+          <p className="text-gray-700">
+            {error || "책 정보를 불러올 수 없습니다."}
+          </p>
+          <Button className="mt-4" onClick={() => navigate(-1)}>
+            뒤로 가기
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto">
@@ -234,23 +394,21 @@ const BookReviewsPage: React.FC = () => {
       {/* 책 정보와 리뷰 폼 레이아웃 */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 mb-8">
         {/* 좌측: 책 정보 */}
-        {book && (
-          <div className="md:col-span-1">
-            <div className="flex flex-col items-center md:items-start">
-              <BookCover
-                book={{
-                  id: parseInt(book.book_id),
-                  title: book.book_name,
-                  author: book.author,
-                  cover: book.book_image,
-                  category: book.genre_name || "기타",
-                  rating: book.rating,
-                }}
-                className="mx-auto md:mx-0 w-full max-w-[180px] md:max-w-full"
-              />
-            </div>
+        <div className="md:col-span-1">
+          <div className="flex flex-col items-center md:items-start">
+            <BookCover
+              book={{
+                id: Number(id),
+                title: book.name,
+                author: book.author.name,
+                cover: bookImage,
+                category: book.category.major,
+                rating: averageRating || 0,
+              }}
+              className="mx-auto md:mx-0 w-full max-w-[180px] md:max-w-full"
+            />
           </div>
-        )}
+        </div>
 
         {/* 우측: 리뷰 작성 폼 - 분리된 컴포넌트 사용 */}
         <div className="md:col-span-4">
@@ -286,7 +444,63 @@ const BookReviewsPage: React.FC = () => {
         totalPages={totalPages}
         currentPage={currentPage}
         onPageChange={handlePageChange}
+        currentUserEmail={email || ""}
+        // 현재 사용자 이메일 전달
+        onEditReview={handleEditReview} // 수정 핸들러 전달
+        onDeleteReview={handleDeleteReview}
       />
+      {isEditModalOpen && (
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>리뷰 수정</DialogTitle>
+              <DialogDescription>
+                아래 내용을 수정한 후 저장 버튼을 클릭하세요.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="flex items-center justify-center space-x-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setEditRating(star)}
+                    className="focus:outline-none"
+                  >
+                    <Star
+                      className={`h-8 w-8 ${
+                        editRating && star <= editRating
+                          ? "text-yellow-500 fill-yellow-500"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-review">리뷰 내용</Label>
+                <Textarea
+                  id="edit-review"
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  rows={5}
+                  placeholder="리뷰 내용을 입력하세요..."
+                  className="resize-none"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                취소
+              </Button>
+              <Button onClick={handleUpdateReview}>저장</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

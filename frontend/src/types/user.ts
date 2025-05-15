@@ -4,15 +4,17 @@ export interface UserProfile {
   nickname: string;
   email: string;
   phoneNumber: string;
-  points: number;
+  point: number;
 }
 
 export interface Subscription {
   isActive: boolean;
+  stillValid?: boolean; // 만료일이 현재 이후라면 true
   plan?: string;
   startDate?: string;
   endDate?: string;
   price?: number;
+  userId?: number;
 }
 
 export interface ProfileUpdateRequest {

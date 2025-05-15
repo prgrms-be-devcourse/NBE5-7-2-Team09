@@ -1,3 +1,4 @@
+// 간소화된 App.tsx 라우터 구성
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import MainPage from "./pages/MainPage";
@@ -7,17 +8,20 @@ import { AuthProvider } from "./contexts/AuthContext";
 import BookDetailPage from "./pages/book/BookDetailPage";
 import BookReviewsPage from "./pages/book/BookReviewsPage";
 import EpubReaderPage from "./pages/book/EpubReaderPage";
+import BooksPage from "./pages/book/BooksPage"; // 도서 목록 페이지
+import CategoryRedirect from "./components/book/CategoryRedirect";
 import LibraryPage from "./pages/library/LibraryPage";
 import LibraryDetailPage from "./pages/library/LibraryDetailPage";
-import { Toaster } from "sonner"; // sonner로 변경
+import { Toaster } from "sonner";
 import MyPage from "./pages/member/MyPage";
-import WishlistPage from "./pages/member/WishlistPage";
+import WishlistPage from "./pages/member/PreferencePage";
 
 // 관리자 페이지 및 인증 관련 컴포넌트
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
+import PreferencePage from "./pages/member/PreferencePage";
 
 function App() {
   return (
@@ -44,18 +48,32 @@ function App() {
                     <Route path="/" element={<MainPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
+
+                    {/* 도서 관련 라우트 */}
+                    <Route path="/books" element={<BooksPage />} />
                     <Route path="/book/:id" element={<BookDetailPage />} />
                     <Route
                       path="/book/:id/reviews"
                       element={<BookReviewsPage />}
                     />
+
+                    {/* 카테고리 관련 리다이렉트 (기존 URL 호환성 유지) */}
+                    <Route
+                      path="/category/:id"
+                      element={<CategoryRedirect />}
+                    />
+                    <Route path="/all" element={<CategoryRedirect />} />
+
+                    {/* 라이브러리 관련 라우트 */}
                     <Route path="/library" element={<LibraryPage />} />
                     <Route
                       path="/library/:id"
                       element={<LibraryDetailPage />}
                     />
+
+                    {/* 유저 관련 라우트 */}
                     <Route path="/my-page" element={<MyPage />} />
-                    <Route path="wishlist" element={<WishlistPage />} />
+                    <Route path="/preference" element={<PreferencePage />} />
                   </Routes>
                 </Layout>
               }

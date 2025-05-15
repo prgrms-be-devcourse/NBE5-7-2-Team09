@@ -1,3 +1,4 @@
+// src/components/layout/Navbar.tsx (기존 Navbar 업데이트 - 검색 기능 추가)
 import { useState, useEffect } from "react";
 import {
   Search,
@@ -17,6 +18,7 @@ const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   const [showCategories, setShowCategories] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   // 스크롤 방향에 따라 카테고리 표시/숨김 처리
@@ -52,8 +54,8 @@ const Navbar = () => {
   };
 
   // 관심 도서로 이동하는 함수
-  const navigateToWishlist = () => {
-    navigate("/wishlist");
+  const navigateToPreference = () => {
+    navigate("/preference");
   };
 
   // 마이페이지로 이동하는 함수
@@ -67,11 +69,30 @@ const Navbar = () => {
     navigate("/");
   };
 
+  // 검색 처리 함수
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/books?query=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
+
+  // 카테고리 클릭 처리
+  const handleCategoryClick = (categoryId: string) => {
+    // 전체 카테고리인 경우
+    if (categoryId === "000") {
+      navigate("/books");
+    } else {
+      navigate(`/books?category=${categoryId}`);
+    }
+  };
+
   // KDC 한국십진분류법 기반 카테고리
   const categories = [
     {
       id: "000",
-      name: "총류",
+      name: "전체",
       subcategories: ["백과사전", "도서관학", "저널리즘", "전집", "연속간행물"],
     },
     {
@@ -181,27 +202,28 @@ const Navbar = () => {
           </a>
           {/* 검색바 */}
           <div className="relative flex-1 hidden sm:flex items-center">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="책 검색..."
-              className="pl-8 pr-20 w-full h-9 rounded-lg focus:ring-2 focus:ring-blue-600"
-            />
-            <Button
-              variant="default"
-              size="sm"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 bg-blue-600 hover:bg-blue-700"
-            >
-              검색하기
-            </Button>
+            <form onSubmit={handleSearch} className="w-full">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="책 검색..."
+                className="pl-8 pr-20 w-full h-9 rounded-lg focus:ring-2 focus:ring-blue-600"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="default"
+                size="sm"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 bg-blue-600 hover:bg-blue-700"
+              >
+                검색하기
+              </Button>
+            </form>
           </div>
         </div>
         {/* 우측: 로그인 상태에 따른 버튼들 */}
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* 모바일 검색 아이콘 */}
-          <Button variant="ghost" size="icon" className="sm:hidden">
-            <Search className="h-5 w-5" />
-          </Button>
           {isAuthenticated ? (
             // 로그인 시 표시될 버튼들
             <>
@@ -219,7 +241,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center"
-                onClick={navigateToWishlist}
+                onClick={navigateToPreference}
               >
                 <Heart className="h-5 w-5" />
                 <span>관심 도서</span>
@@ -253,7 +275,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={navigateToWishlist}
+                  onClick={navigateToPreference}
                 >
                   <Heart className="h-5 w-5" />
                 </Button>
@@ -275,7 +297,7 @@ const Navbar = () => {
             <>
               <Link to="/login">
                 <Button variant="ghost" className="">
-                  <LogIn className="h-5 w-5" />
+                  <LogIn className="h-5 w-5 mr-2" />
                   로그인
                 </Button>
               </Link>
@@ -284,7 +306,7 @@ const Navbar = () => {
                   variant="default"
                   className=" bg-blue-600 hover:bg-blue-700"
                 >
-                  <UserPlus className="h-5 w-5" />
+                  <UserPlus className="h-5 w-5 mr-2" />
                   회원가입
                 </Button>
               </Link>
@@ -305,7 +327,7 @@ const Navbar = () => {
             key={category.id}
             variant="ghost"
             className="text-sm h-8 px-3 flex items-center whitespace-nowrap"
-            onClick={() => navigate(`/category/${category.id}`)}
+            onClick={() => handleCategoryClick(category.id)}
           >
             {category.name}
           </Button>

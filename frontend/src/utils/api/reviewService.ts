@@ -144,6 +144,69 @@ const reviewService = {
       throw error;
     }
   },
+
+  // reviewService.ts에 아래 메서드들을 추가합니다
+
+  /**
+   * 리뷰 수정 함수
+   * @param bookId 책 ID
+   * @param reviewId 리뷰 ID
+   * @param reviewData 수정할 리뷰 데이터 (rating, text)
+   * @param accessToken 액세스 토큰
+   * @returns Promise<any>
+   */
+  updateReview: async (
+    bookId: string | undefined,
+    reviewId: number,
+    reviewData: { rating: number; text: string },
+    accessToken: string
+  ): Promise<any> => {
+    try {
+      // API 경로: /books/{bookId}/reviews/{reviewId}
+      const response = await axios.put(
+        `${API_BASE_URL}/books/${bookId}/reviews/${reviewId}`,
+        reviewData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("리뷰 수정 중 오류 발생:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * 리뷰 삭제 함수
+   * @param bookId 책 ID
+   * @param reviewId 리뷰 ID
+   * @param accessToken 액세스 토큰
+   * @returns Promise<any>
+   */
+  deleteReview: async (
+    bookId: string | undefined,
+    reviewId: number,
+    accessToken: string
+  ): Promise<any> => {
+    try {
+      // API 경로: /books/{bookId}/reviews/{reviewId}
+      const response = await axios.delete(
+        `${API_BASE_URL}/books/${bookId}/reviews/${reviewId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("리뷰 삭제 중 오류 발생:", error);
+      throw error;
+    }
+  },
 };
 
 export default reviewService;

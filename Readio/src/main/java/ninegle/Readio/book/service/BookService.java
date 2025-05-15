@@ -10,13 +10,18 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import ninegle.Readio.adapter.service.NCloudStorageService;
 import ninegle.Readio.book.domain.Author;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.BookSearch;
@@ -71,6 +76,8 @@ public class BookService {
 	private final UserService userService;
 	private final ReviewRepository reviewRepository;
 	private final ReviewMapper reviewMapper;
+  private final NCloudStorageService nCloudStorageService;
+
 
 	public ResponseEntity<BaseResponse<BookListResponseDto>> searchBooks(String keyword, int page, int size) {
 
@@ -94,7 +101,7 @@ public class BookService {
 
 		log.info("result = {}", result);
 		return new ArrayList<>(result);
-	}
+  }
 
 	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) {
 
@@ -241,5 +248,18 @@ public class BookService {
 		ReviewListResponseDto resultResponseDto = reviewMapper.toReviewListResponseDto(reviewList, paginationDto,
 			summaryDto);
 		return BaseResponse.ok("조회가 성공적으로 수행되었습니다.", resultResponseDto, HttpStatus.OK);
+	}
+
+	//파일 받아오기 예시코드
+	public ResponseEntity<byte[]> getBookFile(Long bookId) {
+		String bookName = getBookById(bookId).getName();
+		String bookFileName = bookName + ".epub";
+		byte[] downloadFile = nCloudStorageService.downloadFile(bookFileName);
+
+
+		return ResponseEntity.ok()
+			.contentType(MediaType.APPLICATION_OCTET_STREAM)
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bookFileName + "\"")
+			.body(downloadFile);
 	}
 }

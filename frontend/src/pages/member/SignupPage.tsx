@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -12,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import {
-  validateName,
   validateNickname,
   validateEmail,
   validatePhoneNumber,
@@ -28,10 +26,9 @@ import { authService } from "@/utils/api/authService";
 export default function SignupPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<SignupForm>({
-    name: "",
     nickname: "",
     email: "",
-    phone_number: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -42,10 +39,9 @@ export default function SignupPage() {
 
   const checkFormValidity = () => {
     const { isValid } = validateSignupForm(
-      formData.name,
       formData.nickname,
       formData.email,
-      formData.phone_number,
+      formData.phoneNumber,
       formData.password,
       formData.confirmPassword
     );
@@ -60,7 +56,7 @@ export default function SignupPage() {
     const { id, value } = e.target;
 
     // 핸드폰 번호 자동 포맷팅 처리
-    if (id === "phone_number") {
+    if (id === "phoneNumber") {
       const formattedValue = formatPhoneNumber(value);
       setFormData((prev) => ({
         ...prev,
@@ -75,16 +71,13 @@ export default function SignupPage() {
 
     let validation;
     switch (id) {
-      case "name":
-        validation = validateName(value);
-        break;
       case "nickname":
         validation = validateNickname(value);
         break;
       case "email":
         validation = validateEmail(value);
         break;
-      case "phone_number":
+      case "phoneNumber":
         const formattedValue = formatPhoneNumber(value);
         validation = validatePhoneNumber(formattedValue);
         break;
@@ -121,10 +114,9 @@ export default function SignupPage() {
     setApiError("");
 
     const { isValid, errors: formErrors } = validateSignupForm(
-      formData.name,
       formData.nickname,
       formData.email,
-      formData.phone_number,
+      formData.phoneNumber,
       formData.password,
       formData.confirmPassword
     );
@@ -137,12 +129,12 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
+      console.log(formData);
       const response = await authService.signup({
-        name: formData.name,
-        nickname: formData.nickname,
         email: formData.email,
-        phone_number: formData.phone_number,
         password: formData.password,
+        nickname: formData.nickname,
+        phoneNumber: formData.phoneNumber,
       });
 
       console.log(response);
@@ -190,21 +182,6 @@ export default function SignupPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <Label htmlFor="name">이름</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="홍길동"
-                value={formData.name}
-                onChange={handleInputChange}
-                className={errors.name ? "border-red-500" : ""}
-              />
-              {errors.name && (
-                <p className="text-sm text-red-500">{errors.name}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="nickname">닉네임</Label>
               <Input
                 id="nickname"
@@ -235,17 +212,17 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone_number">핸드폰 번호</Label>
+              <Label htmlFor="phoneNumber">핸드폰 번호</Label>
               <Input
-                id="phone_number"
+                id="phoneNumber"
                 type="tel"
                 placeholder="010-1234-5678"
-                value={formData.phone_number}
+                value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className={errors.phone_number ? "border-red-500" : ""}
+                className={errors.phoneNumber ? "border-red-500" : ""}
               />
-              {errors.phone_number && (
-                <p className="text-sm text-red-500">{errors.phone_number}</p>
+              {errors.phoneNumber && (
+                <p className="text-sm text-red-500">{errors.phoneNumber}</p>
               )}
             </div>
 

@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -39,81 +39,33 @@ const LibraryPage: React.FC = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
-  // 테스트용 데이터
-  const mockLibraries = [
-    {
-      library_id: 1,
-      library_name: "내 첫 번째 라이브러리",
-      created_at: "2025-05-07T15:00:00",
-      updated_at: "2025-05-07T15:00:00",
-    },
-    {
-      library_id: 2,
-      library_name: "소설 모음",
-      created_at: "2025-05-06T10:30:00",
-      updated_at: "2025-05-06T10:30:00",
-    },
-    {
-      library_id: 3,
-      library_name: "자기계발 서적",
-      created_at: "2025-05-05T12:15:00",
-      updated_at: "2025-05-05T12:15:00",
-    },
-    {
-      library_id: 4,
-      library_name: "역사책 컬렉션",
-      created_at: "2025-05-03T09:45:00",
-      updated_at: "2025-05-07T16:20:00",
-    },
-    {
-      library_id: 5,
-      library_name: "과학 도서",
-      created_at: "2025-04-28T14:10:00",
-      updated_at: "2025-04-28T14:10:00",
-    },
-    {
-      library_id: 6,
-      library_name: "철학 도서",
-      created_at: "2025-04-20T11:05:00",
-      updated_at: "2025-04-25T17:30:00",
-    },
-  ];
-
   // 라이브러리 목록 조회
-  const fetchLibraries = async (page: number = 1) => {
+  const fetchLibraries = async (page: number) => {
     setIsLoading(true);
     try {
-      // API 연동 시 아래 주석 해제
-      // const response = await libraryService.getLibraries(page, 6);
-      // setLibraries(response.data.libraries);
-      // setTotalPages(response.data.totalPages || 1);
-
-      // 테스트용 데이터 사용
-      setLibraries(mockLibraries);
-      setTotalPages(2); // 테스트용 페이지 수
+      const response = await libraryService.getLibraries(page, 10);
+      console.log(response.data.libraries);
+      setLibraries(response.data.libraries);
+      setTotalPages(response.data.totalPages || 1);
       setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching libraries:", error);
-      toast({
-        title: "라이브러리 목록 조회 실패",
+      toast.error("라이브러리 목록 조회 실패", {
         description: "라이브러리 목록을 불러오는 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 페이지 로드 시 라이브러리 목록 조회 (테스트 목적으로 isAuthenticated 검사 제거)
+  // 페이지 로드 시 라이브러리 목록 조회
   useEffect(() => {
-    // 실제 구현 시 아래 주석 해제
-    // if (isAuthenticated) {
-    fetchLibraries(1);
-    // }
-  }, []);
+    if (isAuthenticated) {
+      fetchLibraries(0);
+    }
+  }, [isAuthenticated]);
 
   // 페이지 변경 처리
   const handlePageChange = (page: number) => {
@@ -131,17 +83,14 @@ const LibraryPage: React.FC = () => {
       await libraryService.createLibrary(newLibraryName);
       setOpenCreateDialog(false);
       setNewLibraryName("");
-      toast({
-        title: "라이브러리 생성 완료",
+      toast.success("라이브러리 생성 완료", {
         description: "새로운 라이브러리가 생성되었습니다.",
       });
       fetchLibraries(currentPage);
     } catch (error) {
       console.error("Error creating library:", error);
-      toast({
-        title: "라이브러리 생성 실패",
+      toast.error("라이브러리 생성 실패", {
         description: "라이브러리 생성 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };
@@ -160,17 +109,14 @@ const LibraryPage: React.FC = () => {
     try {
       await libraryService.updateLibraryName(editLibraryId, editLibraryName);
       setOpenEditDialog(false);
-      toast({
-        title: "라이브러리 수정 완료",
+      toast.success("라이브러리 수정 완료", {
         description: "라이브러리 이름이 수정되었습니다.",
       });
       fetchLibraries(currentPage);
     } catch (error) {
       console.error("Error updating library:", error);
-      toast({
-        title: "라이브러리 수정 실패",
+      toast.error("라이브러리 수정 실패", {
         description: "라이브러리 이름 수정 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };
@@ -188,17 +134,14 @@ const LibraryPage: React.FC = () => {
     try {
       await libraryService.deleteLibrary(deleteLibraryId);
       setOpenDeleteDialog(false);
-      toast({
-        title: "라이브러리 삭제 완료",
+      toast.success("라이브러리 삭제 완료", {
         description: "라이브러리가 삭제되었습니다.",
       });
       fetchLibraries(currentPage);
     } catch (error) {
       console.error("Error deleting library:", error);
-      toast({
-        title: "라이브러리 삭제 실패",
+      toast.error("라이브러리 삭제 실패", {
         description: "라이브러리 삭제 중 오류가 발생했습니다.",
-        variant: "destructive",
       });
     }
   };
