@@ -2,11 +2,10 @@
 프로그래머스 백엔드 데브코스 5기 7회차 9팀 **9글** 2차 프로젝트입니다.
 <br>
 <br>
+<img src="https://github.com/your-username/your-repo/assets/12345678/readio-logo.png" alt="Readio Logo" width="300"/>
 
 ## 🙋‍♀️ 프로젝트 소개
-> <img src="https://github.com/your-username/your-repo/assets/12345678/readio-logo.png" alt="Readio Logo" width="300"/>
-
-**Readio – 스마트한 전자책 구독 플랫폼**
+> **Readio – 스마트한 전자책 구독 플랫폼**
 
 - 언제 어디서나 웹으로 책을 읽을 수 있는 온라인 전자책 구독 서비스입니다.
 - 전자책 데이터는 네이버 클라우드에 안정적으로 저장되며, Elasticsearch를 통해 빠르고 정확한 검색 환경을 제공합니다.
