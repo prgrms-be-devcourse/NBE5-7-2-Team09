@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
+import ninegle.Readio.mail.subscription.service.SubscriptionMailSender;
 import ninegle.Readio.subscription.domain.Subscription;
 import ninegle.Readio.subscription.repository.SubscriptionRepository;
 import ninegle.Readio.user.domain.User;
@@ -18,14 +20,17 @@ public class SubscriptionManager {
 
 	private final SubscriptionRepository subscriptionRepository;
 	private final UserRepository userRepository;
+	private final SubscriptionMailSender mailSender;
 
-	private static final int SUBSCRIPTION_COST = 24900;
+	private static final int SUBSCRIPTION_COST = 14900;
 
 	public void subscribe(Long userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
 		Optional<Subscription> optional = subscriptionRepository.findByUserId(userId);
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime exp = now.plusMonths(1);
 
 		if (optional.isPresent()) {
 			Subscription subscription = optional.get();
@@ -38,20 +43,27 @@ public class SubscriptionManager {
 			}
 
 			chargePoints(user);
-			subscription.updatePeriod(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+			subscription.updatePeriod(now, exp);
 			subscriptionRepository.save(subscription);
+
+			// 구독 갱신 메일 전송
+			mailSender.sendSubscribeMail(user, subscription);
 			return;
 		}
 
+		// 새로운 구독 생성
 		chargePoints(user);
-		subscriptionRepository.save(
-			Subscription.builder()
-				.userId(userId)
-				.subDate(LocalDateTime.now())
-				.expDate(LocalDateTime.now().plusMonths(1))
-				.canceled(false)
-				.build()
-		);
+		Subscription newSubscription = Subscription.builder()
+			.userId(userId)
+			.subDate(now)
+			.expDate(exp)
+			.canceled(false)
+			.build();
+
+		subscriptionRepository.save(newSubscription);
+
+		// 새 구독 생성 메일 전송
+		mailSender.sendSubscribeMail(user, newSubscription);
 	}
 
 	public void cancelSubscription(Long userId) {
@@ -60,6 +72,12 @@ public class SubscriptionManager {
 
 		subscription.cancel();
 		subscriptionRepository.save(subscription);
+
+		// 구독 취소 메일 전송
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+		mailSender.sendCancelMail(user, subscription);
 	}
 
 	private void chargePoints(User user) {
@@ -69,3 +87,4 @@ public class SubscriptionManager {
 		user.setPoint(user.getPoint() - SUBSCRIPTION_COST);
 	}
 }
+

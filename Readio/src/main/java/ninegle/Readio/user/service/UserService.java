@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.mail.user.service.UserMailSender;
 import ninegle.Readio.user.domain.BlackList;
 import ninegle.Readio.user.domain.RefreshToken;
 import ninegle.Readio.user.domain.User;
@@ -37,6 +38,7 @@ public class UserService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final TokenRepository tokenRepository;
 	private final BlackListRepository blackListRepository;
+	private final UserMailSender userMailSender;
 
 	//암호화 후 db에 회원가입 정보 저장
 	//BaseResponse로 지정한 내용에 http 상태 코드를 수정 후 다시 ResponseEntity로 감싸서 보냄
@@ -52,6 +54,10 @@ public class UserService {
 			.phoneNumber(dto.getPhoneNumber())
 			.build();
 		userRepository.save(user);
+
+		// 회원가입 환영 메일 전송
+		userMailSender.sendSignupMail(user);
+
 		return BaseResponse.ok("회원가입을 성공하셨습니다", HttpStatus.CREATED); //201 반환
 	}
 
