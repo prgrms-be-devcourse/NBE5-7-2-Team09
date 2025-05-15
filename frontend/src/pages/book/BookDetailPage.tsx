@@ -344,7 +344,7 @@ const BookDetailPage = () => {
     if (isLoadingReviews) {
       return (
         <div className="text-center py-4">
-          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
           <p className="mt-2 text-gray-600">리뷰를 불러오는 중...</p>
         </div>
       );
@@ -388,7 +388,7 @@ const BookDetailPage = () => {
   if (isLoading) {
     return (
       <div className="container mx-auto py-12 flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         <p className="mt-4 text-gray-600">책 정보를 불러오는 중...</p>
       </div>
     );
@@ -469,7 +469,7 @@ const BookDetailPage = () => {
                     className={`w-full ${
                       isLibraryAdded
                         ? "bg-green-600 hover:bg-green-700"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-500 hover:bg-blue-600"
                     }`}
                     onClick={handleAddToLibrary}
                   >
@@ -508,7 +508,7 @@ const BookDetailPage = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
               <div>
                 <div className="flex flex-wrap gap-2 mb-2">
-                  <Badge className="bg-blue-600">{book.category.major}</Badge>
+                  <Badge className="bg-blue-500">{book.category.major}</Badge>
                   {book.category.sub && (
                     <Badge variant="outline">{book.category.sub}</Badge>
                   )}
@@ -574,7 +574,7 @@ const BookDetailPage = () => {
                 {book.description && book.description.length > 200 && (
                   <Button
                     variant="ghost"
-                    className="mt-2 text-blue-600 flex items-center"
+                    className="mt-2 text-blue-500 flex items-center"
                     onClick={toggleDescription}
                   >
                     {showFullDescription ? (
@@ -644,7 +644,7 @@ const BookDetailPage = () => {
             </Button>
             <Button
               onClick={handleReadBook}
-              className="bg-blue-600 hover:bg-blue-700 sm:flex-1"
+              className="bg-blue-500 hover:bg-blue-600 sm:flex-1"
             >
               지금 읽기
             </Button>
@@ -667,7 +667,7 @@ const BookDetailPage = () => {
 
           {isLoadingLibraries ? (
             <div className="py-4 text-center">
-              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
               <p className="mt-2 text-gray-600">라이브러리를 불러오는 중...</p>
             </div>
           ) : (
@@ -716,7 +716,7 @@ const BookDetailPage = () => {
               <Button variant="outline">취소</Button>
             </DialogClose>
             <Button
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-500 hover:bg-blue-600"
               onClick={handleAddBookToSelectedLibrary}
               disabled={!selectedLibraryId}
             >
@@ -771,7 +771,7 @@ const BookDetailPage = () => {
               취소
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-500 hover:bg-blue-600"
               onClick={handleCreateLibraryAndAddBook}
               disabled={!newLibraryName.trim()}
             >
