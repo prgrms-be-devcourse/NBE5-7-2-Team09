@@ -3,6 +3,8 @@ package ninegle.Readio.book.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,11 +20,14 @@ import ninegle.Readio.book.domain.BookSearch;
 @Repository
 public interface BookSearchRepository extends ElasticsearchRepository<BookSearch, Long> {
 
-	List<BookSearch> findByExpiredFalseAndNameContaining(String name);
+	Page<BookSearch> findByExpiredFalseAndNameContaining(String name, Pageable pageable);
 
-	List<BookSearch> findByExpiredFalseAndPublisherContaining(String publisher);
+	Page<BookSearch> findByExpiredFalseAndAuthorContaining(String author, Pageable pageable);
 
-	List<BookSearch> findByExpiredFalseAndAuthorContaining(String author);
+	// 전체 페이지 조회
+	Page<BookSearch> findByExpiredFalse(Pageable pageable);
+	// 카테고리별 조회
+	Page<BookSearch> findByExpiredFalseAndCategoryMajor(String major, Pageable pageable);
 
 	Optional<BookSearch> findById(Long id);
 }
