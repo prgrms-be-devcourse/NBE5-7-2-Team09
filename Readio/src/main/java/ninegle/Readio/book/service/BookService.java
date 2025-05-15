@@ -81,9 +81,7 @@ public class BookService {
 
 	public ResponseEntity<BaseResponse<BookListResponseDto>> searchBooks(String keyword, int page, int size) {
 
-		Pageable pageable = PageRequest.of(page-1, size);
-
-		List<BookSearchResponseDto> findBooks = BookSearchMapper.toResponseDto(getBookSearchList(keyword));
+		List<BookSearchResponseDto> findBooks = BookSearchMapper.toResponseDto(getBookSearchList(keyword, page, size));
 
 		long totalElements = findBooks.size();
 		PaginationDto paginationDto = BookMapper.toPaginationDto(totalElements, page, size);
@@ -92,15 +90,25 @@ public class BookService {
 		return BaseResponse.ok("검색 결과입니다.", response, HttpStatus.OK);
 	}
 
-	private List<BookSearch> getBookSearchList(String keyword) {
+	private List<BookSearch> getBookSearchList(String keyword, int page, int size) {
 		Set<BookSearch> result = new LinkedHashSet<>();
 
-		result.addAll(bookSearchRepository.findByExpiredFalseAndAuthorContaining(keyword));
-		result.addAll(bookSearchRepository.findByExpiredFalseAndPublisherContaining(keyword));
-		result.addAll(bookSearchRepository.findByExpiredFalseAndNameContaining(keyword));
+		Pageable pageable = PageRequest.of(page-1, size);
+		result.addAll(bookSearchRepository.findByExpiredFalseAndAuthorContaining(keyword, pageable).getContent());
+		result.addAll(bookSearchRepository.findByExpiredFalseAndNameContaining(keyword, pageable).getContent());
 
-		log.info("result = {}", result);
 		return new ArrayList<>(result);
+  }
+
+  private void updateRatingInBookSearch(long bookId) {
+		BigDecimal rating = reviewRepository.findAverageRatingByBook(bookId);
+		if (rating != null) {
+			rating = BigDecimal.ZERO;
+		}
+		BookSearch bookSearch = bookSearchRepository.findById(bookId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
+		bookSearch.updateRating(rating);
+		bookSearchRepository.save(bookSearch);
   }
 
 	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) {
@@ -159,7 +167,7 @@ public class BookService {
 		Publisher publisher = getPublisher(request.getPublisherName());
 
 		Book updatedBook = targetBook.update(request, category, author, publisher);
-		BookSearch updatedBookSearch = targetBookSearch.update(request, category, author, publisher);
+		BookSearch updatedBookSearch = targetBookSearch.update(request, category, author);
 
 		bookRepository.save(updatedBook);
 		bookSearchRepository.save(updatedBookSearch);
@@ -183,18 +191,19 @@ public class BookService {
 		return BaseResponse.ok("책 삭제가 정상적으로 수행되었습니다.", null, HttpStatus.OK);
 	}
 
+	// TODO: ElasticSearch 적용
 	public ResponseEntity<BaseResponse<BookListResponseDto>> getBookByCategory(String categoryMajor, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page-1, size);
-		Page<Book> findBooks = categoryMajor.equals("null")
-			? bookRepository.findByExpiredFalse(pageable)
-			: bookRepository.findByCategoryMajorAndExpiredFalse(categoryMajor, pageable);
+		Page<BookSearch> findBooks = categoryMajor.equals("null")
+			? bookSearchRepository.findByExpiredFalse(pageable)
+			: bookSearchRepository.findByExpiredFalseAndCategoryMajor(categoryMajor, pageable);
 
 		// 총 책의 개수
 		long totalElements = findBooks.getTotalElements();
 
-		List<Book> books = findBooks.getContent();
-		List<BookSearchResponseDto> responseDtos = BookMapper.toResponseDto(books);
+		List<BookSearch> books = findBooks.getContent();
+		List<BookSearchResponseDto> responseDtos = BookSearchMapper.toResponseDto(books);
 		PaginationDto paginationDto = BookMapper.toPaginationDto(totalElements, page, size);
 
 		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", BookMapper.toBookListResponseDto(responseDtos, paginationDto), HttpStatus.OK);
@@ -214,6 +223,7 @@ public class BookService {
 	public ResponseEntity<BaseResponse<Void>> save(ReviewRequestDto reviewRequestDto, long book_id) {
 		User user = userService.getById(userContextService.getCurrentUserId());
 		Book book = getBookById(book_id);
+		updateRatingInBookSearch(book_id);
 		reviewRepository.save(reviewMapper.toEntity(reviewRequestDto, user, book));
 		return BaseResponse.ok("후기 등록이 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
 	}
@@ -222,6 +232,7 @@ public class BookService {
 	public ResponseEntity<BaseResponse<Void>> delete(Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.delete(review);
+		updateRatingInBookSearch(review.getBook().getId());
 		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.", null,HttpStatus.OK);
 	}
 
@@ -229,6 +240,7 @@ public class BookService {
 	public ResponseEntity<BaseResponse<Void>> update(ReviewRequestDto reviewRequestDto, Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.save(reviewMapper.updateEntity(review, reviewRequestDto));
+		updateRatingInBookSearch(review.getBook().getId());
 		return BaseResponse.ok("후기 수정이 정상적으로 수행되었습니다.", null,HttpStatus.OK);
 	}
 

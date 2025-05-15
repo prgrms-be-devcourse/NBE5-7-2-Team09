@@ -1,5 +1,6 @@
 package ninegle.Readio.book.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -38,43 +39,34 @@ public class BookSearch {
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
 	private String name;
-	private String description;
 	private String image;
-	private String isbn;
-	private String ecn;
-
-	@Field(type = FieldType.Date, format = DateFormat.basic_date)
-	private LocalDate pubDate;
-
-	private Boolean expired;
-
-	private long categoryId;
 	private String categoryMajor;
 	private String categorySub;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private String publisher;
-
-	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
 	private String author;
+
+	@Field(type = FieldType.Double)
+	private BigDecimal rating;
+
+	private Boolean expired;
 
 	public void softDelete() {
 		this.expired = true;
 	}
 
-	public BookSearch update(BookRequestDto dto, Category category, Author author, Publisher publisher) {
+	public BookSearch update(BookRequestDto dto, Category category, Author author) {
 		this.name = dto.getName();
-		this.description = dto.getDescription();
 		this.image = dto.getImage();
-		this.isbn = dto.getIsbn();
-		this.ecn = dto.getEcn();
-		this.pubDate = dto.getPubDate();
-		this.categoryId = category.getId();
 		this.categoryMajor = category.getMajor();
 		this.categorySub = category.getSub();
-		this.publisher = publisher.getName();
 		this.author = author.getName();
 
+		return this;
+	}
+
+	public BookSearch updateRating(BigDecimal rating) {
+		this.rating = rating;
 		return this;
 	}
 

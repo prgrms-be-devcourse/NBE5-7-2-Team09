@@ -83,15 +83,9 @@ public class BookMapper {
 		return BookSearchResponseDto.builder()
 			.id(book.getId())
 			.name(book.getName())
-			.description(book.getDescription())
 			.image(book.getImage())
-			.isbn(book.getIsbn())
-			.ecn(book.getEcn())
-			.pubDate(book.getPubDate())
-			.categoryId(book.getCategory().getId())
 			.categoryMajor(book.getCategory().getMajor())
 			.categorySub(book.getCategory().getSub())
-			.publisherName(book.getPublisher().getName())
 			.authorName(book.getAuthor().getName())
 			.build();
 	}
