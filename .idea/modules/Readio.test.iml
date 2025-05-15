@@ -27,6 +27,7 @@
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-data-elasticsearch:3.4.4" level="project" />
     <orderEntry type="library" name="Gradle: software.amazon.awssdk:s3:2.20.130" level="project" />
     <orderEntry type="library" name="Gradle: software.amazon.awssdk:auth:2.20.130" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-mail:3.4.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.18.36" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-test:3.4.4" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-test:6.4.4" level="project" />
@@ -61,6 +62,8 @@
     <orderEntry type="library" name="Gradle: software.amazon.awssdk:endpoints-spi:2.20.130" level="project" />
     <orderEntry type="library" name="Gradle: software.amazon.awssdk:annotations:2.20.130" level="project" />
     <orderEntry type="library" name="Gradle: software.amazon.eventstream:eventstream:1.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework:spring-context-support:6.2.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse.angus:jakarta.mail:2.0.3" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-test-autoconfigure:3.4.4" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-test:3.4.4" level="project" />
     <orderEntry type="library" name="Gradle: com.jayway.jsonpath:json-path:2.9.0" level="project" />

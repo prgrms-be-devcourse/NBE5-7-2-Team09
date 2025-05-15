@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -87,7 +86,7 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col space-y-2">
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-blue-500 hover:bg-blue-600"
               disabled={isLoading}
             >
               {isLoading ? "로그인 중..." : "로그인"}

@@ -212,21 +212,6 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">핸드폰 번호</Label>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="010-1234-5678"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                className={errors.phoneNumber ? "border-red-500" : ""}
-              />
-              {errors.phoneNumber && (
-                <p className="text-sm text-red-500">{errors.phoneNumber}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="password">비밀번호</Label>
               <Input
                 id="password"
@@ -255,12 +240,27 @@ export default function SignupPage() {
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">핸드폰 번호</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                placeholder="010-1234-5678"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+                className={errors.phoneNumber ? "border-red-500" : ""}
+              />
+              {errors.phoneNumber && (
+                <p className="text-sm text-red-500">{errors.phoneNumber}</p>
+              )}
+            </div>
+
             {apiError && <div className="text-sm text-red-500">{apiError}</div>}
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <Button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={isLoading || !isFormValid}
             >
               {isLoading ? "가입 중..." : "회원가입"}

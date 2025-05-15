@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Star, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import BookCover from "@/components/book/BookCover";
 
 const MainPage = () => {
@@ -60,56 +59,6 @@ const MainPage = () => {
     },
   ];
 
-  const newBooks = [
-    {
-      id: 101,
-      title: "디지털 미니멀리즘",
-      author: "칼 뉴포트",
-      cover: "https://image.yes24.com/goods/74031339/XL",
-      publishDate: "2025-04-15",
-      category: "자기계발",
-      isNew: true,
-    },
-    {
-      id: 102,
-      title: "인생의 마지막 순간에서",
-      author: "정현기",
-      cover: "https://image.yes24.com/goods/74644329/XL",
-      publishDate: "2025-04-10",
-      category: "에세이",
-      isNew: true,
-    },
-    {
-      id: 103,
-      title: "파피용",
-      author: "베르나르 베르베르",
-      cover:
-        "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788932923864.jpg",
-      publishDate: "2025-04-05",
-      category: "소설",
-      isNew: true,
-    },
-    {
-      id: 104,
-      title: "꿀벌의 민주주의",
-      author: "토마스 시리",
-      cover:
-        "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788962630671.jpg",
-      publishDate: "2025-04-01",
-      category: "과학",
-      isNew: true,
-    },
-    {
-      id: 105,
-      title: "내가 틀릴 수도 있습니다",
-      author: "비욘 나티코 린데블라드",
-      cover: "https://image.yes24.com/goods/108850617/XL",
-      publishDate: "2025-03-28",
-      category: "심리학",
-      isNew: false,
-    },
-  ];
-
   // 가로 스크롤 함수
   const scrollSection = (sectionId: any, direction: any) => {
     const section = document.getElementById(sectionId);
@@ -124,67 +73,23 @@ const MainPage = () => {
     navigate(`/book/${bookId}`);
   };
 
-  // 책 렌더링 함수
-  const renderBook = (book: any, isNewRelease = false) => (
-    <div
-      key={book.id}
-      className="flex-shrink-0 w-40 md:w-64 cursor-pointer"
-      onClick={() => navigateToBookDetail(book.id)}
-    >
-      <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-        <div className="relative">
-          <img
-            src={book.cover}
-            alt={book.title}
-            className="w-full h-96 object-cover"
-          />
-        </div>
-        <div className="p-3">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-medium text-sm line-clamp-1">{book.title}</h3>
-            {isNewRelease && book.isNew && (
-              <Badge className="ml-1 bg-green-500 text-xs">신간</Badge>
-            )}
-            {!isNewRelease && book.isBestseller && (
-              <Badge className="ml-1 bg-red-500 text-xs">베스트셀러</Badge>
-            )}
-          </div>
-          <p className="text-gray-600 text-xs">{book.author}</p>
-          <div className="mt-2 flex items-center justify-between">
-            <Badge variant="outline" className="text-xs">
-              {book.category}
-            </Badge>
-            {isNewRelease ? (
-              <div className="flex items-center text-xs text-gray-500">
-                <Clock className="h-3 w-3" />
-                <span>{book.publishDate.slice(5)}</span>
-              </div>
-            ) : (
-              <div className="flex items-center text-xs text-yellow-500">
-                <Star className="h-3 w-3 fill-yellow-500" />
-                <span>{book.rating}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div>
       {/* 히어로 섹션 */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 mb-8">
+      <section className="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-12 mb-8">
         <div className="container mx-auto px-10">
           <div className="max-w-2xl">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               당신의 지식과 상상력을 넓히는 공간
             </h1>
             <p className="text-lg md:text-xl mb-6">
-              북스페이스에서 다양한 도서를 언제 어디서나 만나보세요
+              리디오에서 다양한 도서를 언제 어디서나 만나보세요
             </p>
             <div className="flex gap-3">
-              <Button className="bg-white text-blue-700 hover:bg-gray-100">
+              <Button
+                className="bg-white text-blue-500 hover:bg-gray-100 font-bold"
+                onClick={() => navigate("signup")}
+              >
                 회원가입
               </Button>
             </div>
@@ -226,37 +131,6 @@ const MainPage = () => {
               onClick={navigateToBookDetail}
             />
           ))}
-        </div>
-      </section>
-
-      {/* 신간 도서 섹션 */}
-      <section className="container mx-auto px-4 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">신간 도서</h2>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => scrollSection("new-books", "left")}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => scrollSection("new-books", "right")}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        <div
-          id="new-books"
-          className="flex overflow-x-auto pb-4 scrollbar-hide gap-4"
-        >
-          {newBooks.map((book) => renderBook(book, true))}
         </div>
       </section>
 
