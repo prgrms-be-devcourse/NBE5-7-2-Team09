@@ -212,21 +212,6 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">핸드폰 번호</Label>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="010-1234-5678"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                className={errors.phoneNumber ? "border-red-500" : ""}
-              />
-              {errors.phoneNumber && (
-                <p className="text-sm text-red-500">{errors.phoneNumber}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="password">비밀번호</Label>
               <Input
                 id="password"
@@ -252,6 +237,21 @@ export default function SignupPage() {
               />
               {errors.confirmPassword && (
                 <p className="text-sm text-red-500">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">핸드폰 번호</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                placeholder="010-1234-5678"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+                className={errors.phoneNumber ? "border-red-500" : ""}
+              />
+              {errors.phoneNumber && (
+                <p className="text-sm text-red-500">{errors.phoneNumber}</p>
               )}
             </div>
 

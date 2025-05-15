@@ -1,17 +1,11 @@
 // src/pages/book/BooksPage.tsx (모바일 검색 페이지 제외)
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
-import { Book, ChevronDown, Filter } from "lucide-react";
+import { Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Pagination } from "@/components/ui/pagination";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { bookService } from "@/utils/api/bookService";
 
@@ -236,35 +230,11 @@ const BooksPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-6 mt-20">
+    <div className="container mx-auto">
       {/* 헤더 섹션 */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
           <h1 className="text-2xl font-bold mb-4 sm:mb-0">{getPageTitle()}</h1>
-
-          {/* 카테고리 드롭다운 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center">
-                <Filter className="mr-2 h-4 w-4" />
-                {getCurrentCategoryName()}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {categories.map((category) => (
-                <DropdownMenuItem
-                  key={category.id}
-                  onClick={() => handleCategoryChange(category.id)}
-                  className={
-                    categoryId === category.id ? "bg-slate-100 font-medium" : ""
-                  }
-                >
-                  {category.name}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         {/* 검색 결과 정보 */}
