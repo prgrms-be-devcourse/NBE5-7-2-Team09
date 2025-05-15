@@ -11,7 +11,11 @@ import ninegle.Readio.global.exception.BusinessException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 /**
  * Readio - NCloudStorageService
@@ -45,6 +49,26 @@ public class NCloudStorageService {
 			.build();
 
 		return s3Client.getObjectAsBytes(getRequest).asByteArray();
+	}
+
+	public boolean fileExists(String key) {
+		try {
+			HeadObjectRequest headRequest = HeadObjectRequest.builder()
+				.bucket(bucketName)
+				.key(key)
+				.build();
+			s3Client.headObject(headRequest);
+			return true;
+		} catch (S3Exception e) {
+			return false;
+		}
+	}
+
+	public String getFileUrl(String key) {
+		return s3Client.utilities().getUrl(GetUrlRequest.builder()
+			.bucket(bucketName)
+			.key(key)
+			.build()).toString();
 	}
 
 }
