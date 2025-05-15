@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class AuthorDto {
 
-	private Long id;
+	private long id;
 	private String name;
 }

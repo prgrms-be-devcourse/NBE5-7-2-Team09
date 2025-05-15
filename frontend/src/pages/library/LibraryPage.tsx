@@ -3,13 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Trash2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -41,58 +35,14 @@ const LibraryPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
-  // 테스트용 데이터
-  const mockLibraries = [
-    {
-      library_id: 1,
-      library_name: "내 첫 번째 라이브러리",
-      created_at: "2025-05-07T15:00:00",
-      updated_at: "2025-05-07T15:00:00",
-    },
-    {
-      library_id: 2,
-      library_name: "소설 모음",
-      created_at: "2025-05-06T10:30:00",
-      updated_at: "2025-05-06T10:30:00",
-    },
-    {
-      library_id: 3,
-      library_name: "자기계발 서적",
-      created_at: "2025-05-05T12:15:00",
-      updated_at: "2025-05-05T12:15:00",
-    },
-    {
-      library_id: 4,
-      library_name: "역사책 컬렉션",
-      created_at: "2025-05-03T09:45:00",
-      updated_at: "2025-05-07T16:20:00",
-    },
-    {
-      library_id: 5,
-      library_name: "과학 도서",
-      created_at: "2025-04-28T14:10:00",
-      updated_at: "2025-04-28T14:10:00",
-    },
-    {
-      library_id: 6,
-      library_name: "철학 도서",
-      created_at: "2025-04-20T11:05:00",
-      updated_at: "2025-04-25T17:30:00",
-    },
-  ];
-
   // 라이브러리 목록 조회
-  const fetchLibraries = async (page: number = 1) => {
+  const fetchLibraries = async (page: number) => {
     setIsLoading(true);
     try {
-      // API 연동 시 아래 주석 해제
-      // const response = await libraryService.getLibraries(page, 6);
-      // setLibraries(response.data.libraries);
-      // setTotalPages(response.data.totalPages || 1);
-
-      // 테스트용 데이터 사용
-      setLibraries(mockLibraries);
-      setTotalPages(2); // 테스트용 페이지 수
+      const response = await libraryService.getLibraries(page, 10);
+      console.log(response.data.libraries);
+      setLibraries(response.data.libraries);
+      setTotalPages(response.data.totalPages || 1);
       setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching libraries:", error);
@@ -104,13 +54,12 @@ const LibraryPage: React.FC = () => {
     }
   };
 
-  // 페이지 로드 시 라이브러리 목록 조회 (테스트 목적으로 isAuthenticated 검사 제거)
+  // 페이지 로드 시 라이브러리 목록 조회
   useEffect(() => {
-    // 실제 구현 시 아래 주석 해제
-    // if (isAuthenticated) {
-    fetchLibraries(1);
-    // }
-  }, []);
+    if (isAuthenticated) {
+      fetchLibraries(0);
+    }
+  }, [isAuthenticated]);
 
   // 페이지 변경 처리
   const handlePageChange = (page: number) => {
@@ -207,7 +156,7 @@ const LibraryPage: React.FC = () => {
         <h1 className="text-2xl font-bold">내 라이브러리</h1>
         <Dialog open={openCreateDialog} onOpenChange={setOpenCreateDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-blue-500 hover:bg-blue-600">
               <Plus className="h-4 w-4" />
               라이브러리 생성
             </Button>
@@ -230,7 +179,7 @@ const LibraryPage: React.FC = () => {
               <Button
                 onClick={handleCreateLibrary}
                 disabled={!newLibraryName.trim()}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-500 hover:bg-blue-600"
               >
                 생성하기
               </Button>
@@ -249,7 +198,7 @@ const LibraryPage: React.FC = () => {
           </p>
           <Button
             onClick={() => setOpenCreateDialog(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-500 hover:bg-blue-600"
           >
             <Plus className="mr-2 h-4 w-4" />
             라이브러리 생성
@@ -327,7 +276,7 @@ const LibraryPage: React.FC = () => {
             <Button
               onClick={handleUpdateLibraryName}
               disabled={!editLibraryName.trim()}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-500 hover:bg-blue-600"
             >
               수정하기
             </Button>

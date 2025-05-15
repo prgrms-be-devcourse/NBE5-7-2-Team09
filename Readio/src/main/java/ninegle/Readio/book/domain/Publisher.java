@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +15,11 @@ import lombok.RequiredArgsConstructor;
  * create date:    25. 5. 9.
  * last update:    25. 5. 9.
  * author:  gigol
- * purpose: 
+ * purpose:
  */
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class Publisher {
 
 	@Id
@@ -28,7 +29,9 @@ public class Publisher {
 	@Column(nullable = false)
 	private String name;
 
+	@Builder
 	public Publisher(String name) {
 		this.name = name;
 	}
 }
+

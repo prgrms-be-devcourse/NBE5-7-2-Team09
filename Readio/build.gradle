@@ -60,6 +60,7 @@ dependencies {
 
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign' // Toss API 호출용
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 }
 
 dependencyManagement {
@@ -67,6 +68,12 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
+
+dependencies {
+    // 이메일 전송 기능
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+}
+
 
 tasks.named('test') {
     //useJUnitPlatform()

@@ -1,4 +1,3 @@
-// src/components/layout/Navbar.tsx (기존 Navbar 업데이트 - 검색 기능 추가)
 import { useState, useEffect } from "react";
 import {
   Search,
@@ -13,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import logo from "../../assets/ReadioLogo.png";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -54,8 +54,8 @@ const Navbar = () => {
   };
 
   // 관심 도서로 이동하는 함수
-  const navigateToWishlist = () => {
-    navigate("/wishlist");
+  const navigateToPreference = () => {
+    navigate("/preference");
   };
 
   // 마이페이지로 이동하는 함수
@@ -190,15 +190,14 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 right-0 z-50">
+    <header className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 right-0 z-50 pt-1">
       {/* 헤더 내용 */}
       <div className="container mx-auto px-4 h-16 flex items-center justify-between ">
         {/* 좌측: 로고 및 검색바 */}
         <div className="flex items-center gap-4 flex-1 max-w-xl">
           {/* 로고 */}
           <a href="/" className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-lg text-blue-600">북스페이스</span>
+            <img src={logo} alt="Readio logo" className="w-36 h-w-36" />
           </a>
           {/* 검색바 */}
           <div className="relative flex-1 hidden sm:flex items-center">
@@ -215,7 +214,7 @@ const Navbar = () => {
                 type="submit"
                 variant="default"
                 size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 bg-blue-600 hover:bg-blue-700"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 bg-blue-500 hover:bg-blue-600"
               >
                 검색하기
               </Button>
@@ -241,7 +240,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center"
-                onClick={navigateToWishlist}
+                onClick={navigateToPreference}
               >
                 <Heart className="h-5 w-5" />
                 <span>관심 도서</span>
@@ -275,7 +274,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={navigateToWishlist}
+                  onClick={navigateToPreference}
                 >
                   <Heart className="h-5 w-5" />
                 </Button>
@@ -297,16 +296,16 @@ const Navbar = () => {
             <>
               <Link to="/login">
                 <Button variant="ghost" className="">
-                  <LogIn className="h-5 w-5 mr-2" />
+                  <LogIn className="h-5 w-5" />
                   로그인
                 </Button>
               </Link>
               <Link to="/signup">
                 <Button
                   variant="default"
-                  className=" bg-blue-600 hover:bg-blue-700"
+                  className=" bg-blue-500 hover:bg-blue-600"
                 >
-                  <UserPlus className="h-5 w-5 mr-2" />
+                  <UserPlus className="h-5 w-5" />
                   회원가입
                 </Button>
               </Link>

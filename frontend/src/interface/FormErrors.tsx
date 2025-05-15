@@ -2,7 +2,7 @@ export interface FormErrors {
   name?: string;
   nickname?: string;
   email?: string;
-  phone_number?: string;
+  phoneNumber?: string;
   password?: string;
   confirmPassword?: string;
   adminCode?: string;

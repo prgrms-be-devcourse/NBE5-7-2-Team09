@@ -31,7 +31,7 @@ public class Subscription {
 	private boolean canceled;
 
 	@Builder
-	public Subscription(Long userId, LocalDateTime subDate, LocalDateTime expDate) {
+	public Subscription(Long userId, LocalDateTime subDate, LocalDateTime expDate, boolean canceled) {
 		this.userId = userId;
 		this.subDate = subDate;
 		this.expDate = expDate;

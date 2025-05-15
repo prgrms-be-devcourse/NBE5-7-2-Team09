@@ -1,15 +1,26 @@
 package ninegle.Readio.book.domain;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import ninegle.Readio.book.dto.BookRequestDto;
 
 /**
  * Readio - Book
@@ -20,25 +31,65 @@ import lombok.ToString;
  */
 @Getter
 @Document(indexName = "books")
-@ToString
+@Builder
 public class BookSearch {
+
 	@Id
-	private final String id;
+	@Field(type = FieldType.Keyword)
+	private Long id;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private final String title;
+	private String name;
+
+	@Field(type = FieldType.Text)
+	private String image;
+
+	@Field(type = FieldType.Keyword) // 정확한 매칭용
+	private String categoryMajor;
+
+	@Field(type = FieldType.Text)
+	private String categorySub;
 
 	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private final String publisher;
+	private String author;
 
-	@Field(type = FieldType.Text, analyzer = "nori", searchAnalyzer = "nori")
-	private final String author;
+	@Field(type = FieldType.Double)
+	private BigDecimal rating;
 
-	@Builder
-	public BookSearch(String title, String publisher, String author) {
-		this.id = UUID.randomUUID().toString();
-		this.title = title;
-		this.publisher = publisher;
-		this.author = author;
+	@Field(type = FieldType.Boolean)
+	private Boolean expired;
+
+	public void softDelete() {
+		this.expired = true;
 	}
+
+	public BookSearch update(BookRequestDto dto, Category category, Author author) {
+		this.name = dto.getName();
+		this.image = dto.getImage();
+		this.categoryMajor = category.getMajor();
+		this.categorySub = category.getSub();
+		this.author = author.getName();
+
+		return this;
+	}
+
+	public BookSearch updateRating(BigDecimal rating) {
+		this.rating = rating;
+		return this;
+	}
+
+	// 중복 제거를 위해 Override
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		BookSearch that = (BookSearch) o;
+		return Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
 }
