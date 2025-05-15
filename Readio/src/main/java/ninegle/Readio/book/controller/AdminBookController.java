@@ -26,7 +26,11 @@ public class AdminBookController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<BaseResponse<Void>> updateBook(@PathVariable Long id, @RequestBody BookRequestDto request) {
+<<<<<<< HEAD
 		return bookService.updateBook(id, request);
+=======
+		return bookService.updateBook(id,request);
+>>>>>>> 84ad95fcf2aeea1f4c94e464b15187586e116377
 	}
 
 }
