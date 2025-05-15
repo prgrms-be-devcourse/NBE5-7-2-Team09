@@ -260,7 +260,7 @@ export default function SignupPage() {
           <CardFooter className="flex flex-col space-y-2">
             <Button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={isLoading || !isFormValid}
             >
               {isLoading ? "가입 중..." : "회원가입"}

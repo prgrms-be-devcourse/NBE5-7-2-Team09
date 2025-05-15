@@ -76,17 +76,20 @@ const MainPage = () => {
   return (
     <div>
       {/* 히어로 섹션 */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 mb-8">
+      <section className="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-12 mb-8">
         <div className="container mx-auto px-10">
           <div className="max-w-2xl">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               당신의 지식과 상상력을 넓히는 공간
             </h1>
             <p className="text-lg md:text-xl mb-6">
-              북스페이스에서 다양한 도서를 언제 어디서나 만나보세요
+              리디오에서 다양한 도서를 언제 어디서나 만나보세요
             </p>
             <div className="flex gap-3">
-              <Button className="bg-white text-blue-700 hover:bg-gray-100">
+              <Button
+                className="bg-white text-blue-500 hover:bg-gray-100 font-bold"
+                onClick={() => navigate("signup")}
+              >
                 회원가입
               </Button>
             </div>

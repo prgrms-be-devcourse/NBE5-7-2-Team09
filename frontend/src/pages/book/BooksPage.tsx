@@ -267,7 +267,7 @@ const BooksPage: React.FC = () => {
               setSearchParams(new URLSearchParams());
               navigate("/books");
             }}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-500 hover:bg-blue-600"
           >
             전체 도서 보기
           </Button>

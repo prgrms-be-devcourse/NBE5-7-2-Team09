@@ -3,13 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Trash2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -162,7 +156,7 @@ const LibraryPage: React.FC = () => {
         <h1 className="text-2xl font-bold">내 라이브러리</h1>
         <Dialog open={openCreateDialog} onOpenChange={setOpenCreateDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-blue-500 hover:bg-blue-600">
               <Plus className="h-4 w-4" />
               라이브러리 생성
             </Button>
@@ -185,7 +179,7 @@ const LibraryPage: React.FC = () => {
               <Button
                 onClick={handleCreateLibrary}
                 disabled={!newLibraryName.trim()}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-500 hover:bg-blue-600"
               >
                 생성하기
               </Button>
@@ -204,7 +198,7 @@ const LibraryPage: React.FC = () => {
           </p>
           <Button
             onClick={() => setOpenCreateDialog(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-500 hover:bg-blue-600"
           >
             <Plus className="mr-2 h-4 w-4" />
             라이브러리 생성
@@ -282,7 +276,7 @@ const LibraryPage: React.FC = () => {
             <Button
               onClick={handleUpdateLibraryName}
               disabled={!editLibraryName.trim()}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-500 hover:bg-blue-600"
             >
               수정하기
             </Button>
