@@ -2,11 +2,12 @@
 프로그래머스 백엔드 데브코스 5기 7회차 9팀 **9글** 2차 프로젝트입니다.
 <br>
 <br>
-<img src="https://github.com/your-username/your-repo/assets/12345678/readio-logo.png" alt="Readio Logo" width="300"/>
+
 
 ## 🙋‍♀️ 프로젝트 소개
 > **Readio – 스마트한 전자책 구독 플랫폼**
-
+> <img src="https://github.com/prgrms-be-devcourse/NBE5-7-2-Team09/blob/dev/frontend/src/assets/ReadioLogo.png?raw=true
+" alt="Readio Preview" width="400"/>
 - 언제 어디서나 웹으로 책을 읽을 수 있는 온라인 전자책 구독 서비스입니다.
 - 전자책 데이터는 네이버 클라우드에 안정적으로 저장되며, Elasticsearch를 통해 빠르고 정확한 검색 환경을 제공합니다.
 - 사용자는 토스페이 결제를 통해 포인트를 충전하고, 충전된 포인트로 구독권을 구매할 수 있습니다.
