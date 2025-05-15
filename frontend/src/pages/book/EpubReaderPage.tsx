@@ -215,7 +215,6 @@ const EpubReaderPage: React.FC = () => {
       try {
         setLoading(true);
 
-        // 지정된 EPUB 파일 경로 직접 사용
         const epubPath = "/books/hilton-morning-journey.epub";
 
         // EPUB 파일 불러오기
@@ -1023,8 +1022,9 @@ const EpubReaderPage: React.FC = () => {
           <div className="text-sm">
             {/* 페이지 번호 표시 */}
             {currentPage.pageNumber}
-            {viewMode === "double" && nextPage && ` - ${nextPage.pageNumber}`}/{" "}
-            {book.pages.length}
+            {viewMode === "double" &&
+              nextPage &&
+              ` - ${nextPage.pageNumber}`}/ {book.pages.length}
           </div>
 
           <Button

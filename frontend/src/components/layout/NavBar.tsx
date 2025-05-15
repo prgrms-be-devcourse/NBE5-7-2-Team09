@@ -1,3 +1,4 @@
+// NavBar.tsx - 드롭다운 위치 수정
 import { useState, useEffect } from "react";
 import {
   Search,
@@ -7,58 +8,131 @@ import {
   UserPlus,
   Heart,
   LogOut,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "../../assets/ReadioLogo.png";
+import { categoryService, Category } from "@/utils/api/categoryService";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   const [showCategories, setShowCategories] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
   const navigate = useNavigate();
+
+  // 카테고리 목록 불러오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoadingCategories(true);
+        const response = await categoryService.getCategories();
+        if (response.status === 200) {
+          setCategories(response.data.categories);
+        } else {
+          throw new Error("카테고리 목록을 불러오는데 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("카테고리 불러오기 실패", {
+          description: "카테고리 목록을 불러오는 중 오류가 발생했습니다.",
+        });
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // 스크롤 방향에 따라 카테고리 표시/숨김 처리
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      // 스크롤 방향 체크 (아래로 스크롤 시 숨기고, 위로 스크롤 시 표시)
       if (currentScrollY > lastScrollY) {
-        // 아래로 스크롤 중
         setShowCategories(false);
+        // 스크롤 다운 시 열린 서브카테고리 닫기
+        setExpandedCategory(null);
       } else {
-        // 위로 스크롤 중
         setShowCategories(true);
       }
-
-      // 현재 스크롤 위치 저장
       setLastScrollY(currentScrollY);
     };
 
-    // 스크롤 이벤트 리스너 등록
     window.addEventListener("scroll", handleScroll);
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollY]);
 
-  // 내 라이브러리로 이동하는 함수
+  // 외부 클릭 감지하여 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (expandedCategory !== null) {
+        const target = e.target as HTMLElement;
+        // 드롭다운 또는 버튼 외부 클릭 시 닫기
+        if (!target.closest(".category-container")) {
+          setExpandedCategory(null);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [expandedCategory]);
+
+  // 메인 카테고리 클릭 처리 - 서브 카테고리 토글
+  const handleCategoryClick = (categoryId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+
+    if (expandedCategory === categoryId) {
+      // 이미 열려있는 카테고리를 다시 클릭하면 닫기
+      setExpandedCategory(null);
+    } else {
+      // 다른 카테고리를 클릭하면 해당 카테고리 열기
+      setExpandedCategory(categoryId);
+    }
+  };
+
+  // 서브 카테고리 클릭 처리
+  const handleSubCategoryClick = (
+    categoryId: number,
+    subIndex: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    navigate(`/books?category_major=${categoryId}&category_sub=${subIndex}`);
+    // 서브 카테고리 클릭 후 드롭다운 닫기
+    setExpandedCategory(null);
+  };
+
+  // 전체 카테고리 보기 처리
+  const handleAllCategoriesClick = () => {
+    navigate("/books");
+    setExpandedCategory(null);
+  };
+
+  // 내 라이브러리로 이동
   const navigateToLibrary = () => {
     navigate("/library");
   };
 
-  // 관심 도서로 이동하는 함수
+  // 관심 도서로 이동
   const navigateToPreference = () => {
     navigate("/preference");
   };
 
-  // 마이페이지로 이동하는 함수
+  // 마이페이지로 이동
   const navigateToMyPage = () => {
     navigate("/my-page");
   };
@@ -69,136 +143,26 @@ const Navbar = () => {
     navigate("/");
   };
 
-  // 검색 처리 함수
+  // 검색 처리 함수 - navigate를 사용하여 SPA 방식으로 이동
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/books?query=${encodeURIComponent(searchQuery)}`);
+      navigate(`/books?keyword=${searchQuery}`);
       setSearchQuery("");
     }
   };
 
-  // 카테고리 클릭 처리
-  const handleCategoryClick = (categoryId: string) => {
-    // 전체 카테고리인 경우
-    if (categoryId === "000") {
-      navigate("/books");
-    } else {
-      navigate(`/books?category=${categoryId}`);
-    }
-  };
-
-  // KDC 한국십진분류법 기반 카테고리
-  const categories = [
-    {
-      id: "000",
-      name: "전체",
-      subcategories: ["백과사전", "도서관학", "저널리즘", "전집", "연속간행물"],
-    },
-    {
-      id: "100",
-      name: "철학",
-      subcategories: [
-        "형이상학",
-        "인식론",
-        "논리학",
-        "윤리학",
-        "심리학",
-        "동양철학",
-        "서양철학",
-      ],
-    },
-    {
-      id: "200",
-      name: "종교",
-      subcategories: ["비교종교", "불교", "기독교", "천주교", "이슬람교"],
-    },
-    {
-      id: "300",
-      name: "사회과학",
-      subcategories: [
-        "사회학",
-        "통계학",
-        "경제학",
-        "정치학",
-        "행정학",
-        "법학",
-        "교육학",
-      ],
-    },
-    {
-      id: "400",
-      name: "자연과학",
-      subcategories: ["수학", "물리학", "화학", "천문학", "지구과학", "생물학"],
-    },
-    {
-      id: "500",
-      name: "기술과학",
-      subcategories: ["의학", "농업", "공학", "건축학", "가정학", "경영학"],
-    },
-    {
-      id: "600",
-      name: "예술",
-      subcategories: [
-        "미술",
-        "조각",
-        "디자인",
-        "음악",
-        "영화",
-        "연극",
-        "스포츠",
-      ],
-    },
-    {
-      id: "700",
-      name: "언어",
-      subcategories: [
-        "한국어",
-        "중국어",
-        "일본어",
-        "영어",
-        "독일어",
-        "프랑스어",
-      ],
-    },
-    {
-      id: "800",
-      name: "문학",
-      subcategories: [
-        "시",
-        "소설",
-        "희곡",
-        "수필",
-        "평론",
-        "한국문학",
-        "외국문학",
-      ],
-    },
-    {
-      id: "900",
-      name: "역사",
-      subcategories: [
-        "아시아사",
-        "유럽사",
-        "아프리카사",
-        "북미사",
-        "남미사",
-        "한국사",
-        "지리",
-      ],
-    },
-  ];
-
   return (
-    <header className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 right-0 z-50 pt-1">
+    <header className="w-full border-b border-gray-200 bg-white fixed top-0 left-0 right-0 z-10 pt-1">
       {/* 헤더 내용 */}
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between ">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* 좌측: 로고 및 검색바 */}
         <div className="flex items-center gap-4 flex-1 max-w-xl">
           {/* 로고 */}
-          <a href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Readio logo" className="w-36 h-w-36" />
-          </a>
+          </Link>
+
           {/* 검색바 */}
           <div className="relative flex-1 hidden sm:flex items-center">
             <form onSubmit={handleSearch} className="w-full">
@@ -221,12 +185,11 @@ const Navbar = () => {
             </form>
           </div>
         </div>
-        {/* 우측: 로그인 상태에 따른 버튼들 */}
+
+        {/* 우측 버튼들은 동일하게 유지 */}
         <div className="flex items-center gap-1 sm:gap-2">
           {isAuthenticated ? (
-            // 로그인 시 표시될 버튼들
             <>
-              {/* 내 라이브러리 */}
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center"
@@ -236,7 +199,6 @@ const Navbar = () => {
                 <span>내 라이브러리</span>
               </Button>
 
-              {/* 관심 도서 */}
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center"
@@ -246,7 +208,6 @@ const Navbar = () => {
                 <span>관심 도서</span>
               </Button>
 
-              {/* 마이페이지 */}
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center"
@@ -256,7 +217,6 @@ const Navbar = () => {
                 <span>마이페이지</span>
               </Button>
 
-              {/* 로그아웃 */}
               <Button
                 variant="ghost"
                 className="hidden md:flex gap-1 items-center text-red-600"
@@ -266,7 +226,6 @@ const Navbar = () => {
                 <span>로그아웃</span>
               </Button>
 
-              {/* 모바일 전용: 아이콘만 표시 */}
               <div className="flex md:hidden">
                 <Button variant="ghost" size="icon" onClick={navigateToLibrary}>
                   <BookOpen className="h-5 w-5" />
@@ -292,7 +251,6 @@ const Navbar = () => {
               </div>
             </>
           ) : (
-            // 비로그인 시 표시될 버튼들
             <>
               <Link to="/login">
                 <Button variant="ghost" className="">
@@ -313,24 +271,102 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      {/* 카테고리 메뉴 - KDC 한국십진분류법 기반 */}
+
+      {/* 카테고리 메뉴 - 수정된 부분 */}
       <div
-        className={`container mx-auto px-4 flex gap-2 overflow-x-auto scrollbar-hide transition-all duration-300 ${
+        className={`container mx-auto px-4 transition-all duration-300 ${
           showCategories
-            ? "opacity-100 max-h-12 py-2 "
+            ? "opacity-100 py-2"
             : "opacity-0 max-h-0 overflow-hidden py-0"
         }`}
       >
-        {categories.map((category) => (
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {/* 전체 카테고리 버튼 */}
           <Button
-            key={category.id}
             variant="ghost"
             className="text-sm h-8 px-3 flex items-center whitespace-nowrap"
-            onClick={() => handleCategoryClick(category.id)}
+            onClick={handleAllCategoriesClick}
           >
-            {category.name}
+            전체
           </Button>
-        ))}
+
+          {/* 카테고리 목록 */}
+          {isLoadingCategories
+            ? Array(10)
+                .fill(0)
+                .map((_, index) => (
+                  <Button
+                    key={`skeleton-${index}`}
+                    variant="ghost"
+                    className="text-sm h-8 px-3 flex items-center whitespace-nowrap opacity-50"
+                    disabled
+                  >
+                    <div className="w-16 h-4 animate-pulse bg-gray-200 rounded"></div>
+                  </Button>
+                ))
+            : categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="category-container"
+                  style={{ position: "relative", display: "inline-block" }}
+                >
+                  <Button
+                    variant={
+                      expandedCategory === category.id ? "default" : "ghost"
+                    }
+                    className={`text-sm h-8 px-3 flex items-center whitespace-nowrap gap-1 ${
+                      expandedCategory === category.id
+                        ? "bg-blue-500 text-white"
+                        : ""
+                    }`}
+                    onClick={(e) => handleCategoryClick(category.id, e)}
+                  >
+                    {category.major}
+                    {expandedCategory === category.id ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+
+                  {/* 서브 카테고리 드롭다운 - z-index와 위치 수정 */}
+                  {expandedCategory === category.id && (
+                    <div
+                      className="bg-white shadow-lg rounded-md border border-gray-200 py-2 overflow-y-auto mt-1"
+                      style={{
+                        position: "fixed",
+                        left: `${
+                          document
+                            .querySelector(
+                              `.category-container:nth-child(${
+                                categories.findIndex(
+                                  (c) => c.id === category.id
+                                ) + 2
+                              })`
+                            )
+                            ?.getBoundingClientRect().left
+                        }px`,
+                        zIndex: 9999,
+                        width: "200px",
+                        maxHeight: "300px",
+                      }}
+                    >
+                      {category.subs.map((sub, index) => (
+                        <button
+                          key={index}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer"
+                          onClick={(e) =>
+                            handleSubCategoryClick(category.id, index, e)
+                          }
+                        >
+                          {sub}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+        </div>
       </div>
     </header>
   );
