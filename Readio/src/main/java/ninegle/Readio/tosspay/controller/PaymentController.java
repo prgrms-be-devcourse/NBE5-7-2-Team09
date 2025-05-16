@@ -23,7 +23,6 @@ public class PaymentController {
 	@PostMapping("/confirm")
 	public ResponseEntity<BaseResponse<PaymentSuccessResponseDto>> confirm(
 		@RequestBody TossPaymentConfirmRequestDto request) {
-
 		return paymentService.confirmPayment(request);
 	}
 }

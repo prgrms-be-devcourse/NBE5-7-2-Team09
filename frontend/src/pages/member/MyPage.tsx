@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PointChargeModal from "@/components/ui/PointChargeModal.tsx";
+import {useNavigate, useSearchParams} from "react-router-dom";
+
 import {
   Check,
   CreditCard,
@@ -25,7 +28,27 @@ import {
 } from "@/utils/api/userService";
 import { UserProfile, ProfileUpdateRequest, Subscription } from "@/types/user";
 
+
+
 const MyPage: React.FC = () => {
+
+
+  const navigate = useNavigate();
+
+  const handleSubmitCharge = () => {
+    navigate("/checkout", { state: { amount: totalCharge } });
+  };
+
+
+  //결제
+
+  const [isChargeOpen, setIsChargeOpen] = useState(false);
+  const [totalCharge, setTotalCharge] = useState(0);
+  const [searchParams] = useSearchParams();
+
+
+
+
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -445,10 +468,30 @@ const MyPage: React.FC = () => {
                   disabled
                   className="bg-gray-50"
                 />
+                <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setIsChargeOpen(true)}>
+                  충전
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
+
+        <PointChargeModal
+            isOpen={isChargeOpen}
+            onClose={() => {
+              setTotalCharge(0);
+              setIsChargeOpen(false);
+            }}
+            totalCharge={totalCharge}
+            setTotalCharge={setTotalCharge}
+            onSubmit={handleSubmitCharge}   // ✅ 여기 반드시 연결되어야 함
+            userPoint={userProfile.point}
+        />
+
 
         {/* 구독 현황 탭 */}
         <TabsContent value="subscription">

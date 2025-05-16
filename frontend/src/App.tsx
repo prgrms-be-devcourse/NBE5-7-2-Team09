@@ -23,6 +23,11 @@ import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import PreferencePage from "./pages/member/PreferencePage";
 
+// Toss 결제 관련
+import CheckoutPage from "./pages/payment/CheckoutPage";
+import SuccessPage from "./pages/payment/SuccessPage";
+import FailPage from "./pages/payment/FailPage";
+
 function App() {
   return (
     <Router>
@@ -48,6 +53,11 @@ function App() {
                     <Route path="/" element={<MainPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
+
+                    {/* Toss 결제 */}
+                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/success" element={<SuccessPage />} />
+                    <Route path="/fail" element={<FailPage />} />
 
                     {/* 도서 관련 라우트 */}
                     <Route path="/books" element={<BooksPage />} />
