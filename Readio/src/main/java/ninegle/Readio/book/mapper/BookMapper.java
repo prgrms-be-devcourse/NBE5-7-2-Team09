@@ -55,7 +55,8 @@ public class BookMapper {
 			.build();
 	}
 
-	public static Book toEntity (BookRequestDto dto, Publisher publisher, Author author, Category category) {
+	public static Book toEntity (BookRequestDto dto, Publisher publisher,
+		Author author, Category category) {
 		return Book.builder()
 			.name(dto.getName())
 			.description(dto.getDescription())
