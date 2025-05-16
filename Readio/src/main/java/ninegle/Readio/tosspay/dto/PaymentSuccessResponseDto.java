@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @Builder
 public class PaymentSuccessResponseDto {
 	private final String orderId; // 제품 id
-	private final int amount; //가격
+	private final long amount; //가격
 }
