@@ -1,9 +1,10 @@
 package ninegle.Readio.book.controller;
 
-import java.util.List;
+import java.io.IOException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,12 +25,13 @@ public class AdminBookController {
 	private final BookService bookService;
 
 	@PostMapping
-	public ResponseEntity<BaseResponse<Void>> save(@RequestBody BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> save(@ModelAttribute BookRequestDto request) throws IOException {
 		return bookService.save(request);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(@PathVariable Long id, @RequestBody BookRequestDto request) {
+	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(@PathVariable Long id,
+		@RequestBody BookRequestDto request) {
 		return bookService.updateBook(id, request);
 	}
 
