@@ -7,13 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.global.unit.BaseResponse;
 import ninegle.Readio.tosspay.dto.PaymentSuccessResponseDto;
 import ninegle.Readio.tosspay.dto.TossPaymentConfirmRequestDto;
 import ninegle.Readio.tosspay.service.PaymentService;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/payments")
@@ -25,10 +23,6 @@ public class PaymentController {
 	@PostMapping("/confirm")
 	public ResponseEntity<BaseResponse<PaymentSuccessResponseDto>> confirm(
 		@RequestBody TossPaymentConfirmRequestDto request) {
-		log.info("confirm request: {}", request.getOrderId());
-		log.info("confirm request: {}", request.getPaymentKey());
-		log.info("confirm request: {}", request.getAmount());
-
 		return paymentService.confirmPayment(request);
 	}
 }
