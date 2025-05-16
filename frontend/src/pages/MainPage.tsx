@@ -107,12 +107,7 @@ const MainPage = () => {
               리디오에서 다양한 도서를 언제 어디서나 만나보세요
             </p>
             <div className="flex gap-3">
-              <Button
-                className="bg-white text-blue-500 hover:bg-gray-100 font-bold"
-                onClick={() => navigate("signup")}
-              >
-                회원가입
-              </Button>
+              
             </div>
           </div>
         </div>
