@@ -81,6 +81,11 @@ public enum ErrorCode {
 	PUBLISHER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 출판사입니다."),
 
 	/*
+	 * review 관련 예외 처리
+	 */
+	//400
+	RATING_OUT_OF_BOUNDARY(HttpStatus.BAD_REQUEST, "평점의 범위는 1.0부터 5.0입니다."),
+	/*
 	 * mypage : 관련 예외 처리
 	 */
 	//400

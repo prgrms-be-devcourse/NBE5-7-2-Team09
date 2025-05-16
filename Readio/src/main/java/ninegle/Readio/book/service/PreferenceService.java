@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-import ninegle.Readio.book.dto.BookPreferenceDto;
-import ninegle.Readio.book.dto.BookPreferenceListDto;
+import ninegle.Readio.book.dto.preferencedto.PreferenceResponseDto;
+import ninegle.Readio.book.dto.preferencedto.PreferenceListResponseDto;
 import ninegle.Readio.book.dto.PaginationDto;
 import ninegle.Readio.book.mapper.PreferenceMapper;
 import ninegle.Readio.book.domain.Book;
@@ -63,16 +63,16 @@ public class PreferenceService {
 		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.",null,HttpStatus.OK);
 	}
 
-	public ResponseEntity<BaseResponse<BookPreferenceListDto>> getPreferenceList(int page, int size) {
+	public ResponseEntity<BaseResponse<PreferenceListResponseDto>> getPreferenceList(int page, int size) {
 		User user = userService.getById(userContextService.getCurrentUserId());
 		Pageable pageable = PageRequest.of(page-1,size);
 		long count = preferencesRepository.countByUser(user);
 
 		List<Preference> preferences = preferencesRepository.findPreferencesByUser(user, pageable).getContent();
-		List<BookPreferenceDto> preferenceList = preferenceMapper.toPreferenceDto(preferences);
+		List<PreferenceResponseDto> preferenceList = preferenceMapper.toPreferenceDto(preferences);
 
 		PaginationDto paginationDto = preferenceMapper.toPaginationDto(count, page, size);
-		BookPreferenceListDto preferenceListDto = preferenceMapper.toPreferenceListDto(preferenceList, paginationDto);
+		PreferenceListResponseDto preferenceListDto = preferenceMapper.toPreferenceListDto(preferenceList, paginationDto);
 
 		return BaseResponse.ok("관심도서 조회가 정상적으로 수행되었습니다.",preferenceListDto,HttpStatus.OK);
 	}

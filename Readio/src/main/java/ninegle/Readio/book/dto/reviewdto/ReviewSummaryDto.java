@@ -1,4 +1,4 @@
-package ninegle.Readio.book.dto;
+package ninegle.Readio.book.dto.reviewdto;
 
 import java.math.BigDecimal;
 

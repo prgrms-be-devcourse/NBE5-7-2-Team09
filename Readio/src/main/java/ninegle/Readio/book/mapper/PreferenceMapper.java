@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Preference;
-import ninegle.Readio.book.dto.BookPreferenceDto;
-import ninegle.Readio.book.dto.BookPreferenceListDto;
+import ninegle.Readio.book.dto.preferencedto.PreferenceResponseDto;
+import ninegle.Readio.book.dto.preferencedto.PreferenceListResponseDto;
 import ninegle.Readio.book.dto.PaginationDto;
 import ninegle.Readio.user.domain.User;
 
@@ -27,24 +27,24 @@ public class PreferenceMapper {
 			.book(book)
 			.build();
 	}
-	public BookPreferenceDto toPreferenceDto(Preference preference){
+	public PreferenceResponseDto toPreferenceDto(Preference preference){
 
-		return BookPreferenceDto.builder()
+		return PreferenceResponseDto.builder()
 			.id(preference.getBook().getId())
 			.name(preference.getBook().getName())
 			.image(preference.getBook().getImage())
 			.build();
 	}
-	public List<BookPreferenceDto> toPreferenceDto(List<Preference> preferences){
-		List<BookPreferenceDto> bookPreferenceDtos = new ArrayList<>();
+	public List<PreferenceResponseDto> toPreferenceDto(List<Preference> preferences){
+		List<PreferenceResponseDto> preferenceResponseDtos = new ArrayList<>();
 		for (Preference preference : preferences) {
-			bookPreferenceDtos.add(toPreferenceDto(preference));
+			preferenceResponseDtos.add(toPreferenceDto(preference));
 		}
-		return bookPreferenceDtos;
+		return preferenceResponseDtos;
 	}
-	public BookPreferenceListDto toPreferenceListDto(List<BookPreferenceDto> bookPreferenceDtos, PaginationDto paginationDto){
-		return BookPreferenceListDto.builder()
-			.preferences(bookPreferenceDtos)
+	public PreferenceListResponseDto toPreferenceListDto(List<PreferenceResponseDto> preferenceResponseDtos, PaginationDto paginationDto){
+		return PreferenceListResponseDto.builder()
+			.preferences(preferenceResponseDtos)
 			.pagination(paginationDto)
 			.build();
 	}

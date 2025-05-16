@@ -1,4 +1,4 @@
-package ninegle.Readio.book.dto;
+package ninegle.Readio.book.dto.preferencedto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class BookPreferenceDto {
+public class PreferenceResponseDto {
 	private final long id;
 	private final String name;
 	private final String image;
