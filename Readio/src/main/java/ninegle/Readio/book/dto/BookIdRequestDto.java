@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class BookIdRequestDto {
+
 	private Long id;
 
 }

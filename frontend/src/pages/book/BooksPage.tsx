@@ -1,165 +1,185 @@
-// src/pages/book/BooksPage.tsx (모바일 검색 페이지 제외)
+// src/pages/book/BooksPage.tsx - API 연동 수정
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { bookService } from "@/utils/api/bookService";
+import { categoryService, Category } from "@/utils/api/categoryService";
+import BookCover from "@/components/book/BookCover";
 
-// 책 타입 정의
-interface Author {
+// API 응답에 맞는 책 타입 정의
+interface BookItem {
   id: number;
   name: string;
+  image: string | null;
+  categoryMajor: string;
+  categorySub: string;
+  authorName: string;
+  rating: number;
 }
-
-interface Publisher {
-  id: number;
-  name: string;
-}
-
-interface Category {
-  id: number;
-  major: string;
-  sub: string;
-}
-
-interface Book {
-  id: number;
-  name: string;
-  image: string;
-  isbn: string;
-  ecn: string;
-  pubDate: string;
-  category: Category;
-  publisher: Publisher;
-  author: Author;
-}
-
-interface BooksResponse {
-  books: Book[];
-  totalElements: number;
-  totalPages: number;
-  currentPage: number;
-  size: number;
-}
-
-// KDC 한국십진분류법 기반 카테고리
-const categories = [
-  { id: "all", name: "전체" },
-  { id: "000", name: "총류" },
-  { id: "100", name: "철학" },
-  { id: "200", name: "종교" },
-  { id: "300", name: "사회과학" },
-  { id: "400", name: "자연과학" },
-  { id: "500", name: "기술과학" },
-  { id: "600", name: "예술" },
-  { id: "700", name: "언어" },
-  { id: "800", name: "문학" },
-  { id: "900", name: "역사" },
-];
 
 const BooksPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  // URL에서 검색어, 카테고리, 페이지 값 가져오기
-  const searchQuery = searchParams.get("query") || "";
-  const categoryId = searchParams.get("category") || "all";
-  const page = parseInt(searchParams.get("page") || "1");
+  // URL에서 파라미터 직접 추출
+  const getQueryParams = () => {
+    const params = new URLSearchParams(location.search);
+    const keywordParam = params.get("keyword");
+    const categoryParam = params.get("category_major");
+    const pageParam = params.get("page");
 
-  const [books, setBooks] = useState<Book[]>([]);
+    console.log("📣 URL 파라미터 확인:", {
+      keyword: keywordParam,
+      category_major: categoryParam,
+      page: pageParam,
+    });
+
+    return {
+      keyword: keywordParam || "",
+      categoryId: categoryParam || "0",
+      page: parseInt(pageParam || "1"),
+    };
+  };
+
+  const { keyword, categoryId, page } = getQueryParams();
+
+  const [books, setBooks] = useState<BookItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalElements, setTotalElements] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(page);
-  const pageSize = 20; // 한 페이지에 표시할 책 개수
+  const pageSize = 20;
+
+  // 카테고리 목록 불러오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoadingCategories(true);
+        const response = await categoryService.getCategories();
+        if (response.status === 200) {
+          // API 응답 구조에 맞게 수정: categories 필드 사용
+          setCategories(response.data.categories || []);
+        } else {
+          throw new Error("카테고리 목록을 불러오는데 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("카테고리 불러오기 실패", {
+          description: "카테고리 목록을 불러오는 중 오류가 발생했습니다.",
+        });
+        setCategories(defaultCategories);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // 현재 선택된 카테고리명 가져오기
   const getCurrentCategoryName = () => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    return category ? category.name : "전체";
+    if (categoryId === "0") {
+      return "전체";
+    }
+    const category = categories.find((cat) => cat.id === parseInt(categoryId));
+    return category ? category.major : "전체";
   };
 
   // 페이지 제목 설정
   const getPageTitle = () => {
-    if (searchQuery) {
-      return `"${searchQuery}" 검색 결과`;
+    if (keyword) {
+      return `"${keyword}" 검색 결과`;
     } else {
       return `${getCurrentCategoryName()} 도서`;
     }
   };
 
-  // 책 목록 조회
-  const fetchBooks = async () => {
-    setIsLoading(true);
-    try {
-      let url = `/books?page=${currentPage}&size=${pageSize}`;
+  // 인코딩 없이 페이지 이동
+  const navigateWithoutEncoding = (
+    path: string,
+    params: Record<string, string>
+  ) => {
+    let url = path;
+    const queryParams = [];
 
-      // 카테고리가 전체가 아닌 경우 카테고리 필터 추가
-      if (categoryId && categoryId !== "all") {
-        url += `&category_major=${categoryId}`;
+    for (const key in params) {
+      if (params[key]) {
+        queryParams.push(`${key}=${params[key]}`);
       }
-
-      // 검색어가 있는 경우 검색어 추가
-      if (searchQuery) {
-        url += `&query=${encodeURIComponent(searchQuery)}`;
-      }
-
-      const response = await bookService.getBooks(url);
-
-      // 응답 데이터 처리
-      if (response.code === 200) {
-        const data = response.data;
-        setBooks(data.books);
-        setTotalPages(data.totalPages);
-        setTotalElements(data.totalElements);
-        setCurrentPage(data.currentPage);
-      } else {
-        throw new Error("책 목록을 불러오는데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      toast.error("책 목록 조회 실패", {
-        description: "책 목록을 불러오는 중 오류가 발생했습니다.",
-      });
-      // 에러 발생 시 빈 배열로 초기화
-      setBooks([]);
-    } finally {
-      setIsLoading(false);
     }
+
+    if (queryParams.length > 0) {
+      url += `?${queryParams.join("&")}`;
+    }
+
+    console.log("📣 페이지 이동 URL:", url);
+
+    // 현재 URL을 직접 변경
+    window.location.href = url;
   };
 
-  // 페이지, 카테고리, 검색어가 변경될 때 책 목록 다시 조회
+  // 책 목록 조회 - 검색, 카테고리, 페이지 변경 시 호출
   useEffect(() => {
+    console.log("📣 useEffect 실행 - 파라미터:", {
+      keyword,
+      categoryId,
+      page,
+      pageSize,
+    });
+
     let isMounted = true;
 
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        // API 요청 URL 구성 수정
+        // 페이지는 1부터 시작하게 변경
         let url = `/books?page=${page}&size=${pageSize}`;
-        // URL 구성...
 
+        // 검색어가 있으면 추가
+        if (keyword) {
+          url = `/books/search?keyword=${keyword}&page=${page}&size=${pageSize}`;
+        } else {
+          // 카테고리 필터 추가 - 0이 아닐 때만
+          if (categoryId && categoryId !== "0") {
+            // URL 구성 수정: 검색이 없을 때는 /books 엔드포인트 사용, 카테고리는 category_major 파라미터
+            url = `/books?category_major=${categoryId}&page=${page}&size=${pageSize}`;
+          }
+        }
+
+        console.log("📣 요청 전송할 URL:", url);
         const response = await bookService.getBooks(url);
+        console.log("📣 응답 받음:", response);
 
-        // 컴포넌트가 여전히 마운트되어 있을 때만 상태 업데이트
+        // 응답 처리
         if (isMounted) {
-          if (response.code === 200) {
-            const data = response.data;
-            setBooks(data.books);
-            setTotalPages(data.totalPages);
-            setTotalElements(data.totalElements);
-            setCurrentPage(data.currentPage);
+          if (response && response.status === 200) {
+            if (response.data && response.data.books) {
+              console.log("📣 책 데이터 세팅:", response.data.books.length);
+              setBooks(response.data.books);
+              setTotalPages(response.data.pagination.totalPages || 1);
+              setTotalElements(response.data.pagination.totalElements || 0);
+              setCurrentPage(response.data.pagination.currentPage || 1); // 1부터 시작하는 페이지 번호
+            } else {
+              console.error("📣 데이터 구조 오류:", response.data);
+              throw new Error("응답 데이터 구조가 예상과 다릅니다.");
+            }
           } else {
-            throw new Error("책 목록을 불러오는데 실패했습니다.");
+            console.error("📣 API 오류 응답:", response);
+            throw new Error(
+              `API 오류: ${response?.message || "알 수 없는 오류"}`
+            );
           }
         }
       } catch (error) {
         if (isMounted) {
-          console.error("Error fetching books:", error);
+          console.error("📣 Error fetching books:", error);
           toast.error("책 목록 조회 실패", {
             description: "책 목록을 불러오는 중 오류가 발생했습니다.",
           });
@@ -174,60 +194,92 @@ const BooksPage: React.FC = () => {
 
     fetchData();
 
-    // 클린업 함수
     return () => {
       isMounted = false;
     };
-  }, [categoryId, searchQuery, page, pageSize]);
+  }, [categoryId, keyword, page, pageSize]);
 
   // 페이지 변경 처리
   const handlePageChange = (newPage: number) => {
-    // URL 파라미터 업데이트
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("page", newPage.toString());
-    setSearchParams(newParams);
-  };
+    console.log("📣 페이지 변경:", newPage);
 
-  // 카테고리 변경 처리
-  const handleCategoryChange = (selectedCategoryId: string) => {
-    // URL 변경
-    const newParams = new URLSearchParams();
+    let newParams = {
+      page: newPage.toString(),
+    };
 
-    if (selectedCategoryId !== "all") {
-      newParams.set("category", selectedCategoryId);
+    if (keyword) {
+      newParams["keyword"] = keyword;
     }
 
-    if (searchQuery) {
-      newParams.set("query", searchQuery);
+    if (categoryId && categoryId !== "0") {
+      newParams["category_major"] = categoryId;
     }
 
-    // 카테고리 변경 시 첫 페이지로 이동
-    newParams.set("page", "1");
-
-    setSearchParams(newParams);
+    // location.href를 사용하여 인코딩 우회
+    navigateWithoutEncoding("/books", newParams);
   };
 
   // 책 상세 페이지로 이동
-  const navigateToBookDetail = (bookId: number) => {
+  const handleBookClick = (bookId: number) => {
     navigate(`/book/${bookId}`);
   };
+
+  // 기본 카테고리 목록 (API 에러 시 사용)
+  const defaultCategories: Category[] = [
+    {
+      id: 0,
+      major: "전체",
+      subs: ["백과사전", "도서관학", "저널리즘", "전집", "연속간행물"],
+    },
+    {
+      id: 100,
+      major: "철학",
+      subs: ["형이상학", "인식론", "논리학", "윤리학", "심리학"],
+    },
+    {
+      id: 200,
+      major: "종교",
+      subs: ["비교종교", "불교", "기독교", "천주교", "이슬람교"],
+    },
+    // ... 나머지 카테고리 ...
+  ];
 
   // 로딩 중 스켈레톤 UI
   const renderSkeletons = () => {
     return Array(12)
       .fill(0)
       .map((_, index) => (
-        <Card key={`skeleton-${index}`} className="overflow-hidden">
-          <CardContent className="p-0">
-            <Skeleton className="aspect-[2/3] w-full" />
-          </CardContent>
-          <CardFooter className="px-3 py-2 bg-white flex flex-col items-start gap-1">
-            <Skeleton className="h-4 w-full" />
+        <div key={`skeleton-${index}`}>
+          <Skeleton className="w-full h-60 md:h-96" />
+          <div className="mt-2">
+            <Skeleton className="h-4 w-full mb-1" />
             <Skeleton className="h-3 w-2/3" />
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       ));
   };
+
+  // 전체 도서 보기 버튼 클릭 처리
+  const handleViewAllBooks = () => {
+    window.location.href = "/books";
+  };
+
+  // 컴포넌트가 마운트될 때 로그 추가
+  useEffect(() => {
+    console.log("📣 BooksPage 컴포넌트 마운트");
+    console.log("📣 현재 URL:", window.location.href);
+    return () => {
+      console.log("📣 BooksPage 컴포넌트 언마운트");
+    };
+  }, []);
+
+  console.log("📣 렌더링 - 상태:", {
+    isLoading,
+    booksCount: books.length,
+    totalPages,
+    totalElements,
+    currentPage,
+  });
 
   return (
     <div className="container mx-auto">
@@ -247,7 +299,7 @@ const BooksPage: React.FC = () => {
 
       {/* 책 그리드 */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {renderSkeletons()}
         </div>
       ) : books.length === 0 ? (
@@ -255,51 +307,35 @@ const BooksPage: React.FC = () => {
           <Book className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">책이 없습니다</h3>
           <p className="text-gray-600 mb-4">
-            {searchQuery
-              ? `"${searchQuery}"에 대한 검색 결과가 없습니다.`
-              : categoryId !== "all"
+            {keyword
+              ? `"${keyword}"에 대한 검색 결과가 없습니다.`
+              : categoryId !== "0"
               ? `"${getCurrentCategoryName()}" 카테고리에 등록된 책이 없습니다.`
               : "등록된 책이 없습니다."}
           </p>
           <Button
             variant="default"
-            onClick={() => {
-              setSearchParams(new URLSearchParams());
-              navigate("/books");
-            }}
+            onClick={handleViewAllBooks}
             className="bg-blue-500 hover:bg-blue-600"
           >
             전체 도서 보기
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {books.map((book) => (
-            <Card
+            <BookCover
               key={book.id}
-              className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => navigateToBookDetail(book.id)}
-            >
-              <CardContent className="p-0">
-                <div className="relative aspect-[2/3]">
-                  <img
-                    src={book.image}
-                    alt={book.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/placeholder-book.png";
-                    }}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="px-3 py-2 bg-white flex flex-col items-start">
-                <h3 className="font-medium text-sm line-clamp-2 w-full">
-                  {book.name}
-                </h3>
-                <p className="text-xs text-gray-500 mt-1">{book.author.name}</p>
-              </CardFooter>
-            </Card>
+              book={{
+                id: book.id,
+                title: book.name,
+                author: book.authorName,
+                cover: book.image || "",
+                category: book.categoryMajor,
+                rating: book.rating,
+              }}
+              onClick={handleBookClick}
+            />
           ))}
         </div>
       )}
@@ -309,7 +345,7 @@ const BooksPage: React.FC = () => {
         <div className="mt-8">
           <Pagination
             pageCount={totalPages}
-            currentPage={currentPage}
+            currentPage={currentPage} // 1부터 시작하는 페이지 번호 사용
             onPageChange={handlePageChange}
           />
         </div>

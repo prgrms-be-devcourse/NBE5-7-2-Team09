@@ -1,66 +1,55 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BookCover from "@/components/book/BookCover";
+import bookService from "@/utils/api/bookService";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface Book {
+  id: number;
+  name: string;
+  image: string | null;
+  categoryMajor: string;
+  categorySub: string;
+  authorName: string;
+  rating?: number | null;
+}
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const [popularBooks, setPopularBooks] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 가상 도서 데이터
-  const popularBooks = [
-    {
-      id: 1,
-      title: "사피엔스",
-      author: "유발 하라리",
-      cover:
-        "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788934972464.jpg",
-      rating: 4.8,
-      category: "인문",
-      isBestseller: true,
-    },
-    {
-      id: 2,
-      title: "코스모스",
-      author: "칼 세이건",
-      cover:
-        "https://contents.kyobobook.co.kr/sih/fit-in/200x0/pdt/9788983711892.jpg",
-      rating: 4.9,
-      category: "과학",
-      isBestseller: true,
-    },
-    {
-      id: 3,
-      title: "도둑맞은 집중력",
-      author: "요한 하리",
-      cover: "https://image.yes24.com/goods/118579613/XL",
-      rating: 4.6,
-      category: "자기계발",
-      isBestseller: false,
-    },
-    {
-      id: 4,
-      title: "아몬드",
-      author: "손원평",
-      cover:
-        "https://contents.kyobobook.co.kr/sih/fit-in/400x0/pdt/9788936434267.jpg",
-      rating: 4.7,
-      category: "소설",
-      isBestseller: true,
-    },
-    {
-      id: 5,
-      title: "소크라테스 익스프레스",
-      author: "에릭 와이너",
-      cover:
-        "https://item.elandrs.com/upload/prd/orgimg/159/2108491159_0000001.jpg?w=750&h=&q=100",
-      rating: 4.5,
-      category: "인문",
-      isBestseller: false,
-    },
-  ];
+  // API에서 인기 도서 불러오기
+  useEffect(() => {
+    const fetchPopularBooks = async () => {
+      setIsLoading(true);
+      try {
+        // 기본 페이지 요청으로 도서 가져오기
+        const response = await bookService.getBooks(
+          `/books?keyword=&page=1&size=20`
+        );
+
+        console.log("API 응답:", response);
+
+        if (response && response.status === 200) {
+          setPopularBooks(response.data.books);
+        } else {
+          console.error("인기 도서를 불러오는데 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("Error fetching popular books:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPopularBooks();
+  }, []);
 
   // 가로 스크롤 함수
-  const scrollSection = (sectionId: any, direction: any) => {
+  const scrollSection = (sectionId: string, direction: "left" | "right") => {
     const section = document.getElementById(sectionId);
     if (section) {
       const scrollAmount = direction === "left" ? -400 : 400;
@@ -69,9 +58,41 @@ const MainPage = () => {
   };
 
   // 책 상세 페이지로 이동하는 함수
-  const navigateToBookDetail = (bookId: any) => {
+  const navigateToBookDetail = (bookId: number) => {
     navigate(`/book/${bookId}`);
   };
+
+  // 로딩 중 스켈레톤 UI
+  const renderSkeletons = () => {
+    return Array(6)
+      .fill(0)
+      .map((_, index) => (
+        <div key={`skeleton-${index}`} className="flex-shrink-0 w-40 md:w-64">
+          <div className="aspect-[2/3] mb-2">
+            <Skeleton className="w-full h-full rounded" />
+          </div>
+          <Skeleton className="h-4 w-full mb-1" />
+          <Skeleton className="h-3 w-2/3" />
+        </div>
+      ));
+  };
+
+  // BookCover 컴포넌트에 맞게 책 데이터 형식 변환
+  const formatBookForCover = (book: Book) => {
+    return {
+      id: book.id,
+      title: book.name,
+      author: book.authorName,
+      // BookCover 컴포넌트는 자체적으로 플레이스홀더 이미지를 처리함
+      cover: book.image || "",
+      category: book.categoryMajor,
+      rating: book.rating || 0,
+      isBestseller: false,
+    };
+  };
+
+  // 표시할 책 수 제한 (첫 6권만)
+  const booksToDisplay = popularBooks.slice(0, 6);
 
   return (
     <div>
@@ -98,7 +119,7 @@ const MainPage = () => {
       </section>
 
       {/* 인기 도서 섹션 */}
-      <section className="container mx-auto px-4 mb-6">
+      <section className="container mx-auto mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">인기 도서</h2>
           <div className="flex gap-2">
@@ -124,13 +145,21 @@ const MainPage = () => {
           id="popular-books"
           className="flex overflow-x-auto pb-4 scrollbar-hide gap-4"
         >
-          {popularBooks.map((book) => (
-            <BookCover
-              key={book.id}
-              book={book}
-              onClick={navigateToBookDetail}
-            />
-          ))}
+          {isLoading ? (
+            renderSkeletons()
+          ) : booksToDisplay.length > 0 ? (
+            booksToDisplay.map((book) => (
+              <BookCover
+                key={book.id}
+                book={formatBookForCover(book)}
+                onClick={navigateToBookDetail}
+              />
+            ))
+          ) : (
+            <div className="text-center w-full py-8 text-gray-500">
+              책을 불러오지 못했습니다.
+            </div>
+          )}
         </div>
       </section>
 

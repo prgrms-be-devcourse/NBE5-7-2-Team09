@@ -1,5 +1,7 @@
 package ninegle.Readio.book.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +29,7 @@ public class AdminBookController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(@PathVariable Long id,
-		@RequestBody BookRequestDto request) {
+	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(@PathVariable Long id, @RequestBody BookRequestDto request) {
 		return bookService.updateBook(id, request);
 	}
 

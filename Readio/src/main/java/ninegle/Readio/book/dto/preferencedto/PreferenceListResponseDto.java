@@ -1,10 +1,11 @@
-package ninegle.Readio.book.dto;
+package ninegle.Readio.book.dto.preferencedto;
 
 import java.util.List;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ninegle.Readio.book.dto.PaginationDto;
 
 /**
  * Readio - BookPreferenceListDto
@@ -16,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class BookPreferenceListDto {
-	private final List<BookPreferenceDto> preferences;
+public class PreferenceListResponseDto {
+	private final List<PreferenceResponseDto> preferences;
 	private final PaginationDto pagination;
 }

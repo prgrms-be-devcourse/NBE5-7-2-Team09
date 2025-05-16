@@ -2,7 +2,17 @@ show databases;
 use programmers;
 show databases;
 show tables ;
+# 비밀번호는 전부 1111
+INSERT INTO user (email, password, role, nickname, phone_number, point)
+VALUES
+    ('test1@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자1', '010-1000-1001', 50000),
+    ('test2@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자2', '010-1000-1002', 50000),
+    ('test3@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자3', '010-1000-1003', 50000),
+    ('test4@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자4', '010-1000-1004', 50000),
+    ('test5@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자5', '010-1000-1005', 50000);
 
+select *
+from user;
 INSERT INTO `category` VALUES
                            (0,'총류','총류 일반'),
                            (10,'총류','도서관학'),
@@ -147,4 +157,5 @@ VALUES
 select *
 from book;
 
-
+select *
+from review;
