@@ -22,7 +22,7 @@ public class SubscriptionManager {
 	private final UserRepository userRepository;
 	private final SubscriptionMailSender mailSender;
 
-	private static final int SUBSCRIPTION_COST = 14900;
+	private static final long SUBSCRIPTION_COST = 14900;
 
 	public void subscribe(Long userId) {
 		User user = userRepository.findById(userId)
