@@ -19,9 +19,8 @@ public enum ErrorCode {
 	AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "인증이 필요한 요청입니다. 로그인 해주세요."),
 
 	// 404
-	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 책을 찾을 수 없습니다."),
+	BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 책을 찾을 수 없습니다."),
 	CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 카테고리를 찾을 수 없습니다."),
-
 
 	// 500
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "예기치 못한 오류가 발생했습니다."),
@@ -97,8 +96,6 @@ public enum ErrorCode {
 	//400
 	SUBSCRIPTION_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 구독입니다."),
 	;
-
-
 
 	private final HttpStatus status;
 	private final String message;

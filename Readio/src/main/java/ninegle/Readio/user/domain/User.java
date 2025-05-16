@@ -32,10 +32,10 @@ public class User {
 
 	private String phoneNumber;
 
-	private long point = 50000;
+	private long point;
 
 	@Builder
-	public User(String email, String password, String nickname, String phoneNumber, long point) {
+	public User(String email, String password, String nickname, String phoneNumber) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
