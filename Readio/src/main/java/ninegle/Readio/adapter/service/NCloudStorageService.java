@@ -7,9 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -24,6 +28,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
  * author:  gigol
  * purpose: 네이버 클라우드 연동
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NCloudStorageService {
@@ -62,6 +67,39 @@ public class NCloudStorageService {
 		} catch (S3Exception e) {
 			return false;
 		}
+	}
+
+	public void renameFileOnCloud(String beforeName, String afterName) {
+		String oldKey = generateObjectKey(beforeName);
+		String newKey = generateObjectKey(afterName);
+
+		// 이름이 동일하면 실행하지 않음
+		if (oldKey.equals(newKey)) {
+			return;
+		}
+
+		try {
+			CopyObjectRequest copyReq = CopyObjectRequest.builder()
+				.sourceBucket(bucketName)
+				.sourceKey(oldKey)
+				.destinationBucket(bucketName)
+				.destinationKey(newKey)
+				.build();
+			s3Client.copyObject(copyReq);
+
+			DeleteObjectRequest deleteReq = DeleteObjectRequest.builder()
+				.bucket(bucketName)
+				.key(oldKey)
+				.build();
+			s3Client.deleteObject(deleteReq);
+		} catch (S3Exception e) {
+			log.info("e.getMessage() = {}", e.getMessage());
+			throw new BusinessException(ErrorCode.DUPLICATE_NAME);
+		}
+	}
+
+	private String generateObjectKey(String bookName) {
+		return bookName + ".epub";
 	}
 
 }

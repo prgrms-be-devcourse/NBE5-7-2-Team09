@@ -115,8 +115,7 @@ public class BookService {
 
 		// 1. S3에 업로드할 파일명 생성 ( 책 제목 기반 )
 		String fileName = request.getName() + ".epub";
-		log.info("request.getEpubFile() = {}", request.getEpubFile());
-		log.info("fileName = {}", fileName);
+
 		// 2. S3에 해당 파일 존재 여부 확인
 		if (!nCloudStorageService.fileExists(fileName)) {
 			nCloudStorageService.uploadFile(fileName, request.getEpubFile());
@@ -170,6 +169,13 @@ public class BookService {
 		Book targetBook = bookRepository.findById(id)
 			.orElseThrow(()->new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
+		String beforeName = targetBook.getName();
+		String afterName = request.getName();
+
+		if (!beforeName.equals(afterName)) {
+			nCloudStorageService.renameFileOnCloud(beforeName, afterName);
+		}
+
 		BookSearch targetBookSearch = bookSearchRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
@@ -202,7 +208,6 @@ public class BookService {
 		return BaseResponse.ok("책 삭제가 정상적으로 수행되었습니다.", null, HttpStatus.OK);
 	}
 
-	// TODO: ElasticSearch 적용
 	public ResponseEntity<BaseResponse<BookListResponseDto>> getBookByCategory(String categoryMajor, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page-1, size);
