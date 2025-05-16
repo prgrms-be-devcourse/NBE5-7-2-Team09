@@ -1,5 +1,6 @@
 package ninegle.Readio.book.service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -16,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -111,15 +111,25 @@ public class BookService {
 		bookSearchRepository.save(bookSearch);
   }
 
-	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) throws IOException {
 
+		// 1. S3에 업로드할 파일명 생성 ( 책 제목 기반 )
+		String fileName = request.getName() + ".epub";
+
+		// 2. S3에 해당 파일 존재 여부 확인
+		if (!nCloudStorageService.fileExists(fileName)) {
+			nCloudStorageService.uploadFile(fileName, request.getEpubFile());
+		}
+
+		// 3. 연관 엔티티 조회
 		Category category = getCategory(request.getCategorySub());
 		Author author = getAuthor(request.getAuthorName());
 		Publisher publisher = getPublisher(request.getPublisherName());
 
+		// 4. Book 저장
 		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category));
 
-		// ElasticSearch Repository에 저장
+		// 5. ElasticSearch Repository에 저장
 		bookSearchRepository.save(BookSearchMapper.toEntity(savedBook));
 
 		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
@@ -159,6 +169,13 @@ public class BookService {
 		Book targetBook = bookRepository.findById(id)
 			.orElseThrow(()->new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
+		String beforeName = targetBook.getName();
+		String afterName = request.getName();
+
+		if (!beforeName.equals(afterName)) {
+			nCloudStorageService.renameFileOnCloud(beforeName, afterName);
+		}
+
 		BookSearch targetBookSearch = bookSearchRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
@@ -191,7 +208,6 @@ public class BookService {
 		return BaseResponse.ok("책 삭제가 정상적으로 수행되었습니다.", null, HttpStatus.OK);
 	}
 
-	// TODO: ElasticSearch 적용
 	public ResponseEntity<BaseResponse<BookListResponseDto>> getBookByCategory(String categoryMajor, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page-1, size);
