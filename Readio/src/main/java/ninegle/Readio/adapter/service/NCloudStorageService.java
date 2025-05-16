@@ -64,11 +64,4 @@ public class NCloudStorageService {
 		}
 	}
 
-	public String getFileUrl(String key) {
-		return s3Client.utilities().getUrl(GetUrlRequest.builder()
-			.bucket(bucketName)
-			.key(key)
-			.build()).toString();
-	}
-
 }

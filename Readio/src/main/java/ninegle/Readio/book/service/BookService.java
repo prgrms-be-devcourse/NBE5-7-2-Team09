@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,24 +115,22 @@ public class BookService {
 
 		// 1. S3에 업로드할 파일명 생성 ( 책 제목 기반 )
 		String fileName = request.getName() + ".epub";
-
+		log.info("request.getEpubFile() = {}", request.getEpubFile());
+		log.info("fileName = {}", fileName);
 		// 2. S3에 해당 파일 존재 여부 확인
 		if (!nCloudStorageService.fileExists(fileName)) {
 			nCloudStorageService.uploadFile(fileName, request.getEpubFile());
 		}
 
-		// 3. epubUri 생성
-		String epubUrl = nCloudStorageService.getFileUrl(fileName);
-
-		// 4. 연관 엔티티 조회
+		// 3. 연관 엔티티 조회
 		Category category = getCategory(request.getCategorySub());
 		Author author = getAuthor(request.getAuthorName());
 		Publisher publisher = getPublisher(request.getPublisherName());
 
-		// 5. Book 저장
-		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category, epubUrl));
+		// 4. Book 저장
+		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category));
 
-		// 6. ElasticSearch Repository에 저장
+		// 5. ElasticSearch Repository에 저장
 		bookSearchRepository.save(BookSearchMapper.toEntity(savedBook));
 
 		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);

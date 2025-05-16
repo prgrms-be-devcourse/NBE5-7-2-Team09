@@ -53,8 +53,6 @@ public class Book {
 	@Column(nullable = false)
 	private LocalDate pubDate;
 
-	private String epubUrl;
-
 	private LocalDate updatedAt;
 
 	private Boolean expired = false;
@@ -75,14 +73,13 @@ public class Book {
 
 	@Builder
 	public Book(String name, String description, String image, String isbn, String ecn, LocalDate pubDate,
-		String epubUrl, Author author, Publisher publisher, Category category) {
+		Author author, Publisher publisher, Category category) {
 		this.name = name;
 		this.description = description;
 		this.image = image;
 		this.isbn = isbn;
 		this.ecn = ecn;
 		this.pubDate = pubDate;
-		this.epubUrl = epubUrl;
 		this.author = author;
 		this.publisher = publisher;
 		this.category = category;
