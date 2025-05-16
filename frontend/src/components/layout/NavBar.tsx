@@ -106,12 +106,16 @@ const Navbar = () => {
 
   // 서브 카테고리 클릭 처리
   const handleSubCategoryClick = (
-    categoryId: number,
+    category: string,
     subIndex: number,
     e: React.MouseEvent
   ) => {
     e.stopPropagation(); // 이벤트 버블링 방지
-    navigate(`/books?category_major=${categoryId}&category_sub=${subIndex}`);
+
+    // category에서 " 일반" 문자열 제거
+    const cleanCategory = category.replace(" 일반", "");
+
+    navigate(`/books?category_major=${cleanCategory}&category_sub=${subIndex}`);
     // 서브 카테고리 클릭 후 드롭다운 닫기
     setExpandedCategory(null);
   };
@@ -355,9 +359,7 @@ const Navbar = () => {
                         <button
                           key={index}
                           className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm cursor-pointer"
-                          onClick={(e) =>
-                            handleSubCategoryClick(category.id, index, e)
-                          }
+                          onClick={(e) => handleSubCategoryClick(sub, index, e)}
                         >
                           {sub}
                         </button>
