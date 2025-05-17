@@ -29,5 +29,5 @@ public interface BookSearchRepository extends ElasticsearchRepository<BookSearch
 	// 카테고리별 조회
 	Page<BookSearch> findByExpiredFalseAndCategoryMajor(String major, Pageable pageable);
 
-	Optional<BookSearch> findById(Long id);
+	Optional<BookSearch> findByIdAndExpiredFalse(Long id);
 }
