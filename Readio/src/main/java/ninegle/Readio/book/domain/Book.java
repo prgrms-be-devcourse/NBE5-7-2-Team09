@@ -53,8 +53,6 @@ public class Book {
 	@Column(nullable = false)
 	private LocalDate pubDate;
 
-	private String epubUrl;
-
 	private LocalDate updatedAt;
 
 	private Boolean expired = false;

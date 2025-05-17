@@ -30,6 +30,7 @@ import ninegle.Readio.book.dto.BookListResponseDto;
 import ninegle.Readio.book.dto.BookRequestDto;
 import ninegle.Readio.book.dto.BookResponseDto;
 import ninegle.Readio.book.dto.BookSearchResponseDto;
+import ninegle.Readio.book.dto.ViewerResponseDto;
 import ninegle.Readio.book.mapper.BookMapper;
 import ninegle.Readio.book.mapper.BookSearchMapper;
 import ninegle.Readio.book.repository.AuthorRepository;
@@ -164,7 +165,7 @@ public class BookService {
 		String beforeName = targetBook.getName();
 		String afterName = request.getName();
 
-		// ✅ 이름이 바뀌었으면 epub 파일도 rename
+		// 이름이 바뀌었으면 epub, image 파일 rename
 		if (!beforeName.equals(afterName)) {
 			nCloudStorageService.renameFileOnCloud(beforeName, afterName,"epub",".epub"); // epub 파일명 변경
 			nCloudStorageService.renameFileOnCloud(beforeName, afterName,"image", ".jpg");
@@ -186,10 +187,10 @@ public class BookService {
 
 	public ResponseEntity<BaseResponse<Void>> deleteBook(Long id) {
 
-		Book findBook = bookRepository.findById(id)
+		Book findBook = bookRepository.findByIdAndExpiredFalse(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
-		BookSearch findBookSearch = bookSearchRepository.findById(id)
+		BookSearch findBookSearch = bookSearchRepository.findByIdAndExpiredFalse(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
 		bookRepository.delete(findBook);
@@ -200,7 +201,6 @@ public class BookService {
 		return BaseResponse.ok("책 삭제가 정상적으로 수행되었습니다.", null, HttpStatus.OK);
 	}
 
-	// TODO: ElasticSearch 적용
 	public ResponseEntity<BaseResponse<BookListResponseDto>> getBookByCategory(String categoryMajor, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page-1, size);
@@ -216,6 +216,17 @@ public class BookService {
 		PaginationDto paginationDto = BookMapper.toPaginationDto(totalElements, page, size);
 
 		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", BookMapper.toBookListResponseDto(responseDtos, paginationDto), HttpStatus.OK);
+	}
+
+	public ResponseEntity<BaseResponse<ViewerResponseDto>> getViewerBook(Long id) {
+		Book findBook = bookRepository.findByIdAndExpiredFalse(id)
+			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
+
+		String epubUri = nCloudStorageService.generateObjectUrl("epub/" + findBook.getName() + ".epub");
+
+		ViewerResponseDto response = ViewerResponseDto.builder().epubUri(epubUri).build();
+
+		return BaseResponse.ok("요청에 성공했습니다.", response, HttpStatus.OK);
 	}
 
 	public Book getBookById(long id) {
