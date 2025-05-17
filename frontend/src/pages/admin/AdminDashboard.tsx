@@ -549,8 +549,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // 도서 폼 제출 처리
-  // 도서 폼 제출 처리
   const handleBookFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -573,30 +571,40 @@ const AdminDashboard: React.FC = () => {
       let response;
 
       if (editingBookId) {
-        // 도서 수정 API 호출 (JSON 형식)
-        const requestData = {
-          categorySub: bookForm.categorySub,
-          publisherName: bookForm.publisherName,
-          authorName: bookForm.authorName,
-          name: bookForm.name,
-          description: bookForm.description,
-          isbn: bookForm.isbn,
-          ecn: bookForm.ecn || "",
-          pubDate: bookForm.publishedDateString
-            ? `${bookForm.publishedDateString}`
-            : "",
-        };
+        // 도서 수정 API 호출
+        const formData = new FormData();
+
+        // 기본 필드 추가
+        formData.append("categorySub", bookForm.categorySub);
+        formData.append("publisherName", bookForm.publisherName);
+        formData.append("authorName", bookForm.authorName);
+        formData.append("name", bookForm.name);
+        formData.append("description", bookForm.description || "");
+        formData.append("isbn", bookForm.isbn);
+        formData.append("ecn", bookForm.ecn || "");
+        formData.append("pubDate", bookForm.publishedDateString || "");
+
+        // 이미지 파일 추가 (있는 경우에만)
+        if (bookForm.image) {
+          formData.append("image", bookForm.image);
+        }
+
+        // EPUB 파일 추가 (있는 경우에만)
+        if (bookForm.epubFile) {
+          formData.append("epubFile", bookForm.epubFile);
+        }
 
         response = await axios.put(
           `${API_BASE_URL}/admin/books/${editingBookId}`,
-          requestData,
+          formData,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data", // 수정: JSON 대신 multipart/form-data 사용
             },
           }
         );
+
         toast.success("도서 정보가 성공적으로 수정되었습니다.");
       } else {
         // 도서 추가 API 호출 (FormData 형식)
@@ -641,6 +649,7 @@ const AdminDashboard: React.FC = () => {
             "Content-Type": "multipart/form-data",
           },
         });
+
         toast.success("새 도서가 성공적으로 추가되었습니다.");
       }
 
