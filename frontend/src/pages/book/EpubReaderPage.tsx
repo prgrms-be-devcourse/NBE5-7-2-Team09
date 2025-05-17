@@ -264,7 +264,7 @@ const EpubReaderPage: React.FC = () => {
 
           const apiResponse: BookApiResponse = await response.json();
 
-          if (apiResponse.code !== 200 || !apiResponse.data?.epubUri) {
+          if (apiResponse.status !== 200 || !apiResponse.data?.epubUri) {
             throw new Error(`API 응답 오류: ${apiResponse.message}`);
           }
 
