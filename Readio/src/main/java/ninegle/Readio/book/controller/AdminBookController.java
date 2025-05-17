@@ -31,7 +31,7 @@ public class AdminBookController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(@PathVariable Long id,
-		@RequestBody BookRequestDto request) {
+		@ModelAttribute BookRequestDto request) {
 		return bookService.updateBook(id, request);
 	}
 

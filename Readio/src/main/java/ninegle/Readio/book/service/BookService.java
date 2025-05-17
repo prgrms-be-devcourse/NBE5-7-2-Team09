@@ -1,5 +1,6 @@
 package ninegle.Readio.book.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -93,15 +94,31 @@ public class BookService {
   }
 
 
-	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) {
+	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) throws IOException {
 
+		// 1. S3에 업로드할 파일명 생성 ( 책 제목 기반 )
+		String fileKey = "epub/" + request.getName() + ".epub";
+		String imageKey = "image/" +request.getName() + ".jpg";
+
+		// 2. S3에 해당 파일 존재 여부 확인
+		if (!nCloudStorageService.fileExists(fileKey)) {
+			nCloudStorageService.uploadFile(fileKey, request.getEpubFile());
+		}
+		if (!nCloudStorageService.fileExists(imageKey)) {
+			nCloudStorageService.uploadFile(imageKey,request.getImage());
+		}
+		// 이미지 URL 생성
+		String imageUrl = nCloudStorageService.generateObjectUrl(imageKey);
+
+		// 3. 연관 엔티티 조회
 		Category category = getCategory(request.getCategorySub());
 		Author author = getAuthor(request.getAuthorName());
 		Publisher publisher = getPublisher(request.getPublisherName());
 
-		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category));
+		// 4. Book 저장
+		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category, imageUrl));
 
-		// ElasticSearch Repository에 저장
+		// 5. ElasticSearch Repository에 저장
 		bookSearchRepository.save(BookSearchMapper.toEntity(savedBook));
 
 		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
@@ -144,12 +161,22 @@ public class BookService {
 		BookSearch targetBookSearch = bookSearchRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
+		String beforeName = targetBook.getName();
+		String afterName = request.getName();
+
+		// ✅ 이름이 바뀌었으면 epub 파일도 rename
+		if (!beforeName.equals(afterName)) {
+			nCloudStorageService.renameFileOnCloud(beforeName, afterName,"epub",".epub"); // epub 파일명 변경
+			nCloudStorageService.renameFileOnCloud(beforeName, afterName,"image", ".jpg");
+		}
+		String updatedImageUrl = nCloudStorageService.generateObjectUrl("image/" + afterName + ".jpg");
+
 		Category category = getCategory(request.getCategorySub());
 		Author author = getAuthor(request.getAuthorName());
 		Publisher publisher = getPublisher(request.getPublisherName());
 
-		Book updatedBook = targetBook.update(request, category, author, publisher);
-		BookSearch updatedBookSearch = targetBookSearch.update(request, category, author);
+		Book updatedBook = targetBook.update(request, category, author, publisher, updatedImageUrl);
+		BookSearch updatedBookSearch = targetBookSearch.update(request, category, author, updatedImageUrl);
 
 		bookRepository.save(updatedBook);
 		bookSearchRepository.save(updatedBookSearch);

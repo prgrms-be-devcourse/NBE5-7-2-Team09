@@ -63,9 +63,9 @@ public class BookSearch {
 		this.expired = true;
 	}
 
-	public BookSearch update(BookRequestDto dto, Category category, Author author) {
+	public BookSearch update(BookRequestDto dto, Category category, Author author, String imageUrl) {
 		this.name = dto.getName();
-		this.image = dto.getImage();
+		this.image = imageUrl;
 		this.categoryMajor = category.getMajor();
 		this.categorySub = category.getSub();
 		this.author = author.getName();

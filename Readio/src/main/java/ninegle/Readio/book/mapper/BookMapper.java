@@ -56,11 +56,11 @@ public class BookMapper {
 	}
 
 	public static Book toEntity (BookRequestDto dto, Publisher publisher,
-		Author author, Category category) {
+		Author author, Category category, String imageUrl) {
 		return Book.builder()
 			.name(dto.getName())
 			.description(dto.getDescription())
-			.image(dto.getImage())
+			.image(imageUrl)
 			.isbn(dto.getIsbn())
 			.ecn(dto.getEcn())
 			.pubDate(dto.getPubDate())
