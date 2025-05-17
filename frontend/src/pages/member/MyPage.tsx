@@ -5,9 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PointChargeModal from "@/components/ui/PointChargeModal.tsx";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   Check,
@@ -28,26 +27,17 @@ import {
 } from "@/utils/api/userService";
 import { UserProfile, ProfileUpdateRequest, Subscription } from "@/types/user";
 
-
-
 const MyPage: React.FC = () => {
-
-
   const navigate = useNavigate();
 
   const handleSubmitCharge = () => {
     navigate("/checkout", { state: { amount: totalCharge } });
   };
 
-
-  //결제
-
+  // 결제
   const [isChargeOpen, setIsChargeOpen] = useState(false);
   const [totalCharge, setTotalCharge] = useState(0);
   const [searchParams] = useSearchParams();
-
-
-
 
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -333,7 +323,7 @@ const MyPage: React.FC = () => {
     return (
       <div className="container mx-auto flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
           <p className="text-lg text-gray-600">
             회원 정보를 불러오는 중입니다...
           </p>
@@ -346,319 +336,288 @@ const MyPage: React.FC = () => {
     <div className="container mx-auto">
       <h1 className="text-2xl font-bold mb-6">마이페이지</h1>
 
-      <Tabs defaultValue="profile" className="mb-8">
-        <TabsList className="mb-4">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User size={16} />
-            회원 정보
-          </TabsTrigger>
-          <TabsTrigger value="subscription" className="flex items-center gap-2">
-            <CreditCard size={16} />
-            구독 현황
-          </TabsTrigger>
-        </TabsList>
-
-        {/* 회원 정보 탭 */}
-        <TabsContent value="profile">
-          <Card className="py-4">
-            <CardHeader className="flex flex-row items-center justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 회원 정보 섹션 - 왼쪽 */}
+        <Card className="h-full">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <User size={20} className="text-blue-600" />
               <CardTitle className="text-lg">회원 정보</CardTitle>
-              {!isEditing ? (
+            </div>
+            {!isEditing ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEditClick}
+                className="flex items-center gap-1"
+              >
+                <Edit2 size={16} />
+                수정
+              </Button>
+            ) : (
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleEditClick}
-                  className="flex items-center gap-1"
+                  onClick={handleCancelEdit}
+                  disabled={isSubmitting}
                 >
-                  <Edit2 size={16} />
-                  수정
+                  취소
                 </Button>
-              ) : (
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCancelEdit}
-                    disabled={isSubmitting}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleSaveProfile}
-                    className="bg-blue-600 hover:bg-blue-700"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <Loader2 size={16} className="mr-1 animate-spin" />
-                    ) : (
-                      <Check size={16} className="mr-1" />
-                    )}
-                    저장
-                  </Button>
-                </div>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* 이메일 (수정 불가) */}
-              <div className="space-y-2">
-                <Label htmlFor="email">이메일</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={userProfile.email}
-                  disabled
-                  className="bg-gray-50"
-                />
-                <p className="text-xs text-gray-500">
-                  이메일은 변경할 수 없습니다. 고객센터에 문의하세요.
-                </p>
-              </div>
-
-              {/* 닉네임 (수정 가능) */}
-              <div className="space-y-2">
-                <Label htmlFor="nickname">닉네임</Label>
-                {isEditing ? (
-                  <Input
-                    id="nickname"
-                    name="nickname"
-                    value={editedProfile.nickname}
-                    onChange={handleProfileChange}
-                    placeholder="닉네임을 입력하세요"
-                    className="focus:ring-2 focus:ring-blue-600"
-                  />
-                ) : (
-                  <Input id="nickname" value={userProfile.nickname} disabled />
-                )}
-              </div>
-
-              {/* 핸드폰 번호 (수정 가능) */}
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">핸드폰 번호</Label>
-                {isEditing ? (
-                  <Input
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    value={editedProfile.phoneNumber}
-                    onChange={handleProfileChange}
-                    placeholder="010-0000-0000"
-                    className="focus:ring-2 focus:ring-blue-600"
-                  />
-                ) : (
-                  <Input
-                    id="phoneNumber"
-                    value={userProfile.phoneNumber}
-                    disabled
-                  />
-                )}
-              </div>
-
-              {/* 포인트 (수정 불가) */}
-              <div className="space-y-2">
-                <Label htmlFor="point">포인트</Label>
-                <Input
-                  id="point"
-                  value={
-                    userProfile.point
-                      ? `${userProfile.point.toLocaleString()}P`
-                      : "0P"
-                  }
-                  disabled
-                  className="bg-gray-50"
-                />
                 <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => setIsChargeOpen(true)}>
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveProfile}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 size={16} className="mr-1 animate-spin" />
+                  ) : (
+                    <Check size={16} className="mr-1" />
+                  )}
+                  저장
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* 이메일 (수정 불가) */}
+            <div className="space-y-2">
+              <Label htmlFor="email">이메일</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={userProfile.email}
+                disabled
+                className="bg-gray-50"
+              />
+              <p className="text-xs text-gray-500">
+                이메일은 변경할 수 없습니다. 고객센터에 문의하세요.
+              </p>
+            </div>
+
+            {/* 닉네임 (수정 가능) */}
+            <div className="space-y-2">
+              <Label htmlFor="nickname">닉네임</Label>
+              {isEditing ? (
+                <Input
+                  id="nickname"
+                  name="nickname"
+                  value={editedProfile.nickname}
+                  onChange={handleProfileChange}
+                  placeholder="닉네임을 입력하세요"
+                  className="focus:ring-2 focus:ring-blue-600"
+                />
+              ) : (
+                <Input id="nickname" value={userProfile.nickname} disabled />
+              )}
+            </div>
+
+            {/* 핸드폰 번호 (수정 가능) */}
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">핸드폰 번호</Label>
+              {isEditing ? (
+                <Input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={editedProfile.phoneNumber}
+                  onChange={handleProfileChange}
+                  placeholder="010-0000-0000"
+                  className="focus:ring-2 focus:ring-blue-600"
+                />
+              ) : (
+                <Input
+                  id="phoneNumber"
+                  value={userProfile.phoneNumber}
+                  disabled
+                />
+              )}
+            </div>
+
+            {/* 포인트 (수정 불가) - 포인트 카드 스타일 적용 */}
+            <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg p-5 shadow-md text-white">
+              <div className="flex justify-between items-center mb-2">
+                <Label htmlFor="point" className="text-white font-medium">
+                  포인트
+                </Label>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setIsChargeOpen(true)}
+                  className="bg-white text-blue-700 hover:bg-gray-100"
+                >
                   충전
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <div className="flex items-baseline">
+                <span className="text-3xl font-bold tracking-tight">
+                  {userProfile.point ? userProfile.point.toLocaleString() : "0"}
+                </span>
+                <span className="ml-1 text-lg font-normal">P</span>
+              </div>
+              <p className="text-xs text-blue-100 mt-2">
+                포인트로 도서 구매 및 이벤트 참여가 가능합니다
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-        <PointChargeModal
-            isOpen={isChargeOpen}
-            onClose={() => {
-              setTotalCharge(0);
-              setIsChargeOpen(false);
-            }}
-            totalCharge={totalCharge}
-            setTotalCharge={setTotalCharge}
-            onSubmit={handleSubmitCharge}   // ✅ 여기 반드시 연결되어야 함
-            userPoint={userProfile.point}
-        />
-
-
-        {/* 구독 현황 탭 */}
-        <TabsContent value="subscription">
-          <Card className="py-4">
-            <CardHeader>
+        {/* 구독 현황 섹션 - 오른쪽 */}
+        <Card className="h-full">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CreditCard size={20} className="text-cyan-600" />
               <CardTitle className="text-lg">구독 현황</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {subscription.stillValid ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">
-                      {subscription.plan || "Premium"} 플랜
-                    </span>
-                    <Badge className="bg-green-600 py-1">구독 중</Badge>
-                    {!subscription.isActive && (
-                      <Badge className="bg-orange-500 py-1">해지 예정</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {subscription.stillValid ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">
+                    {subscription.plan || "Premium"} 플랜
+                  </span>
+                  <Badge className="bg-green-600 py-1">구독 중</Badge>
+                  {!subscription.isActive && (
+                    <Badge className="bg-orange-500 py-1">해지 예정</Badge>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm text-gray-500">구독 시작일</Label>
+                    <p className="font-medium">
+                      {formatDate(subscription.startDate)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm text-gray-500">구독 종료일</Label>
+                    <p className="font-medium">
+                      {formatDate(subscription.endDate)}
+                    </p>
+
+                    {subscription.endDate && (
+                      <div className="mt-1 flex items-center gap-1">
+                        <Calendar size={14} className="text-orange-600" />
+                        <p className="text-xs text-orange-600 font-medium">
+                          {calculateDaysRemaining(subscription.endDate)}
+                        </p>
+                      </div>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-gray-500">
-                        구독 시작일
-                      </Label>
-                      <p className="font-medium">
-                        {formatDate(subscription.startDate)}
-                      </p>
-                    </div>
-
-                    <div>
-                      <Label className="text-sm text-gray-500">
-                        구독 종료일
-                      </Label>
-                      <p className="font-medium">
-                        {formatDate(subscription.endDate)}
-                      </p>
-
-                      {subscription.endDate && (
-                        <div className="mt-1 flex items-center gap-1">
-                          <Calendar size={14} className="text-orange-600" />
-                          <p className="text-xs text-orange-600 font-medium">
-                            {calculateDaysRemaining(subscription.endDate)}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <Label className="text-sm text-gray-500">
-                        월 결제 금액
-                      </Label>
-                      <p className="font-medium">
-                        {subscription.price
-                          ? `${subscription.price.toLocaleString()}원`
-                          : "14,900원"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    {!subscription.isActive ? (
-                      <div className="flex items-center text-gray-500">
-                        <p className="text-sm">
-                          이미 해지 신청이 완료되었습니다. 만료일까지 서비스를
-                          이용하실 수 있습니다.
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <Button
-                          variant="outline"
-                          onClick={handleChangeSubscription}
-                        >
-                          구독 변경
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={handleCancelSubscription}
-                          disabled={isCancelling}
-                        >
-                          {isCancelling ? (
-                            <Loader2 size={16} className="mr-1 animate-spin" />
-                          ) : null}
-                          구독 해지
-                        </Button>
-                      </>
-                    )}
+                  <div>
+                    <Label className="text-sm text-gray-500">
+                      월 결제 금액
+                    </Label>
+                    <p className="font-medium">
+                      {subscription.price
+                        ? `${subscription.price.toLocaleString()}원`
+                        : "14,900원"}
+                    </p>
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <Alert className="bg-amber-50 border-amber-200 text-amber-700">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      현재 구독 중인 플랜이 없습니다. 다양한 혜택을 누리시려면
-                      구독을 시작해보세요.
-                    </AlertDescription>
-                  </Alert>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <Card className="border-purple-300 hover:shadow-md transition-all cursor-pointer pt-0 border-0">
-                      <CardHeader className="bg-purple-50 rounded-t-lg pb-0 gap-0">
-                        <CardTitle className="text-center text-purple-700 p-2">
-                          Premium
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="text-center mb-4">
-                          <p className="text-2xl font-bold">
-                            14,900원
-                            <span className="text-sm font-normal">/월</span>
-                          </p>
-                        </div>
-                        <ul className="space-y-2 mb-4">
-                          <li className="flex items-center gap-2">
-                            <Check size={16} className="text-green-600" />
-                            <span>무제한 대여</span>
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check size={16} className="text-green-600" />
-                            <span>프리미엄 도서 열람</span>
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Check size={16} className="text-green-600" />
-                            <span>오디오북 무제한</span>
-                          </li>
-                        </ul>
-                        <Button
-                          className="w-full bg-purple-600 hover:bg-purple-700"
-                          onClick={handleStartSubscription}
-                          disabled={isSubscribing}
-                        >
-                          {isSubscribing ? (
-                            <Loader2 size={16} className="mr-1 animate-spin" />
-                          ) : null}
-                          시작하기
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <section className="mt-8">
-                    <h2 className="text-xl font-bold mb-4">
-                      이벤트 및 프로모션
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg p-6 text-white">
-                        <h3 className="text-lg font-bold mb-2">
-                          첫 가입 30일 무료
-                        </h3>
-                        <p className="mb-4">
-                          지금 가입하시면 30일간 무료로 모든 도서를 이용할 수
-                          있습니다.
-                        </p>
-                        <Button className="bg-white text-purple-700 hover:bg-gray-100">
-                          자세히 보기
-                        </Button>
-                      </div>
+                <div className="flex gap-2 pt-2">
+                  {!subscription.isActive ? (
+                    <div className="flex items-center text-gray-500">
+                      <p className="text-sm">
+                        이미 해지 신청이 완료되었습니다. 만료일까지 서비스를
+                        이용하실 수 있습니다.
+                      </p>
                     </div>
-                  </section>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={handleChangeSubscription}
+                      >
+                        구독 변경
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleCancelSubscription}
+                        disabled={isCancelling}
+                      >
+                        {isCancelling ? (
+                          <Loader2 size={16} className="mr-1 animate-spin" />
+                        ) : null}
+                        구독 해지
+                      </Button>
+                    </>
+                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Alert className="bg-amber-50 border-amber-200 text-amber-700">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    현재 구독 중인 플랜이 없습니다. 다양한 혜택을 누리시려면
+                    구독을 시작해보세요.
+                  </AlertDescription>
+                </Alert>
+
+                <Card className="border-blue-300 hover:shadow-md transition-all pt-0 border-0">
+                  <CardHeader className="bg-cyan-50 rounded-t-lg pb-0 gap-0">
+                    <CardTitle className="text-center text-cyan-600 p-2 text-lg">
+                      Premium
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center mb-4">
+                      <p className="text-2xl font-bold">
+                        14,900원
+                        <span className="text-sm font-normal">/월</span>
+                      </p>
+                    </div>
+                    <ul className="space-y-2 mb-4">
+                      <li className="flex items-center justify-center gap-2">
+                        <Check size={16} className="text-green-600" />
+                        <span>무제한 대여</span>
+                      </li>
+                      <li className="flex items-center justify-center gap-2">
+                        <Check size={16} className="text-green-600" />
+                        <span>프리미엄 도서 열람</span>
+                      </li>
+                      <li className="flex items-center justify-center gap-2">
+                        <Check size={16} className="text-green-600" />
+                        <span>오디오북 무제한</span>
+                      </li>
+                    </ul>
+                    <Button
+                      className="w-full bg-cyan-500 hover:bg-cyan-600"
+                      onClick={handleStartSubscription}
+                      disabled={isSubscribing}
+                    >
+                      {isSubscribing ? (
+                        <Loader2 size={16} className="mr-1 animate-spin" />
+                      ) : null}
+                      시작하기
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <PointChargeModal
+        isOpen={isChargeOpen}
+        onClose={() => {
+          setTotalCharge(0);
+          setIsChargeOpen(false);
+        }}
+        totalCharge={totalCharge}
+        setTotalCharge={setTotalCharge}
+        onSubmit={handleSubmitCharge}
+        userPoint={userProfile.point}
+      />
     </div>
   );
 };
