@@ -52,7 +52,7 @@ import { Publisher } from "@/types/publisher";
 import { Book, BookDetail, Category as BookCategory } from "@/types/book";
 import { categoryService, Category } from "@/utils/api/categoryService";
 import bookService from "@/utils/api/bookService";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 function isValidDateFormat(dateString: string): boolean {
   // YYYY-MM-DD 형식 검증
@@ -236,14 +236,11 @@ const AdminDashboard: React.FC = () => {
 
       toast.success("출판사가 성공적으로 추가되었습니다.");
       setPublisherModalOpen(false);
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as AxiosError;
       console.error("출판사 추가 중 오류 발생:", error);
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        toast.error(`출판사 추가 실패: ${error.response.data.message}`);
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(`출판사 추가 실패: ${err.response.data.message}`);
       } else {
         toast.error("출판사 추가 중 오류가 발생했습니다.");
       }
@@ -656,21 +653,20 @@ const AdminDashboard: React.FC = () => {
       setBookForm(emptyBookForm);
       setCoverPreview(null);
       setSubCategories([]);
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as AxiosError;
       console.error("도서 저장 중 오류:", error);
 
       // 더 자세한 에러 로깅
-      if (error.response) {
-        console.error("응답 상태:", error.response.status);
-        console.error("응답 데이터:", error.response.data);
-        toast.error(
-          `저장 실패: ${error.response.data?.message || "서버 오류"}`
-        );
-      } else if (error.request) {
-        console.error("요청은 전송됐지만 응답이 없음:", error.request);
+      if (err.response) {
+        console.error("응답 상태:", err.response.status);
+        console.error("응답 데이터:", err.response.data);
+        toast.error(`저장 실패: ${err.response.data?.message || "서버 오류"}`);
+      } else if (err.request) {
+        console.error("요청은 전송됐지만 응답이 없음:", err.request);
         toast.error("서버에서 응답이 없습니다. 네트워크를 확인해주세요.");
       } else {
-        console.error("요청 설정 중 오류:", error.message);
+        console.error("요청 설정 중 오류:", err.message);
         toast.error("요청을 보내는 중 오류가 발생했습니다.");
       }
     } finally {
