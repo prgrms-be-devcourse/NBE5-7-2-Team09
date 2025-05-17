@@ -3,6 +3,7 @@ import { Book } from "epubjs"; // EPUB.js 라이브러리 임포트
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { useParams, useNavigate } from "react-router-dom"; // React Router 사용
 import {
   Select,
   SelectContent,
@@ -10,12 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -37,7 +32,6 @@ import {
   BookOpen,
   List,
   Search,
-  Bookmark,
   Moon,
   Sun,
   ZoomIn,
@@ -45,7 +39,18 @@ import {
   X,
   Columns,
   BookIcon,
+  AlertCircle,
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+// API 응답 인터페이스
+interface BookApiResponse {
+  code: number;
+  message: string;
+  data: {
+    epubUri: string;
+  };
+}
 
 // EPUB 도서 인터페이스
 interface EpubBook {
@@ -75,15 +80,6 @@ interface EpubPage {
   chapterId: string;
   content: string;
   pageNumber: number;
-}
-
-// Mock interface for a bookmark
-interface Bookmark {
-  id: string;
-  chapterId: string;
-  position: number;
-  text: string;
-  createdAt: Date;
 }
 
 // 글로벌 스타일을 위한 CSS 추가
@@ -171,12 +167,16 @@ const globalStyles = `
 `;
 
 const EpubReaderPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>(); // React Router의 useParams 사용
+  const navigate = useNavigate(); // 페이지 이동을 위한 navigate 함수
+
   // 도서 및 챕터 상태 관리
   const [book, setBook] = useState<EpubBook | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentChapterIndex, setCurrentChapterIndex] = useState<number>(0);
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
+  const [epubBookInstance, setEpubBookInstance] = useState<Book | null>(null);
 
   // 리더 설정
   const [fontSize, setFontSize] = useState<number>(16);
@@ -209,35 +209,93 @@ const EpubReaderPage: React.FC = () => {
     };
   }, []);
 
+  // EPUB 인스턴스 정리(cleanup)
+  useEffect(() => {
+    return () => {
+      // 컴포넌트 언마운트 시 EPUB 인스턴스 정리
+      if (epubBookInstance) {
+        // .destroy() 메서드가 없을 수 있으므로 안전하게 처리
+        if (typeof epubBookInstance.destroy === "function") {
+          epubBookInstance.destroy();
+        } else {
+          // destroy 메서드가 없으면 대안으로 사용 가능한 메서드 호출
+          try {
+            // 가능한 정리 메서드들 시도
+            if (typeof epubBookInstance.unload === "function") {
+              epubBookInstance.unload();
+            }
+            if (typeof epubBookInstance.close === "function") {
+              epubBookInstance.close();
+            }
+          } catch (e) {
+            console.warn("EPUB 인스턴스 정리 중 오류:", e);
+          }
+        }
+      }
+    };
+  }, [epubBookInstance]);
+
   // EPUB 파일 로드 및 파싱
   useEffect(() => {
     const loadBook = async () => {
       try {
         setLoading(true);
+        setError(null);
 
-        const epubPath = "/books/hilton-morning-journey.epub";
+        // URL에서 id 확인
+        if (!id) {
+          setError("책 ID가 없습니다. URL을 확인해주세요.");
+          setLoading(false);
+          return;
+        }
 
-        // EPUB 파일 불러오기
         try {
-          // 파일 존재 여부 확인
-          const response = await fetch(epubPath);
+          // API 호출하여 EPUB URI 가져오기
+          const response = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/viewer/books/${id}`
+          );
+          console.log(response);
+
           if (!response.ok) {
             throw new Error(
-              `EPUB 파일을 로드할 수 없습니다: ${response.status} ${response.statusText}`
+              `API 오류: ${response.status} ${response.statusText}`
             );
           }
 
+          const apiResponse: BookApiResponse = await response.json();
+
+          if (apiResponse.code !== 200 || !apiResponse.data?.epubUri) {
+            throw new Error(`API 응답 오류: ${apiResponse.message}`);
+          }
+
+          const epubUri = apiResponse.data.epubUri;
+
+          // 이전 EPUB 인스턴스 정리
+          if (epubBookInstance) {
+            try {
+              if (typeof epubBookInstance.destroy === "function") {
+                epubBookInstance.destroy();
+              } else if (typeof epubBookInstance.unload === "function") {
+                epubBookInstance.unload();
+              }
+            } catch (e) {
+              console.warn("이전 EPUB 인스턴스 정리 중 오류:", e);
+            }
+          }
+
           // EPUB.js를 사용하여 책 로드
-          const book = new Book(epubPath);
-          await book.ready;
+          const bookInstance = new Book(epubUri);
+          setEpubBookInstance(bookInstance);
+
+          await bookInstance.ready;
 
           // 메타데이터 추출
-          const metadata = await book.loaded.metadata;
+          const metadata = await bookInstance.loaded.metadata;
           const title = metadata.title;
           const author = metadata.creator;
 
           // 목차 추출
-          const navigation = await book.loaded.navigation;
+          const navigation = await bookInstance.loaded.navigation;
           const toc = navigation.toc;
 
           // 챕터 및 콘텐츠 추출
@@ -247,35 +305,83 @@ const EpubReaderPage: React.FC = () => {
             const href = item.href;
 
             // 챕터 내용 로드
-            // EPUB.js에서 chapter 객체는 document 또는 다른 형태로 반환될 수 있음
-            const chapter = await book.load(href);
             let content = "";
+            try {
+              const chapter = await bookInstance.load(href);
 
-            // document 객체인 경우 innerHTML 접근 가능
-            if (chapter.body && typeof chapter.body.innerHTML === "string") {
-              content = chapter.body.innerHTML;
-            }
-            // 문자열인 경우 직접 사용
-            else if (typeof chapter === "string") {
-              content = chapter;
-            }
-            // documentFragment인 경우
-            else if (chapter.documentElement) {
-              content = chapter.documentElement.outerHTML;
-            }
-            // 기타 경우 대비
-            else {
-              const tempDiv = document.createElement("div");
-              tempDiv.appendChild(chapter.cloneNode(true));
-              content = tempDiv.innerHTML;
+              // document 객체인 경우 innerHTML 접근 가능
+              if (
+                chapter &&
+                chapter.body &&
+                typeof chapter.body.innerHTML === "string"
+              ) {
+                content = chapter.body.innerHTML;
+              }
+              // 문자열인 경우 직접 사용
+              else if (typeof chapter === "string") {
+                content = chapter;
+              }
+              // documentFragment인 경우
+              else if (chapter && chapter.documentElement) {
+                content = chapter.documentElement.outerHTML;
+              }
+              // 기타 경우 대비
+              else if (chapter) {
+                const tempDiv = document.createElement("div");
+                try {
+                  tempDiv.appendChild(chapter.cloneNode(true));
+                  content = tempDiv.innerHTML;
+                } catch (e) {
+                  console.warn(`챕터 내용 처리 중 오류 (${item.label}):`, e);
+                  content = "챕터 내용을 불러올 수 없습니다.";
+                }
+              } else {
+                content = "챕터 내용을 불러올 수 없습니다.";
+              }
+            } catch (e) {
+              console.warn(`챕터 로드 중 오류 (${item.label}):`, e);
+              content = "챕터 로드 중 오류가 발생했습니다.";
             }
 
             chapters.push({
               id: `chapter-${i + 1}`,
-              title: item.label,
+              title: item.label || `Chapter ${i + 1}`,
               content: content,
               position: i,
             });
+          }
+
+          // 챕터가 없는 경우 기본 챕터 추가
+          if (chapters.length === 0) {
+            try {
+              const spine = bookInstance.spine;
+              if (spine && spine.items && spine.items.length > 0) {
+                for (let i = 0; i < spine.items.length; i++) {
+                  const item = spine.items[i];
+                  const href = item.href;
+                  let content = "";
+
+                  try {
+                    const chapter = await bookInstance.load(href);
+                    if (chapter && chapter.body) {
+                      content = chapter.body.innerHTML;
+                    }
+                  } catch (e) {
+                    console.warn(`스파인 아이템 로드 중 오류 (${i}):`, e);
+                    content = "내용을 불러올 수 없습니다.";
+                  }
+
+                  chapters.push({
+                    id: `spine-${i + 1}`,
+                    title: `Section ${i + 1}`,
+                    content: content,
+                    position: i,
+                  });
+                }
+              }
+            } catch (e) {
+              console.warn("스파인 로드 중 오류:", e);
+            }
           }
 
           // 페이지 생성
@@ -289,6 +395,19 @@ const EpubReaderPage: React.FC = () => {
             tempDiv.innerHTML = chapter.content;
 
             const paragraphs = tempDiv.querySelectorAll("p, div");
+
+            // 단락이 없는 경우 전체 콘텐츠를 단일 페이지로
+            if (paragraphs.length === 0) {
+              pages.push({
+                id: `${chapter.id}-page-1`,
+                chapterId: chapter.id,
+                content: chapter.content,
+                pageNumber: pageCounter,
+              });
+              pageCounter++;
+              continue;
+            }
+
             let currentPageContent = "";
             let currentPageSize = 0;
             const pageSize = 1000; // 페이지당 텍스트 길이 기준값
@@ -321,7 +440,7 @@ const EpubReaderPage: React.FC = () => {
               pages.push({
                 id: `${chapter.id}-page-1`,
                 chapterId: chapter.id,
-                content: chapter.content,
+                content: chapter.content || "내용 없음",
                 pageNumber: pageCounter,
               });
               pageCounter++;
@@ -331,7 +450,7 @@ const EpubReaderPage: React.FC = () => {
           // 표지 이미지 URL 가져오기
           let coverUrl;
           try {
-            coverUrl = await book.coverUrl();
+            coverUrl = await bookInstance.coverUrl();
           } catch (e) {
             console.warn("표지 이미지를 불러오는데 실패했습니다:", e);
             coverUrl = "/api/placeholder/400/600";
@@ -339,8 +458,8 @@ const EpubReaderPage: React.FC = () => {
 
           // 책 데이터 설정
           setBook({
-            title: title || "아침의 여정",
-            author: author || "조지 힐튼",
+            title: title || "제목 없음",
+            author: author || "작가 미상",
             coverUrl: coverUrl,
             chapters: chapters,
             pages: pages,
@@ -351,28 +470,22 @@ const EpubReaderPage: React.FC = () => {
             },
           });
 
-          console.log(`"${epubPath}" EPUB 파일을 성공적으로 로드했습니다.`);
+          console.log(`"${epubUri}" EPUB 파일을 성공적으로 로드했습니다.`);
         } catch (error) {
-          console.error(`"${epubPath}" EPUB 파일 로드 중 오류:`, error);
-
-          // 오류 발생 시 fallback으로 테스트 데이터 사용 (개발 목적으로만 사용)
-          alert(
-            `실제 EPUB 파일을 로드하지 못했습니다: ${error.message}\n테스트 데이터를 대신 표시합니다.`
-          );
-
-          // 테스트 데이터 - 실제 배포 전 제거 필요
-          // (생략)
+          console.error(`EPUB 파일 로드 중 오류:`, error);
+          setError(`EPUB 파일을 불러올 수 없습니다: ${error.message}`);
         }
 
         setLoading(false);
       } catch (error) {
         console.error("EPUB 파일을 로드하는 중 오류가 발생했습니다:", error);
+        setError(`EPUB 파일을 불러올 수 없습니다: ${error.message}`);
         setLoading(false);
       }
     };
 
     loadBook();
-  }, []);
+  }, [id]);
 
   // 페이지 및 챕터 탐색 함수
   const goToNextPage = () => {
@@ -437,51 +550,6 @@ const EpubReaderPage: React.FC = () => {
     if (newMode === "double" && currentPageIndex % 2 !== 0) {
       setCurrentPageIndex(Math.max(0, currentPageIndex - 1));
     }
-  };
-
-  // 북마크 관련 함수
-  const addBookmark = () => {
-    if (!book) return;
-
-    const selection = window.getSelection();
-    if (!selection || selection.toString().trim() === "") return;
-
-    // 현재 페이지의 챕터 ID 찾기
-    const currentPage = book.pages[currentPageIndex];
-
-    const newBookmark: Bookmark = {
-      id: `bookmark-${Date.now()}`,
-      chapterId: currentPage.chapterId,
-      position: currentPageIndex, // 페이지 인덱스 저장
-      text:
-        selection.toString().slice(0, 100) +
-        (selection.toString().length > 100 ? "..." : ""),
-      createdAt: new Date(),
-    };
-
-    setBookmarks([...bookmarks, newBookmark]);
-  };
-
-  const removeBookmark = (id: string) => {
-    setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== id));
-  };
-
-  const goToBookmark = (bookmark: Bookmark) => {
-    if (!book) return;
-
-    // 북마크의 위치(페이지 인덱스)로 이동
-    setCurrentPageIndex(bookmark.position);
-
-    // 해당 챕터 인덱스 찾기
-    const chapterIndex = book.chapters.findIndex(
-      (chapter) => chapter.id === bookmark.chapterId
-    );
-    if (chapterIndex !== -1) {
-      setCurrentChapterIndex(chapterIndex);
-    }
-
-    window.scrollTo(0, 0);
-    setShowSidebar(false);
   };
 
   // 검색 기능
@@ -554,6 +622,22 @@ const EpubReaderPage: React.FC = () => {
     );
   }
 
+  // 에러 화면
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center p-6 max-w-md">
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>오류 발생</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          <Button onClick={() => navigate("/")}>홈으로 돌아가기</Button>
+        </div>
+      </div>
+    );
+  }
+
   // 책이 없을 때 화면
   if (!book) {
     return (
@@ -621,9 +705,6 @@ const EpubReaderPage: React.FC = () => {
                 <TabsTrigger value="contents" className="w-1/3">
                   목차
                 </TabsTrigger>
-                <TabsTrigger value="bookmarks" className="w-1/3">
-                  북마크
-                </TabsTrigger>
                 <TabsTrigger value="search" className="w-1/3">
                   검색
                 </TabsTrigger>
@@ -650,51 +731,6 @@ const EpubReaderPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </TabsContent>
-
-              <TabsContent value="bookmarks" className="mt-4">
-                {bookmarks.length === 0 ? (
-                  <p className="text-sm text-gray-500">북마크가 없습니다.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {bookmarks.map((bookmark) => (
-                      <div
-                        key={bookmark.id}
-                        className={`p-3 rounded border ${
-                          theme === "dark"
-                            ? "border-gray-700"
-                            : "border-gray-200"
-                        }`}
-                      >
-                        <div className="flex justify-between mb-1">
-                          <span className="text-xs text-gray-500">
-                            {book.chapters.find(
-                              (ch) => ch.id === bookmark.chapterId
-                            )?.title || "알 수 없는 챕터"}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeBookmark(bookmark.id)}
-                          >
-                            <X size={14} />
-                          </Button>
-                        </div>
-                        <p className="text-sm mb-2 line-clamp-2">
-                          {bookmark.text}
-                        </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => goToBookmark(bookmark)}
-                        >
-                          북마크로 이동
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </TabsContent>
 
               <TabsContent value="search" className="mt-4">
@@ -818,17 +854,6 @@ const EpubReaderPage: React.FC = () => {
                   </TooltipContent>
                 </Tooltip>
               )}
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={addBookmark}>
-                    <Bookmark size={20} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>북마크 추가</p>
-                </TooltipContent>
-              </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>

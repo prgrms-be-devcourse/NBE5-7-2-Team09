@@ -14,7 +14,6 @@ import LibraryPage from "./pages/library/LibraryPage";
 import LibraryDetailPage from "./pages/library/LibraryDetailPage";
 import { Toaster } from "sonner";
 import MyPage from "./pages/member/MyPage";
-import WishlistPage from "./pages/member/PreferencePage";
 
 // 관리자 페이지 및 인증 관련 컴포넌트
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
