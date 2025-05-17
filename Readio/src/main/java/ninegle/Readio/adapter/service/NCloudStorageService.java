@@ -69,9 +69,9 @@ public class NCloudStorageService {
 		}
 	}
 
-	public void renameFileOnCloud(String beforeName, String afterName) {
-		String oldKey = generateObjectKey(beforeName);
-		String newKey = generateObjectKey(afterName);
+	public void renameFileOnCloud(String beforeName, String afterName, String folderName, String extension ) {
+		String oldKey = generateObjectKey(beforeName, folderName, extension);
+		String newKey = generateObjectKey(afterName, folderName, extension);
 
 		// 이름이 동일하면 실행하지 않음
 		if (oldKey.equals(newKey)) {
@@ -98,8 +98,16 @@ public class NCloudStorageService {
 		}
 	}
 
-	private String generateObjectKey(String bookName) {
-		return bookName + ".epub";
+	private String generateObjectKey(String bookName, String folderName, String extension ) {
+		return folderName+ "/" + bookName + extension;
+	}
+
+	public String generateObjectUrl(String key) {
+		GetUrlRequest getUrlRequest = GetUrlRequest.builder()
+			.bucket(bucketName)
+			.key(key)
+			.build();
+		return s3Client.utilities().getUrl(getUrlRequest).toString();
 	}
 
 }

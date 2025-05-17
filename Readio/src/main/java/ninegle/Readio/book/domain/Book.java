@@ -53,6 +53,8 @@ public class Book {
 	@Column(nullable = false)
 	private LocalDate pubDate;
 
+	private String epubUrl;
+
 	private LocalDate updatedAt;
 
 	private Boolean expired = false;
@@ -85,10 +87,10 @@ public class Book {
 		this.category = category;
 	}
 
-	public Book update(BookRequestDto dto, Category category, Author author, Publisher publisher) {
+	public Book update(BookRequestDto dto, Category category, Author author, Publisher publisher, String imageUrl) {
 		this.name = dto.getName();
 		this.description = dto.getDescription();
-		this.image = dto.getImage();
+		this.image = imageUrl;
 		this.isbn = dto.getIsbn();
 		this.ecn = dto.getEcn();
 		this.pubDate = dto.getPubDate();

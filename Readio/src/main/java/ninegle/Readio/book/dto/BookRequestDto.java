@@ -21,7 +21,7 @@ public class BookRequestDto {
 
 	private String name;
 	private String description;
-	private String image;
+	private MultipartFile image;
 	private String isbn;
 	private String ecn;
 	private LocalDate pubDate;
