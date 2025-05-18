@@ -86,6 +86,7 @@ public class NCloudStorageService {
 				.sourceKey(oldKey)
 				.destinationBucket(bucketName)
 				.destinationKey(newKey)
+				.acl(ObjectCannedACL.PUBLIC_READ)
 				.build();
 			s3Client.copyObject(copyReq);
 
