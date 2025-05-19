@@ -14,10 +14,6 @@ import ninegle.Readio.book.dto.PaginationDto;
  * author:  gigol
  * purpose: 
  */
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class PreferenceListResponseDto {
-	private final List<PreferenceResponseDto> preferences;
-	private final PaginationDto pagination;
+public record PreferenceListResponseDto(List<PreferenceResponseDto> preferences, PaginationDto pagination) {
 }

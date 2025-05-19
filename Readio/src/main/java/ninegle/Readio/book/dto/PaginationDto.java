@@ -11,12 +11,6 @@ import lombok.RequiredArgsConstructor;
  * author:  gigol
  * purpose: 
  */
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class PaginationDto {
-	private final long totalElements;
-	private final int totalPages;
-	private final int currentPage;
-	private final int size;
+public record PaginationDto(long totalElements, int totalPages, int currentPage, int size) {
 }
