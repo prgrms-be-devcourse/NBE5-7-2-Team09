@@ -52,8 +52,8 @@ public class SecurityConfig {
 					.requestMatchers("/admin/**").hasRole("ADMIN")
 					.requestMatchers(HttpMethod.GET, "/books/**").permitAll()
 					.requestMatchers(HttpMethod.GET, "/category").permitAll()
-					.requestMatchers("/viewer/**").permitAll()
-					.anyRequest().hasAnyRole("USER", "ADMIN"); //나머지 요청은 USER나 ADMiN 권한을 가져야 접근 가능
+					.requestMatchers("/viewer/**").permitAll().anyRequest()
+					.hasAnyRole("USER", "ADMIN"); //나머지 요청은 USER나 ADMiN 권한을 가져야 접근 가능
 			})
 
 			.sessionManagement(session -> session

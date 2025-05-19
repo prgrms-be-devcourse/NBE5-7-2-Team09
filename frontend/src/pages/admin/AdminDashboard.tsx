@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAdminAuth } from "@/contexts/AdminAuthContext";
+import { authService } from "@/utils/api/authService";
+import { useAdminAuth } from "@/contexts/AdminAuthContext"; // ✅ 반드시 필요
 import {
   Card,
   CardContent,
@@ -294,7 +295,7 @@ const AdminDashboard: React.FC = () => {
 
   // 로그아웃 처리
   const handleLogout = async () => {
-    await logout();
+    await authService.logout(); // ✅ 공통 logout 사용
     navigate("/admin/login");
   };
 
