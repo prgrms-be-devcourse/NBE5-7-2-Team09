@@ -40,7 +40,7 @@ public class User {
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
-		this.point = 50000L;
+		this.point = 15000L;
 	}
 
 	// 닉네임 변경 메서드

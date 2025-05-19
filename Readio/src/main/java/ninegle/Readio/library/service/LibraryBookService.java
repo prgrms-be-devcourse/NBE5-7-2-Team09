@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.domain.Book;
@@ -30,6 +31,7 @@ public class LibraryBookService {
 	private final UserContextService userContextService;
 
 	//라이브러리에 책 저장
+	@Transactional
 	public ResponseEntity<BaseResponse<Void>> newLibraryBook(Long libraryId, NewLibraryBookRequestDto bookRequestDto) {
 
 		//라이브러리 가져오기
@@ -43,7 +45,7 @@ public class LibraryBookService {
 		Long newLibraryBookId = LibraryBookMapper.toNewLibraryBook(bookRequestDto);
 		Optional<Book> findBook = bookRepository.findById(newLibraryBookId);
 		if (findBook.isEmpty()) {
-			BaseResponse.error("책이 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+			return BaseResponse.error("책이 존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
 		}
 		Book book = findBook.get();
 
@@ -57,6 +59,7 @@ public class LibraryBookService {
 	}
 
 	//라이브러리에 책들 불러오기
+	@Transactional(readOnly = true)
 	public ResponseEntity<BaseResponse<LibraryBookListResponseDto>> getAllLibraryBooks(Long libraryId,
 		Pageable pageable) {
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
@@ -74,6 +77,7 @@ public class LibraryBookService {
 	}
 
 	//라이브러리에 책 삭제
+	@Transactional
 	public ResponseEntity<BaseResponse<Void>> deleteLibraryBook(Long libraryId, Long libraryBookId) {
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
