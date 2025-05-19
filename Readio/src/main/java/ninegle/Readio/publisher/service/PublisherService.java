@@ -1,4 +1,4 @@
-package ninegle.Readio.book.service;
+package ninegle.Readio.publisher.service;
 
 import java.util.List;
 
@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.book.domain.Publisher;
-import ninegle.Readio.book.dto.PublisherListResponseDto;
-import ninegle.Readio.book.dto.PublisherRequestDto;
-import ninegle.Readio.book.dto.PublisherResponseDto;
-import ninegle.Readio.book.mapper.PublisherMapper;
-import ninegle.Readio.book.repository.PublisherRepository;
+import ninegle.Readio.publisher.domain.Publisher;
+import ninegle.Readio.publisher.dto.PublisherListResponseDto;
+import ninegle.Readio.publisher.dto.PublisherRequestDto;
+import ninegle.Readio.publisher.dto.PublisherResponseDto;
+import ninegle.Readio.publisher.mapper.PublisherMapper;
+import ninegle.Readio.publisher.repository.PublisherRepository;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.global.unit.BaseResponse;

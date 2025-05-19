@@ -1,11 +1,11 @@
-package ninegle.Readio.book.mapper;
+package ninegle.Readio.publisher.mapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ninegle.Readio.book.domain.Publisher;
-import ninegle.Readio.book.dto.PublisherListResponseDto;
-import ninegle.Readio.book.dto.PublisherResponseDto;
+import ninegle.Readio.publisher.domain.Publisher;
+import ninegle.Readio.publisher.dto.PublisherListResponseDto;
+import ninegle.Readio.publisher.dto.PublisherResponseDto;
 
 public class PublisherMapper {
 

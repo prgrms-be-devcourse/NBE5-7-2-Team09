@@ -3,27 +3,35 @@ package ninegle.Readio.book.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import ninegle.Readio.adapter.config.NCloudStorageConfig;
 import ninegle.Readio.book.domain.Author;
 import ninegle.Readio.book.domain.Book;
-import ninegle.Readio.book.domain.Category;
-import ninegle.Readio.book.domain.Publisher;
-import ninegle.Readio.book.dto.AuthorDto;
-import ninegle.Readio.book.dto.BookListResponseDto;
+import ninegle.Readio.category.domain.Category;
+import ninegle.Readio.publisher.domain.Publisher;
+import ninegle.Readio.book.dto.author.AuthorDto;
+import ninegle.Readio.book.dto.booksearch.BookListResponseDto;
 import ninegle.Readio.book.dto.BookRequestDto;
 import ninegle.Readio.book.dto.BookResponseDto;
-import ninegle.Readio.book.dto.BookSearchResponseDto;
-import ninegle.Readio.book.dto.CategoryDto;
+import ninegle.Readio.book.dto.booksearch.BookSearchResponseDto;
+import ninegle.Readio.category.dto.CategoryDto;
 import ninegle.Readio.book.dto.PaginationDto;
-import ninegle.Readio.book.dto.PublisherDto;
+import ninegle.Readio.publisher.dto.PublisherDto;
 
+@Component
+@RequiredArgsConstructor
 public class BookMapper {
 
-	public static BookResponseDto toDto(Book book) {
+	private final NCloudStorageConfig nCloudStorageConfig;
+
+	public BookResponseDto toDto(Book book) {
 		return BookResponseDto.builder()
 			.id(book.getId())
 			.name(book.getName())
 			.description(book.getDescription())
-			.image(book.getImage())
+			.image(nCloudStorageConfig.toImageUrl(book.getImage()))
 			.isbn(book.getIsbn())
 			.ecn(book.getEcn())
 			.pubDate(book.getPubDate())
@@ -33,7 +41,7 @@ public class BookMapper {
 			.build();
 	}
 
-	public static CategoryDto toCategoryDto(Category category) {
+	public CategoryDto toCategoryDto(Category category) {
 		return CategoryDto.builder()
 			.id(category.getId())
 			.major(category.getMajor())
@@ -41,21 +49,21 @@ public class BookMapper {
 			.build();
 	}
 
-	public static PublisherDto toPublisherDto(Publisher publisher) {
+	public PublisherDto toPublisherDto(Publisher publisher) {
 		return PublisherDto.builder()
 			.id(publisher.getId())
 			.name(publisher.getName())
 			.build();
 	}
 
-	public static AuthorDto toAuthorDto(Author author) {
+	public AuthorDto toAuthorDto(Author author) {
 		return AuthorDto.builder()
 			.id(author.getId())
 			.name(author.getName())
 			.build();
 	}
 
-	public static Book toEntity (BookRequestDto dto, Publisher publisher,
+	public Book toEntity (BookRequestDto dto, Publisher publisher,
 		Author author, Category category, String imageUrl) {
 		return Book.builder()
 			.name(dto.getName())
@@ -70,7 +78,7 @@ public class BookMapper {
 			.build();
 	}
 
-	public static PaginationDto toPaginationDto(Long count,int page,int size){
+	public PaginationDto toPaginationDto(Long count,int page,int size){
 		return PaginationDto.builder()
 			.totalPages((count.intValue()/size)+1)
 			.size(size)
@@ -79,7 +87,7 @@ public class BookMapper {
 			.build();
 	}
 
-	public static BookSearchResponseDto toSearchResponseDto(Book book) {
+	public BookSearchResponseDto toSearchResponseDto(Book book) {
 		return BookSearchResponseDto.builder()
 			.id(book.getId())
 			.name(book.getName())
@@ -90,7 +98,7 @@ public class BookMapper {
 			.build();
 	}
 
-	public static List<BookSearchResponseDto> toResponseDto(List<Book> books){
+	public List<BookSearchResponseDto> toResponseDto(List<Book> books){
 		ArrayList<BookSearchResponseDto> bookResponseDtos = new ArrayList<>();
 		for (Book book : books) {
 			bookResponseDtos.add(toSearchResponseDto(book));
@@ -98,7 +106,7 @@ public class BookMapper {
 		return bookResponseDtos;
 	}
 
-	public static BookListResponseDto toBookListResponseDto(List<BookSearchResponseDto> bookList, PaginationDto paginationDto) {
+	public BookListResponseDto toBookListResponseDto(List<BookSearchResponseDto> bookList, PaginationDto paginationDto) {
 		return BookListResponseDto.builder()
 			.books(bookList)
 			.pagination(paginationDto)

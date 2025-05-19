@@ -1,4 +1,4 @@
-package ninegle.Readio.book.service;
+package ninegle.Readio.category.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.book.domain.Category;
-import ninegle.Readio.book.dto.CategoryGroupDto;
-import ninegle.Readio.book.dto.CategoryGroupResponseDto;
-import ninegle.Readio.book.mapper.CategoryMapper;
-import ninegle.Readio.book.repository.CategoryRepository;
+import ninegle.Readio.category.domain.Category;
+import ninegle.Readio.category.dto.CategoryGroupDto;
+import ninegle.Readio.category.dto.CategoryGroupResponseDto;
+import ninegle.Readio.category.mapper.CategoryMapper;
+import ninegle.Readio.category.repository.CategoryRepository;
 import ninegle.Readio.global.unit.BaseResponse;
 
 @Service

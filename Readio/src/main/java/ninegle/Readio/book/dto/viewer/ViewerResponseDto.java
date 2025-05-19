@@ -1,4 +1,4 @@
-package ninegle.Readio.book.dto;
+package ninegle.Readio.book.dto.viewer;
 
 import lombok.Builder;
 

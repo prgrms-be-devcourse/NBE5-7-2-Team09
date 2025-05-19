@@ -28,6 +28,7 @@ public class LibraryBookService {
 	private final LibraryRepository libraryRepository;
 	private final LibraryBookRepository libraryBookRepository;
 	private final UserContextService userContextService;
+	private final LibraryBookMapper libraryBookMapper;
 
 	//라이브러리에 책 저장
 	public ResponseEntity<BaseResponse<Void>> newLibraryBook(Long libraryId, NewLibraryBookRequestDto bookRequestDto) {
@@ -40,7 +41,7 @@ public class LibraryBookService {
 		Library library = libraryOptional.get();
 
 		//라이브러리에 추가할 책
-		Long newLibraryBookId = LibraryBookMapper.toNewLibraryBook(bookRequestDto);
+		Long newLibraryBookId = libraryBookMapper.toNewLibraryBook(bookRequestDto);
 		Optional<Book> findBook = bookRepository.findById(newLibraryBookId);
 		if (findBook.isEmpty()) {
 			BaseResponse.error("책이 존재하지 않습니다", HttpStatus.BAD_REQUEST);
@@ -68,7 +69,7 @@ public class LibraryBookService {
 
 		//조회한 책들
 		Page<Book> books = libraryBookRepository.findBookByLibraryId(library.getId(), pageable);
-		LibraryBookListResponseDto libraryBookListResponseDto = LibraryBookMapper.libraryBookListResponseDto(library,
+		LibraryBookListResponseDto libraryBookListResponseDto = libraryBookMapper.libraryBookListResponseDto(library,
 			books);
 		return BaseResponse.ok("라이브러리에 책들을 성공적으로 불러왔습니다", libraryBookListResponseDto, HttpStatus.OK);
 	}
