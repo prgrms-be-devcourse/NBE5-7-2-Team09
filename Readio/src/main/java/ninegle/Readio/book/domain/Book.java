@@ -1,7 +1,6 @@
 package ninegle.Readio.book.domain;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLDelete;
 
@@ -13,11 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ninegle.Readio.book.dto.BookRequestDto;
+import ninegle.Readio.category.domain.Category;
+import ninegle.Readio.publisher.domain.Publisher;
 
 /**
  * Readio - Book

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import ninegle.Readio.book.domain.Book;
-import ninegle.Readio.book.domain.Category;
 
 /**
  * Readio - BookRepository

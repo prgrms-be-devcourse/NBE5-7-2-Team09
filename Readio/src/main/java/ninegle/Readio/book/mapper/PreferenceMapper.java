@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import ninegle.Readio.adapter.config.NCloudStorageConfig;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Preference;
 import ninegle.Readio.book.dto.preferencedto.PreferenceResponseDto;
@@ -20,7 +22,11 @@ import ninegle.Readio.user.domain.User;
  * purpose: 
  */
 @Component
+@RequiredArgsConstructor
 public class PreferenceMapper {
+
+	private final NCloudStorageConfig nCloudStorageConfig;
+
 	public Preference toEntity(User user, Book book){
 		return Preference.builder()
 			.user(user)
@@ -32,7 +38,7 @@ public class PreferenceMapper {
 		return PreferenceResponseDto.builder()
 			.id(preference.getBook().getId())
 			.name(preference.getBook().getName())
-			.image(preference.getBook().getImage())
+			.image(nCloudStorageConfig.toImageUrl(preference.getBook().getImage()))
 			.build();
 	}
 	public List<PreferenceResponseDto> toPreferenceDto(List<Preference> preferences){

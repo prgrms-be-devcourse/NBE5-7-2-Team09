@@ -1,8 +1,8 @@
-package ninegle.Readio.book.mapper;
+package ninegle.Readio.category.mapper;
 
 import java.util.ArrayList;
 
-import ninegle.Readio.book.dto.CategoryGroupDto;
+import ninegle.Readio.category.dto.CategoryGroupDto;
 
 public class CategoryMapper {
 
