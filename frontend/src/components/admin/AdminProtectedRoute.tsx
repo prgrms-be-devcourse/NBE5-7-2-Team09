@@ -14,10 +14,14 @@ const AdminProtectedRoute: React.FC = () => {
     );
   }
 
-  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+ //인증되지 않은 경우 로그인 페이지로 리다이렉트
   if (false) {
     return <Navigate to="/admin/login" />;
   }
+ //  if (!isAuthenticated) {
+ //    return <Navigate to="/admin/login" replace/>;
+ //  }
+
 
   // 인증된 경우 자식 라우트 렌더링
   return <Outlet />;

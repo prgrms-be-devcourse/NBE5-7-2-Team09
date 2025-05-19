@@ -54,7 +54,8 @@ export default function PointChargeModal({
         <DialogHeader>
           <DialogTitle className="text-center text-xl">포인트 충전</DialogTitle>
           <DialogDescription className="text-center">
-            충전할 포인트 금액을 선택해주세요.
+            충전할 포인트 금액을 선택해주세요.<br></br>
+            5,000원 또는 10,000원 단위
           </DialogDescription>
         </DialogHeader>
 
