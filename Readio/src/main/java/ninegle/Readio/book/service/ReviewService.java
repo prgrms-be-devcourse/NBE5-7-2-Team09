@@ -59,12 +59,13 @@ public class ReviewService {
 
 	private void updateRatingInBookSearch(long bookId) {
 		BigDecimal rating = reviewRepository.findAverageRatingByBook(bookId);
-		if (rating != null) {
+		if (rating == null) {
 			rating = BigDecimal.ZERO;
 		}
 		BookSearch bookSearch = bookSearchRepository.findById(bookId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 		bookSearch.updateRating(rating);
+		log.info("rating = {}", rating);
 		bookSearchRepository.save(bookSearch);
 	}
 
@@ -72,8 +73,10 @@ public class ReviewService {
 	public ResponseEntity<BaseResponse<Void>> save(ReviewRequestDto reviewRequestDto, long book_id) {
 		User user = userService.getById(userContextService.getCurrentUserId());
 		Book book = bookService.getBookById(book_id);
-		updateRatingInBookSearch(book_id);
 		reviewRepository.save(reviewMapper.toEntity(reviewRequestDto, user, book));
+		reviewRepository.flush();
+
+		updateRatingInBookSearch(book_id);
 		return BaseResponse.ok("후기 등록이 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
 	}
 
@@ -81,6 +84,8 @@ public class ReviewService {
 	public ResponseEntity<BaseResponse<Void>> delete(Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.delete(review);
+		reviewRepository.flush();
+
 		updateRatingInBookSearch(review.getBook().getId());
 		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.", null,HttpStatus.OK);
 	}
@@ -89,6 +94,8 @@ public class ReviewService {
 	public ResponseEntity<BaseResponse<Void>> update(ReviewRequestDto reviewRequestDto, Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.save(reviewMapper.updateEntity(review, reviewRequestDto));
+		reviewRepository.flush();
+
 		updateRatingInBookSearch(review.getBook().getId());
 		return BaseResponse.ok("후기 수정이 정상적으로 수행되었습니다.", null,HttpStatus.OK);
 	}

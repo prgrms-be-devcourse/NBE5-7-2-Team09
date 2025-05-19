@@ -64,9 +64,8 @@ public class BookSearch {
 		return this;
 	}
 
-	public BookSearch updateRating(BigDecimal rating) {
+	public void updateRating(BigDecimal rating) {
 		this.rating = rating;
-		return this;
 	}
 
 	// 중복 제거를 위해 Override
