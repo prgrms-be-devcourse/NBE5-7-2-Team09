@@ -14,6 +14,8 @@ import LibraryPage from "./pages/library/LibraryPage";
 import LibraryDetailPage from "./pages/library/LibraryDetailPage";
 import { Toaster } from "sonner";
 import MyPage from "./pages/member/MyPage";
+import FAQ from "./components/cs/faq";
+import NoticeBoard from "./components/cs/notice";
 
 // 관리자 페이지 및 인증 관련 컴포넌트
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
@@ -83,6 +85,11 @@ function App() {
                     {/* 유저 관련 라우트 */}
                     <Route path="/my-page" element={<MyPage />} />
                     <Route path="/preference" element={<PreferencePage />} />
+
+                    {/* CS관련 라우트 추가 */}
+                    <Route path="/cs/faq" element={<FAQ />} />
+                    <Route path="/cs/notice" element={<NoticeBoard />} />
+
                   </Routes>
                 </Layout>
               }

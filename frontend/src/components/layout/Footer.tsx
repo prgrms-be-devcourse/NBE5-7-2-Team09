@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Github, Code, Users, BookOpen, Globe } from "lucide-react";
+import { Github, Code, Users, BookOpen, Globe, Headphones, Phone, Mail } from "lucide-react";
 
 interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 
@@ -11,7 +11,7 @@ const Footer = ({ className, ...props }: FooterProps) => {
       {...props}
     >
       <div className="container px-4 md:px-6 py-6 mx-auto ">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <div className="flex flex-col">
             <h3 className="text-sm font-medium flex items-center gap-2">
               <Code className="h-4 w-4" />
@@ -32,6 +32,25 @@ const Footer = ({ className, ...props }: FooterProps) => {
               <p>팀 9 (NBE5-7-2-Team09)</p>
             </div>
           </div>
+
+          <div className="flex flex-col">
+            <a
+              href="/cs/notice"
+              className="text-sm font-medium flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Headphones className="h-4 w-4" />
+              <span>공지사항</span>
+            </a>
+
+            <a
+              href="/cs/faq"
+              className="mt-2 flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors text-sm"
+            >
+              <Phone className="h-3 w-3" />
+              <span>자주 묻는 질문</span>
+            </a>
+          </div>
+
 
           <div className="flex flex-col">
             <h3 className="text-sm font-medium flex items-center gap-2">
@@ -63,7 +82,7 @@ const Footer = ({ className, ...props }: FooterProps) => {
 
         <div className="pt-4 border-t flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} NBE5-7-1-Team09. All rights reserved.
+            © {new Date().getFullYear()} NBE5-7-2-Team09. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground mt-2 md:mt-0">
             Made with 💻 by Team 9 at Programmers DevCourse
