@@ -11,11 +11,6 @@ import lombok.RequiredArgsConstructor;
  * author:  gigol
  * purpose: 
  */
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class PreferenceResponseDto {
-	private final long id;
-	private final String name;
-	private final String image;
+public record PreferenceResponseDto(long id, String name, String image) {
 }

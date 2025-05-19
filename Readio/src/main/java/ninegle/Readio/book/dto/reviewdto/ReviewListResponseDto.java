@@ -14,11 +14,7 @@ import ninegle.Readio.book.dto.PaginationDto;
  * author:  gigol
  * purpose: 
  */
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class ReviewListResponseDto {
-	private final List<ReviewResponseDto> reviews;
-	private final PaginationDto pagination;
-	private final ReviewSummaryDto summary;
+public record ReviewListResponseDto(List<ReviewResponseDto> reviews, PaginationDto pagination,
+									ReviewSummaryDto summary) {
 }

@@ -14,14 +14,7 @@ import lombok.RequiredArgsConstructor;
  * author:  gigol
  * purpose: 
  */
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class ReviewResponseDto {
-	private final long id;
-	private final String email;
-	private final BigDecimal rating;
-	private final String text;
-	private final LocalDateTime createdAt;
-	private final LocalDateTime updatedAt;
+public record ReviewResponseDto(long id, String email, BigDecimal rating, String text, LocalDateTime createdAt,
+								LocalDateTime updatedAt) {
 }

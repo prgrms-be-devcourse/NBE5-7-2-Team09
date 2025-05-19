@@ -13,10 +13,6 @@ import lombok.RequiredArgsConstructor;
  * author:  gigol
  * purpose: 
  */
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class ReviewSummaryDto {
-	private final BigDecimal averageRating;
-	private final int totalReviews;
+public record ReviewSummaryDto(BigDecimal averageRating, int totalReviews) {
 }
