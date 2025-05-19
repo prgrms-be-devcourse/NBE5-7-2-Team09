@@ -6,14 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @Builder
-@RequiredArgsConstructor
-public class SubscriptionResponseDto {
+public record SubscriptionResponseDto(Long userId, LocalDateTime subDate, LocalDateTime expDate, boolean active,
+									  boolean canceled) {
 
-	private final Long userId;
-	private final LocalDateTime subDate;
-	private final LocalDateTime expDate;
-	private final boolean active;
-	private final boolean canceled;
 }
