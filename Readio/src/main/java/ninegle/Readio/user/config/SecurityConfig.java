@@ -48,17 +48,11 @@ public class SecurityConfig {
 			.httpBasic(httpBasic -> httpBasic.disable())
 			.authorizeHttpRequests(auth -> {
 				auth
-					.requestMatchers("/user/login", "/user/signup", "/user/logout")
-					.permitAll()
-					.requestMatchers("/admin/**")
-					.hasRole("ADMIN")
-					.requestMatchers(HttpMethod.GET, "/books/**")
-					.permitAll()
-					.requestMatchers(HttpMethod.GET, "/category")
-					.permitAll()
-					.requestMatchers("/viewer/**")
-					.permitAll()
-					.anyRequest()
+					.requestMatchers("/user/login", "/user/signup", "/user/logout").permitAll()
+					.requestMatchers("/admin/**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.GET, "/books/**").permitAll()
+					.requestMatchers(HttpMethod.GET, "/category").permitAll()
+					.requestMatchers("/viewer/**").permitAll().anyRequest()
 					.hasAnyRole("USER", "ADMIN"); //나머지 요청은 USER나 ADMiN 권한을 가져야 접근 가능
 			})
 
