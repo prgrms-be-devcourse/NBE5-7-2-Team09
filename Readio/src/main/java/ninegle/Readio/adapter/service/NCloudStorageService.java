@@ -101,6 +101,22 @@ public class NCloudStorageService {
 		}
 	}
 
+	public void deleteFileOnCloud(String key, String folderName, String extension) {
+		String fileKey = generateObjectKey(key, folderName, extension);
+		try {
+			DeleteObjectRequest deleteReq = DeleteObjectRequest.builder()
+				.bucket(bucketName)
+				.key(fileKey)
+				.build();
+			s3Client.deleteObject(deleteReq);
+		} catch (NoSuchKeyException e) {
+			log.debug("삭제하려는 키가 없습니다. key={}", key);
+		} catch (S3Exception e) {
+			log.error("Cloud 파일 삭제 중 오류 발생. key={}, message={}", key, e.awsErrorDetails().errorMessage());
+			throw e;
+		}
+	}
+
 	private String generateObjectKey(String bookName, String folderName, String extension ) {
 		return folderName+ "/" + bookName + extension;
 	}
