@@ -1,4 +1,4 @@
-package ninegle.Readio.book.controller;
+package ninegle.Readio.category.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.book.dto.CategoryGroupResponseDto;
-import ninegle.Readio.book.service.CategoryService;
+import ninegle.Readio.category.dto.CategoryGroupResponseDto;
+import ninegle.Readio.category.service.CategoryService;
 import ninegle.Readio.global.unit.BaseResponse;
 
 @RestController

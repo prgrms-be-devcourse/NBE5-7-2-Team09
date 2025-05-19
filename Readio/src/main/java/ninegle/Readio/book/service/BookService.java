@@ -24,27 +24,23 @@ import ninegle.Readio.adapter.service.NCloudStorageService;
 import ninegle.Readio.book.domain.Author;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.BookSearch;
-import ninegle.Readio.book.domain.Category;
-import ninegle.Readio.book.domain.Publisher;
-import ninegle.Readio.book.dto.BookListResponseDto;
+import ninegle.Readio.category.domain.Category;
+import ninegle.Readio.publisher.domain.Publisher;
+import ninegle.Readio.book.dto.booksearch.BookListResponseDto;
 import ninegle.Readio.book.dto.BookRequestDto;
 import ninegle.Readio.book.dto.BookResponseDto;
-import ninegle.Readio.book.dto.BookSearchResponseDto;
-import ninegle.Readio.book.dto.ViewerResponseDto;
+import ninegle.Readio.book.dto.booksearch.BookSearchResponseDto;
+import ninegle.Readio.book.dto.viewer.ViewerResponseDto;
 import ninegle.Readio.book.mapper.BookMapper;
 import ninegle.Readio.book.mapper.BookSearchMapper;
 import ninegle.Readio.book.repository.AuthorRepository;
 import ninegle.Readio.book.repository.BookRepository;
 import ninegle.Readio.book.repository.BookSearchRepository;
-import ninegle.Readio.book.repository.CategoryRepository;
-import ninegle.Readio.book.repository.PublisherRepository;
+import ninegle.Readio.category.repository.CategoryRepository;
+import ninegle.Readio.publisher.repository.PublisherRepository;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
-import ninegle.Readio.user.service.UserContextService;
-import ninegle.Readio.user.service.UserService;
-import ninegle.Readio.book.mapper.ReviewMapper;
 import ninegle.Readio.book.dto.PaginationDto;
-import ninegle.Readio.book.repository.ReviewRepository;
 import ninegle.Readio.global.unit.BaseResponse;
 
 
@@ -66,20 +62,18 @@ public class BookService {
 	private final CategoryRepository categoryRepository;
 	private final PublisherRepository publisherRepository;
 	private final BookSearchRepository bookSearchRepository;
-	private final UserContextService userContextService;
-	private final UserService userService;
-	private final ReviewRepository reviewRepository;
-	private final ReviewMapper reviewMapper;
-  private final NCloudStorageService nCloudStorageService;
+  	private final NCloudStorageService nCloudStorageService;
+	  private final BookSearchMapper bookSearchMapper;
+	  private final BookMapper bookMapper;
 
 
 	public ResponseEntity<BaseResponse<BookListResponseDto>> searchBooks(String keyword, int page, int size) {
 
-		List<BookSearchResponseDto> findBooks = BookSearchMapper.toResponseDto(getBookSearchList(keyword, page, size));
+		List<BookSearchResponseDto> findBooks = bookSearchMapper.toResponseDto(getBookSearchList(keyword, page, size));
 
 		long totalElements = findBooks.size();
-		PaginationDto paginationDto = BookMapper.toPaginationDto(totalElements, page, size);
-		BookListResponseDto response = BookMapper.toBookListResponseDto(findBooks, paginationDto);
+		PaginationDto paginationDto = bookMapper.toPaginationDto(totalElements, page, size);
+		BookListResponseDto response = bookMapper.toBookListResponseDto(findBooks, paginationDto);
 
 		return BaseResponse.ok("검색 결과입니다.", response, HttpStatus.OK);
 	}
@@ -108,8 +102,6 @@ public class BookService {
 		if (!nCloudStorageService.fileExists(imageKey)) {
 			nCloudStorageService.uploadFile(imageKey,request.getImage());
 		}
-		// 이미지 URL 생성
-		String imageUrl = nCloudStorageService.generateObjectUrl(imageKey);
 
 		// 3. 연관 엔티티 조회
 		Category category = getCategory(request.getCategorySub());
@@ -117,10 +109,10 @@ public class BookService {
 		Publisher publisher = getPublisher(request.getPublisherName());
 
 		// 4. Book 저장
-		Book savedBook = bookRepository.save(BookMapper.toEntity(request, publisher, author, category, imageUrl));
+		Book savedBook = bookRepository.save(bookMapper.toEntity(request, publisher, author, category, imageKey));
 
 		// 5. ElasticSearch Repository에 저장
-		bookSearchRepository.save(BookSearchMapper.toEntity(savedBook));
+		bookSearchRepository.save(bookSearchMapper.toEntity(savedBook));
 
 		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
 	}
@@ -151,7 +143,7 @@ public class BookService {
 			throw new BusinessException(ErrorCode.BOOK_NOT_FOUND);
 		}
 
-		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", BookMapper.toDto(findBook) ,HttpStatus.OK);
+		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", bookMapper.toDto(findBook) ,HttpStatus.OK);
 	}
 
 	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(Long id, BookRequestDto request) {
@@ -170,7 +162,7 @@ public class BookService {
 			nCloudStorageService.renameFileOnCloud(beforeName, afterName,"epub",".epub"); // epub 파일명 변경
 			nCloudStorageService.renameFileOnCloud(beforeName, afterName,"image", ".jpg");
 		}
-		String updatedImageUrl = nCloudStorageService.generateObjectUrl("image/" + afterName + ".jpg");
+		String updatedImageUrl = "image/" + afterName + ".jpg";
 
 		Category category = getCategory(request.getCategorySub());
 		Author author = getAuthor(request.getAuthorName());
@@ -182,7 +174,7 @@ public class BookService {
 		bookRepository.save(updatedBook);
 		bookSearchRepository.save(updatedBookSearch);
 
-		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.", BookMapper.toDto(updatedBook), HttpStatus.OK);
+		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.", bookMapper.toDto(updatedBook), HttpStatus.OK);
 	}
 
 	public ResponseEntity<BaseResponse<Void>> deleteBook(Long id) {
@@ -212,10 +204,10 @@ public class BookService {
 		long totalElements = findBooks.getTotalElements();
 
 		List<BookSearch> books = findBooks.getContent();
-		List<BookSearchResponseDto> responseDtos = BookSearchMapper.toResponseDto(books);
-		PaginationDto paginationDto = BookMapper.toPaginationDto(totalElements, page, size);
+		List<BookSearchResponseDto> responseDtos = bookSearchMapper.toResponseDto(books);
+		PaginationDto paginationDto = bookMapper.toPaginationDto(totalElements, page, size);
 
-		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", BookMapper.toBookListResponseDto(responseDtos, paginationDto), HttpStatus.OK);
+		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", bookMapper.toBookListResponseDto(responseDtos, paginationDto), HttpStatus.OK);
 	}
 
 	public ResponseEntity<BaseResponse<ViewerResponseDto>> getViewerBook(Long id) {

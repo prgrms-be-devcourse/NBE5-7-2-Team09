@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.book.dto.ViewerResponseDto;
+import ninegle.Readio.book.dto.viewer.ViewerResponseDto;
 import ninegle.Readio.book.service.BookService;
 import ninegle.Readio.global.unit.BaseResponse;
 
