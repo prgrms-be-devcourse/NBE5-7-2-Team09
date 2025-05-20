@@ -9,6 +9,6 @@ import ninegle.Readio.subscription.domain.Subscription;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-	//사용자 ID로 구독 조회 메서드
+	// 사용자 ID로 구독 조회 메서드
 	Optional<Subscription> findByUserId(Long userId);
 }

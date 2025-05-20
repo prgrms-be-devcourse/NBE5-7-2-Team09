@@ -19,7 +19,7 @@ public class SubscriptionMailSender {
 	private final SubscriptionMailTemplateProvider templateProvider;
 
 	@Async
-	public void sendSubscribeMail(User user, Subscription subscription) { //구독 결제 완료
+	public void sendSubscribeMail(User user, Subscription subscription) { // 구독 결제 완료
 		String subject = "[Readio] 구독 결제가 완료되었습니다.";
 		String body = templateProvider.buildSubscribeMailBody(user.getNickname(), subscription);
 
@@ -27,7 +27,7 @@ public class SubscriptionMailSender {
 	}
 
 	@Async
-	public void sendCancelMail(User user, Subscription subscription) { //구독 취소
+	public void sendCancelMail(User user, Subscription subscription) { // 구독 취소
 		String subject = "[Readio] 구독이 취소되었습니다.";
 		String body = templateProvider.buildCancelMailBody(user.getNickname(), subscription);
 
@@ -48,8 +48,7 @@ public class SubscriptionMailSender {
 		send(user.getEmail(), subject, body);
 	}
 
-
-	//공통 메일 전송 메서드
+	// 공통 메일 전송 메서드
 	private void send(String to, String subject, String body) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
@@ -64,5 +63,3 @@ public class SubscriptionMailSender {
 		}
 	}
 }
-
-
