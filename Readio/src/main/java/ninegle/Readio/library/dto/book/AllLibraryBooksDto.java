@@ -1,21 +1,11 @@
 package ninegle.Readio.library.dto.book;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
 @Builder
-public class AllLibraryBooksDto {
-	private final Long bookId;
-	private final String bookName;
-	private final String bookImage;
-	private final String bookIsbn;
-	private final String bookEcn;
-	private final LocalDate bookPubDate;
-	private final LocalDate bookUpdateAt;
-
+public record AllLibraryBooksDto(Long bookId, String bookName, String bookImage, String bookIsbn, String bookEcn,
+								 LocalDate bookPubDate, LocalDate bookUpdateAt, BigDecimal rating) {
 }

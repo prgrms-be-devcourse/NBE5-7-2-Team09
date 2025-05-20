@@ -1,5 +1,6 @@
 package ninegle.Readio.book.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -56,6 +57,8 @@ public class Book {
 
 	private LocalDate updatedAt;
 
+	private BigDecimal rating = BigDecimal.ZERO;
+
 	private Boolean expired = false;
 
 	private LocalDateTime expiredAt;
@@ -71,6 +74,10 @@ public class Book {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
+
+	public void updateRating(BigDecimal rating) {
+		this.rating = rating;
+	}
 
 	@Builder
 	public Book(String name, String description, String image, String isbn, String ecn, LocalDate pubDate,
@@ -93,6 +100,7 @@ public class Book {
 		this.isbn = dto.getIsbn();
 		this.ecn = dto.getEcn();
 		this.pubDate = dto.getPubDate();
+		this.updatedAt = LocalDate.now();
 		this.category = category;
 		this.author = author;
 		this.publisher = publisher;

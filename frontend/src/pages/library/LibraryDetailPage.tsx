@@ -26,6 +26,7 @@ interface LibraryBook {
   bookEcn: string | null;
   bookPubDate: string;
   bookUpdateAt: string;
+  rating: number;
 }
 
 interface LibraryDetail {
@@ -122,7 +123,7 @@ const LibraryDetailPage: React.FC = () => {
           ? book.bookImage
           : defaultCoverImage,
       category: "분류", // LibraryBook에는 카테고리 정보가 없으므로 임시 데이터
-      rating: 4.5, // 임시 평점
+      rating: book.rating, // 임시 평점
       publishDate: book.bookPubDate,
       isNew: false,
       isBestseller: false,
