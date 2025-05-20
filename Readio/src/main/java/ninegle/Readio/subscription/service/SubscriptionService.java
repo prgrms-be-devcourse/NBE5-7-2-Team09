@@ -21,7 +21,7 @@ public class SubscriptionService {
 	private final SubscriptionManager subscriptionManager;
 
 	// 비즈니스 규칙: 구독 ID는 항상 1
-	private static final Long SUBSCRIPTION_ID = 1L;
+	private static final long SUBSCRIPTION_ID = 1L;
 
 	// 구독 조회
 	@Transactional(readOnly = true)
