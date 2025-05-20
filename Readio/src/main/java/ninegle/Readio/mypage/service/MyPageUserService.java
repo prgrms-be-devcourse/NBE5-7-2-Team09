@@ -13,7 +13,6 @@ import ninegle.Readio.mypage.dto.request.UserUpdateRequestDto;
 import ninegle.Readio.mypage.dto.response.UserInfoDto;
 import ninegle.Readio.mypage.mapper.MyPageUserMapper;
 
-
 @Service
 @RequiredArgsConstructor
 public class MyPageUserService {

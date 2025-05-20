@@ -54,7 +54,12 @@ public enum ErrorCode {
 	/*
 	 * Preference : 관심 도서 예외 처리
 	 */
+
+	//409
 	BOOK_ALREADY_IN_PREFERENCE(HttpStatus.CONFLICT, "이미 관심 도서로 등록된 책입니다."),
+	//404
+	PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND,  "관심 도서로 등록되지 않은 책입니다."),
+
 
 	/*
 	 * Subscription : 구독 예외 처리
@@ -116,7 +121,13 @@ public enum ErrorCode {
 	// 404 Not Found
 	LOGIN_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "로그인 정보와 일치하는 사용자가 존재하지 않습니다."),
 
-	;
+	
+  /*
+	 * 리뷰관련 예외처리
+	 */
+	//404
+	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND,"리뷰를 찾을수 없습니다." );
+
 
 	private final HttpStatus status;
 	private final String message;

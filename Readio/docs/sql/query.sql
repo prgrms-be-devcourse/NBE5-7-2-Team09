@@ -1,5 +1,3 @@
-show databases;
-use programmers;
 show tables ;
 # 비밀번호는 전부 1111
 INSERT INTO user (email, password, role, nickname, phone_number, point)
@@ -10,8 +8,6 @@ VALUES
     ('test4@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자4', '010-1000-1004', 50000),
     ('test5@readio.com', '{bcrypt}$2a$10$Dci/t08LfH.gBh9AxrFJIuP7fYtvF27Koi89sFPIm8fk46QOqGOym', 0, '관리자5', '010-1000-1005', 50000);
 
-select *
-from user;
 INSERT INTO `category` VALUES
                            (0,'총류','총류 일반'),
                            (10,'총류','도서관학'),
@@ -114,9 +110,6 @@ INSERT INTO `category` VALUES
                            (980,'역사','남아메리카사'),
                            (990,'역사','오세아니아사, 기타 지역사');
 
-select *
-from category;
-
 INSERT INTO `author` VALUES
                          (1,'손무'),
                          (2,'알렉산더 해밀턴'),
@@ -129,18 +122,12 @@ INSERT INTO `author` VALUES
                          (9,'소스타인 베블런'),
                          (10,'장 자크 루소');
 
-select *
-from author;
-
 INSERT INTO `publisher` VALUES
                             (1,'CH북스(크리스천다이제스트)'),
                             (2,'위키북스'),
                             (3,'길벗'),
                             (4,'생능출판사'),
                             (5,'책밥출판사');
-
-select *
-from publisher;
 
 INSERT INTO `book`
 (`expired`, `author_id`, `publisher_id`, `category_id`, `image`,`pub_date`, `updated_at`, `isbn`, `ecn`, `description`,`name`)
@@ -167,8 +154,3 @@ VALUES
      '9788998139103', NULL, '사회계약론',  '사회계약론');
 
 
-select *
-from book;
-
-select *
-from review;

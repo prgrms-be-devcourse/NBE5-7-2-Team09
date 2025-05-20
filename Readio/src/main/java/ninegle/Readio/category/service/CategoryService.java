@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +14,15 @@ import ninegle.Readio.category.dto.CategoryGroupDto;
 import ninegle.Readio.category.dto.CategoryGroupResponseDto;
 import ninegle.Readio.category.mapper.CategoryMapper;
 import ninegle.Readio.category.repository.CategoryRepository;
-import ninegle.Readio.global.unit.BaseResponse;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
-	public ResponseEntity<BaseResponse<CategoryGroupResponseDto>> findCategoryGroup() {
+	@Transactional(readOnly = true)
+	public CategoryGroupResponseDto findCategoryGroup() {
 		List<Category> categories = categoryRepository.findAll();
 
 		List<CategoryGroupDto> result = new ArrayList<>();
@@ -48,8 +45,8 @@ public class CategoryService {
 				map.get(major).getSubs().add(sub);
 			}
 		}
-		CategoryGroupResponseDto responseDto = new CategoryGroupResponseDto(result);
-		return BaseResponse.ok("카테고리 그룹 조회가 성공적으로 수행되었습니다.", responseDto, HttpStatus.OK);
+		return new CategoryGroupResponseDto(result);
+
 	}
 
 }

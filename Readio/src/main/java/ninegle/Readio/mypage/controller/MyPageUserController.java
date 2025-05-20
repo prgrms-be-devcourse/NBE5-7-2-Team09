@@ -32,8 +32,4 @@ public class MyPageUserController {
 		UserInfoDto data = myPageUserService.updateUserInfo(dto);
 		return BaseResponse.ok("회원 정보 수정 성공", data, HttpStatus.OK);
 	}
-
-
-
-
 }

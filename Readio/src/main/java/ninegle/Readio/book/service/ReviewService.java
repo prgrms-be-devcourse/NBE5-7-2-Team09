@@ -40,7 +40,6 @@ import ninegle.Readio.user.service.UserService;
  */
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ReviewService {
 	private final BookService bookService;
@@ -54,7 +53,7 @@ public class ReviewService {
 
 	public Review getReviewById(long id) {
 		return reviewRepository.findById(id).orElseThrow(
-			() -> new NoSuchElementException());
+			() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
 	}
 
 	private void updateRatingInBookSearch(long bookId) {
@@ -70,37 +69,39 @@ public class ReviewService {
 	}
 
 	// Review Create
-	public ResponseEntity<BaseResponse<Void>> save(ReviewRequestDto reviewRequestDto, long book_id) {
-		User user = userService.getById(userContextService.getCurrentUserId());
+	@Transactional
+	public void save(Long userId,ReviewRequestDto reviewRequestDto, long book_id) {
+		User user = userService.getById(userId);
 		Book book = bookService.getBookById(book_id);
 		reviewRepository.save(reviewMapper.toEntity(reviewRequestDto, user, book));
+
 		reviewRepository.flush();
 
 		updateRatingInBookSearch(book_id);
-		return BaseResponse.ok("후기 등록이 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
 	}
 
 	// Review Delete
-	public ResponseEntity<BaseResponse<Void>> delete(Long reviewId) {
+	@Transactional
+	public void delete(Long reviewId) {
 		Review review = getReviewById(reviewId);
+
 		reviewRepository.delete(review);
 		reviewRepository.flush();
 
 		updateRatingInBookSearch(review.getBook().getId());
-		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.", null,HttpStatus.OK);
 	}
 
 	// Review Update
-	public ResponseEntity<BaseResponse<Void>> update(ReviewRequestDto reviewRequestDto, Long reviewId) {
+	@Transactional
+	public void update(ReviewRequestDto reviewRequestDto, Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.save(reviewMapper.updateEntity(review, reviewRequestDto));
 		reviewRepository.flush();
 
-		updateRatingInBookSearch(review.getBook().getId());
-		return BaseResponse.ok("후기 수정이 정상적으로 수행되었습니다.", null,HttpStatus.OK);
+		updateRatingInBookSearch(review.getBook().getId());;
 	}
 
-	public ResponseEntity<BaseResponse<ReviewListResponseDto>> getReviewList(Long bookId, int page, int size) {
+	public ReviewListResponseDto getReviewList(Long bookId, int page, int size) {
 
 		Book book = bookService.getBookById(bookId);
 		Pageable pageable = PageRequest.of(page - 1, size);
@@ -113,8 +114,8 @@ public class ReviewService {
 		PaginationDto paginationDto = reviewMapper.toPaginationDto(count, page, size);
 		ReviewSummaryDto summaryDto = reviewMapper.toSummaryDto(count, average);
 
-		ReviewListResponseDto resultResponseDto = reviewMapper.toReviewListResponseDto(reviewList, paginationDto,
+		return reviewMapper.toReviewListResponseDto(reviewList, paginationDto,
 			summaryDto);
-		return BaseResponse.ok("조회가 성공적으로 수행되었습니다.", resultResponseDto, HttpStatus.OK);
+
 	}
 }

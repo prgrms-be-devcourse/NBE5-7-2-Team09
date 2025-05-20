@@ -23,9 +23,22 @@ import ninegle.Readio.user.domain.User;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
+
 public class Preference {
+	@Override
+	public String toString() {
+		return "Preference{" +
+			"id=" + id +
+			", user=" + user +
+			", book=" + book +
+			'}';
+	}
+
+	@Builder
+	public Preference(User user, Book book) {
+		this.user = user;
+		this.book = book;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

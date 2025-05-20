@@ -2,11 +2,9 @@ package ninegle.Readio.publisher.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.publisher.domain.Publisher;
 import ninegle.Readio.publisher.dto.PublisherListResponseDto;
@@ -16,30 +14,28 @@ import ninegle.Readio.publisher.mapper.PublisherMapper;
 import ninegle.Readio.publisher.repository.PublisherRepository;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
-import ninegle.Readio.global.unit.BaseResponse;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class PublisherService {
 
 	private final PublisherRepository publisherRepository;
 
-	public ResponseEntity<BaseResponse<PublisherResponseDto>> save(PublisherRequestDto dto) {
+	@Transactional
+	public PublisherResponseDto save(PublisherRequestDto dto) {
 
 		if (publisherRepository.findByName(dto.getName()).isPresent()) {
 			throw new BusinessException(ErrorCode.PUBLISHER_ALREADY_EXISTS);
 		}
 
-		PublisherResponseDto response = PublisherMapper.toResponseDto(publisherRepository.save(new Publisher(dto.getName())));
-		return BaseResponse.ok("출판사 등록이 정상적으로 등록되었습니다.", response, HttpStatus.CREATED);
+		return PublisherMapper.toResponseDto(publisherRepository.save(new Publisher(dto.getName())));
 	}
 
-	public ResponseEntity<BaseResponse<PublisherListResponseDto>> getPublisherAll() {
+	@Transactional(readOnly = true)
+	public PublisherListResponseDto getPublisherAll() {
 		List<Publisher> response = publisherRepository.findAll();
 
-		PublisherMapper.toListResponseDto(response);
-		return BaseResponse.ok("출판사 조회가 정상적으로 수행되었습니다.", PublisherMapper.toListResponseDto(response), HttpStatus.OK);
+		return  PublisherMapper.toListResponseDto(response);
 	}
 
 
