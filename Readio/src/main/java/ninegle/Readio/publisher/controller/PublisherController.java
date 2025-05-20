@@ -24,11 +24,13 @@ public class PublisherController {
 
 	@PostMapping
 	public ResponseEntity<BaseResponse<PublisherResponseDto>> save(@RequestBody PublisherRequestDto request) {
-		return BaseResponse.ok("출판사 등록이 정상적으로 등록되었습니다.", publisherService.save(request), HttpStatus.CREATED);
+		PublisherResponseDto response = publisherService.save(request);
+		return BaseResponse.ok("출판사 등록이 정상적으로 등록되었습니다.", response, HttpStatus.CREATED);
 	}
 
 	@GetMapping
 	public ResponseEntity<BaseResponse<PublisherListResponseDto>> getPublishers() {
-		return BaseResponse.ok("출판사 조회가 정상적으로 수행되었습니다.", publisherService.getPublisherAll(), HttpStatus.OK);
+		PublisherListResponseDto response = publisherService.getPublisherAll();
+		return BaseResponse.ok("출판사 조회가 정상적으로 수행되었습니다.", response, HttpStatus.OK);
 	}
 }

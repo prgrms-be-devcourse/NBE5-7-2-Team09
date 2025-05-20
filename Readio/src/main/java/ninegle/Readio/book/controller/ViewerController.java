@@ -21,7 +21,8 @@ public class ViewerController {
 
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BaseResponse<ViewerResponseDto>> getBookDetail(@PathVariable Long bookId) {
-		return BaseResponse.ok("요청에 성공했습니다.", bookService.getViewerBook(bookId), HttpStatus.OK);
+		ViewerResponseDto response = bookService.getViewerBook(bookId);
+		return BaseResponse.ok("요청에 성공했습니다.", response, HttpStatus.OK);
 	}
 
 }

@@ -34,8 +34,8 @@ public class BookController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<BaseResponse<BookResponseDto>> getBookDetail(@PathVariable Long id) {
-
-		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", bookService.getBookDetail(id) ,HttpStatus.OK);
+		BookResponseDto response = bookService.getBookDetail(id);
+		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", response, HttpStatus.OK);
 	}
 
 	@GetMapping
@@ -49,7 +49,8 @@ public class BookController {
 		@Max(value = 50, message = "size는 50 이하이어야 합니다.")
 		int size
 	) {
-		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", bookService.getBookByCategory(categoryMajor, page, size), HttpStatus.OK);
+		BookListResponseDto response = bookService.getBookByCategory(categoryMajor, page, size);
+		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", response, HttpStatus.OK);
 	}
 
 	@GetMapping("/search")
@@ -62,7 +63,8 @@ public class BookController {
 		@Max(value = 50, message = "size는 50 이하이어야 합니다.")
 		int size
 	) {
-		return BaseResponse.ok("검색 결과입니다.", bookService.searchBooks(keyword, page, size), HttpStatus.OK);
+		BookListResponseDto response = bookService.searchBooks(keyword, page, size);
+		return BaseResponse.ok("검색 결과입니다.", response, HttpStatus.OK);
 	}
 
 }

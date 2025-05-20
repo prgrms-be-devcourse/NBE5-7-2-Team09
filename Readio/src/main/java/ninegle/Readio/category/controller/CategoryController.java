@@ -20,6 +20,7 @@ public class CategoryController {
 
 	@GetMapping
 	public ResponseEntity<BaseResponse<CategoryGroupResponseDto>> getCategoryGroup() {
-		return BaseResponse.ok("카테고리 그룹 조회가 성공적으로 수행되었습니다.", categoryService.findCategoryGroup(), HttpStatus.OK);
+		CategoryGroupResponseDto response = categoryService.findCategoryGroup();
+		return BaseResponse.ok("카테고리 그룹 조회가 성공적으로 수행되었습니다.", response, HttpStatus.OK);
 	}
 }

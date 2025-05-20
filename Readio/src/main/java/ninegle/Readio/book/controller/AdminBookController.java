@@ -34,7 +34,8 @@ public class AdminBookController {
 	@PutMapping("/{id}")
 	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(@PathVariable Long id,
 		@ModelAttribute BookRequestDto request) {
-		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.", bookService.updateBook(id, request), HttpStatus.OK);
+		BookResponseDto response = bookService.updateBook(id, request);
+		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.", response, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
