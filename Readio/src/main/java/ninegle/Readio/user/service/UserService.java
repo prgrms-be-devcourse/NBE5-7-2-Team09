@@ -43,15 +43,15 @@ public class UserService {
 	//암호화 후 db에 회원가입 정보 저장
 	//BaseResponse로 지정한 내용에 http 상태 코드를 수정 후 다시 ResponseEntity로 감싸서 보냄
 	public ResponseEntity<BaseResponse<Void>> signup(SingUpRequestDto dto) {
-		if (userRepository.findByEmail(dto.email()).isPresent()) {
+		if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
 			return BaseResponse.error("이미 존재하는 이메일입니다.", null, HttpStatus.UNAUTHORIZED); //401 반환 (409 숨기기)
 		}
 
 		User user = User.builder()
-			.email(dto.email())
-			.password(passwordEncoder.encode(dto.password()))
-			.nickname(dto.nickname())
-			.phoneNumber(dto.phoneNumber())
+			.email(dto.getEmail())
+			.password(passwordEncoder.encode(dto.getPassword()))
+			.nickname(dto.getNickname())
+			.phoneNumber(dto.getPhoneNumber())
 			.build();
 		userRepository.save(user);
 
