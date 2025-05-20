@@ -1,5 +1,6 @@
 package ninegle.Readio.book.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,8 @@ public class BookController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<BaseResponse<BookResponseDto>> getBookDetail(@PathVariable Long id) {
-		return bookService.getBookDetail(id);
+
+		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", bookService.getBookDetail(id) ,HttpStatus.OK);
 	}
 
 	@GetMapping
@@ -47,7 +49,7 @@ public class BookController {
 		@Max(value = 50, message = "size는 50 이하이어야 합니다.")
 		int size
 	) {
-		return bookService.getBookByCategory(categoryMajor,page,size);
+		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", bookService.getBookByCategory(categoryMajor, page, size), HttpStatus.OK);
 	}
 
 	@GetMapping("/search")
@@ -60,15 +62,7 @@ public class BookController {
 		@Max(value = 50, message = "size는 50 이하이어야 합니다.")
 		int size
 	) {
-		return bookService.searchBooks(keyword, page, size);
-	}
-
-
-
-	//파일 받아오기 예시 코드
-	@GetMapping("/download/{book_id}")
-	public ResponseEntity<byte[]> getBookFile(@PathVariable("book_id") Long bookId){
-		return bookService.getBookFile(bookId);
+		return BaseResponse.ok("검색 결과입니다.", bookService.searchBooks(keyword, page, size), HttpStatus.OK);
 	}
 
 }
