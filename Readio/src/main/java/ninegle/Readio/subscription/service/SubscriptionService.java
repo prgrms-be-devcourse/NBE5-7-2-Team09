@@ -43,7 +43,7 @@ public class SubscriptionService {
 	@Transactional
 	public void cancelSubscription(Long subscriptionId) {
 		// 비즈니스 규칙: 구독 ID는 항상 1이어야 함
-		if (!SUBSCRIPTION_ID.equals(subscriptionId)) {
+		if (subscriptionId == null || subscriptionId != SUBSCRIPTION_ID) {
 			throw new BusinessException(ErrorCode.SUBSCRIPTION_NOT_FOUND);
 		}
 

@@ -25,15 +25,20 @@ public class SubscriptionController {
 	public ResponseEntity<BaseResponse<SubscriptionResponseDto>> getSubscription() {
 		SubscriptionResponseDto response = subscriptionService.getSubscription();
 
-		String message = (response == null) ? "존재하는 구독이 없습니다." : "조회에 성공하였습니다.";
-		return BaseResponse.ok(message, response, HttpStatus.OK);
+		// 구독 정보가 있는 경우 메시지와 함께 반환
+		if (response != null) {
+			return BaseResponse.ok("조회에 성공하였습니다.", response, HttpStatus.OK);
+		} else {
+			// 구독 정보가 없는 경우 메시지만 반환
+			return BaseResponse.ok("존재하는 구독이 없습니다.", null, HttpStatus.OK);
+		}
 	}
 
 	@PostMapping
 	public ResponseEntity<BaseResponse<Void>> createSubscription() {
 		subscriptionService.createSubscription();
 
-		return BaseResponse.ok("구독 결제에 성공하였습니다.", null, HttpStatus.OK);
+		return BaseResponse.okOnlyStatus(HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{subscription_id}")
@@ -41,6 +46,6 @@ public class SubscriptionController {
 		@PathVariable("subscription_id") Long subscriptionId) {
 		subscriptionService.cancelSubscription(subscriptionId);
 
-		return BaseResponse.ok("구독 취소되었습니다.", null, HttpStatus.OK);
+		return BaseResponse.okOnlyStatus(HttpStatus.OK);
 	}
 }
