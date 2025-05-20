@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import ninegle.Readio.book.dto.preferencedto.PreferenceResponseDto;
@@ -18,6 +19,8 @@ import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Preference;
 import ninegle.Readio.book.dto.BookIdRequestDto;
 import ninegle.Readio.book.repository.PreferencesRepository;
+import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.global.unit.BaseResponse;
 import ninegle.Readio.user.domain.User;
 import ninegle.Readio.user.service.UserContextService;
@@ -45,26 +48,38 @@ public class PreferenceService {
 	}
 
 
-	public ResponseEntity<BaseResponse<Void>> save(BookIdRequestDto dto) {
+	@Transactional
+	public PreferenceResponseDto save(Long userId,BookIdRequestDto dto) {
 
-		Book book =bookService.getBookById(dto.getId());
-		User user = userService.getById(userContextService.getCurrentUserId());
+		Book book = bookService.getBookById(dto.getId());
+		User user = userService.getById(userId);
 
-		preferencesRepository.save(preferenceMapper.toEntity(user,book));
-		return BaseResponse.ok("관심도서 추가가 정상적으로 수행되었습니다.", null,HttpStatus.CREATED);
+		// 409 Conflict
+		if(getPreferenceByBookAndUser(book,user)!=null) {
+			throw new BusinessException(ErrorCode.BOOK_ALREADY_IN_PREFERENCE);
+		}
+
+		Preference preference = preferenceMapper.toEntity(user, book);
+		preferencesRepository.save(preference);
+		return preferenceMapper.toPreferenceDto(preference);
 	}
 
-	public ResponseEntity<BaseResponse<Void>> delete(Long bookId) {
+	public ResponseEntity<BaseResponse<Void>> delete(Long userId,Long bookId) {
 		Book book =bookService.getBookById(bookId);
-		User user = userService.getById(userContextService.getCurrentUserId());
+		User user = userService.getById(userId);
 		Preference preference = getPreferenceByBookAndUser(book, user);
+
+		//404 Not Found
+		if(preference==null) {
+			throw new BusinessException(ErrorCode.PREFERENCE_NOT_FOUND);
+		}
 
 		preferencesRepository.delete(preference);
 		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.",null,HttpStatus.OK);
 	}
 
-	public ResponseEntity<BaseResponse<PreferenceListResponseDto>> getPreferenceList(int page, int size) {
-		User user = userService.getById(userContextService.getCurrentUserId());
+	public PreferenceListResponseDto getPreferenceList(Long userId,int page, int size) {
+		User user = userService.getById(userId);
 		Pageable pageable = PageRequest.of(page-1,size);
 		long count = preferencesRepository.countByUser(user);
 
@@ -72,8 +87,7 @@ public class PreferenceService {
 		List<PreferenceResponseDto> preferenceList = preferenceMapper.toPreferenceDto(preferences);
 
 		PaginationDto paginationDto = preferenceMapper.toPaginationDto(count, page, size);
-		PreferenceListResponseDto preferenceListDto = preferenceMapper.toPreferenceListDto(preferenceList, paginationDto);
 
-		return BaseResponse.ok("관심도서 조회가 정상적으로 수행되었습니다.",preferenceListDto,HttpStatus.OK);
+		return preferenceMapper.toPreferenceListDto(preferenceList, paginationDto);
 	}
 }

@@ -55,6 +55,9 @@ public enum ErrorCode {
 	 * Preference : 관심 도서 예외 처리
 	 */
 	BOOK_ALREADY_IN_PREFERENCE(HttpStatus.CONFLICT, "이미 관심 도서로 등록된 책입니다."),
+	//404
+	PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND,  "관심 도서로 등록되지 않은 책입니다."),
+
 
 	/*
 	 * Subscription : 구독 예외 처리
