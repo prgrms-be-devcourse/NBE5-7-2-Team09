@@ -4,15 +4,14 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.repository.BookRepository;
-import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.library.domain.Library;
 import ninegle.Readio.library.domain.LibraryBook;
 import ninegle.Readio.library.dto.book.LibraryBookListResponseDto;
@@ -33,12 +32,12 @@ public class LibraryBookService {
 
 	//라이브러리에 책 저장
 	@Transactional
-	public ResponseEntity<BaseResponse<Void>> newLibraryBook(Long libraryId, NewLibraryBookRequestDto bookRequestDto) {
+	public void newLibraryBook(Long libraryId, NewLibraryBookRequestDto bookRequestDto) {
 
 		//라이브러리 가져오기
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
-			BaseResponse.error("라이브러리가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND); //404
 		}
 		Library library = libraryOptional.get();
 
@@ -46,7 +45,7 @@ public class LibraryBookService {
 		Long newLibraryBookId = libraryBookMapper.toNewLibraryBook(bookRequestDto);
 		Optional<Book> findBook = bookRepository.findById(newLibraryBookId);
 		if (findBook.isEmpty()) {
-			return BaseResponse.error("책이 존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.BOOK_NOT_FOUND); //404
 		}
 		Book book = findBook.get();
 
@@ -56,16 +55,15 @@ public class LibraryBookService {
 
 		libraryBookRepository.save(libraryBook);
 
-		return BaseResponse.ok("읽고 있는 책이 추가되었습니다", null, HttpStatus.OK);
 	}
 
 	//라이브러리에 책들 불러오기
 	@Transactional(readOnly = true)
-	public ResponseEntity<BaseResponse<LibraryBookListResponseDto>> getAllLibraryBooks(Long libraryId,
+	public LibraryBookListResponseDto getAllLibraryBooks(Long libraryId,
 		Pageable pageable) {
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
-			return BaseResponse.error("라이브러리가 존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND); //404
 		}
 		//조회한 라이브러리
 		Library library = libraryOptional.get();
@@ -74,24 +72,22 @@ public class LibraryBookService {
 		Page<Book> books = libraryBookRepository.findBookByLibraryId(library.getId(), pageable);
 		LibraryBookListResponseDto libraryBookListResponseDto = libraryBookMapper.libraryBookListResponseDto(library,
 			books);
-		return BaseResponse.ok("라이브러리에 책들을 성공적으로 불러왔습니다", libraryBookListResponseDto, HttpStatus.OK);
+		return libraryBookListResponseDto;
 	}
 
 	//라이브러리에 책 삭제
 	@Transactional
-	public ResponseEntity<BaseResponse<Void>> deleteLibraryBook(Long libraryId, Long libraryBookId) {
+	public void deleteLibraryBook(Long libraryId, Long libraryBookId) {
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
-			return BaseResponse.error("존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND); //404
 		}
 		Optional<LibraryBook> libraryBoook = libraryBookRepository.findLibraryBoook(libraryId, libraryBookId);
 		if (libraryBoook.isEmpty()) {
-			return BaseResponse.error("존재하지 않습니다", null, HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.BOOK_NOT_FOUND); //404
 		}
 		LibraryBook libraryBook = libraryBoook.get();
 		libraryBookRepository.delete(libraryBook);
-
-		return BaseResponse.ok("라이브러리에 책이 삭제 되었습니다", null, HttpStatus.OK);
 
 	}
 }

@@ -4,14 +4,13 @@ import java.util.Base64;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.tosspay.config.TossApiClient;
 import ninegle.Readio.tosspay.dto.PaymentSuccessResponseDto;
 import ninegle.Readio.tosspay.dto.TossPaymentConfirmRequestDto;
@@ -33,14 +32,14 @@ public class PaymentService {
 	private String secretKey;
 
 	@Transactional
-	public ResponseEntity<BaseResponse<PaymentSuccessResponseDto>> confirmPayment(
+	public PaymentSuccessResponseDto confirmPayment(
 		TossPaymentConfirmRequestDto tossRequest) {
 
 		//유저 검증
 		Long userId = userContextService.getCurrentUserId();
 		Optional<User> userOptional = userRepository.findById(userId);
 		if (userOptional.isEmpty()) {
-			return BaseResponse.error("❌ 유저가 존재하지 않음", null, HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.USER_NOT_FOUND); //404
 		}
 
 		//인증 헤더 생성
@@ -50,19 +49,15 @@ public class PaymentService {
 		TossPaymentConfirmResponseDto response = tossApiClient.confirmPayment(
 			"Basic " + encodedKey, tossRequest);
 
-		if (!"DONE".equals(response.getStatus())) {
-			return BaseResponse.error("❌ 결제 승인 실패: " + response.getStatus(), null, HttpStatus.BAD_REQUEST);
+		if (!"DONE".equals(response.status())) {
+			throw new BusinessException(ErrorCode.INVALID_REQUEST_DATA); //400
 		}
-
-		// LocalDateTime now = LocalDateTime.now();
-		// Subscriptiontest subscription = new Subscriptiontest(userId, now, now.plusMonths(1));
-		// subscriptiontestRepository.save(subscription);
 
 		User user1 = userOptional.get();
 		Long point = tossRequest.getAmount();
 
 		if (point < 1) {
-			return BaseResponse.error("❌ 0원은 결제되지 않습니다: " + response.getStatus(), null, HttpStatus.BAD_REQUEST);
+			throw new BusinessException(ErrorCode.USER_NOT_FOUND); //404 0원 결제 시
 		}
 		user1.setPoint(user1.getPoint() + point);
 
@@ -71,6 +66,6 @@ public class PaymentService {
 			.orderId(tossRequest.getOrderId())
 			.amount(tossRequest.getAmount()).build();
 
-		return BaseResponse.ok("포인트 결제 완료", paymentSuccessResponseDto, HttpStatus.OK);
+		return paymentSuccessResponseDto;
 	}
 }

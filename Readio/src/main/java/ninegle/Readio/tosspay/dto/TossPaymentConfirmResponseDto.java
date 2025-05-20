@@ -1,15 +1,8 @@
 package ninegle.Readio.tosspay.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+/**
+ * @param status  결제 상태 "DONE" */
 
-@Getter
-@NoArgsConstructor
-public class TossPaymentConfirmResponseDto {
-	private String orderId;
-	private String paymentKey;
-	private String status; // 결제 상태 "DONE"
-	private String requestedAt;
-	private String approvedAt;
-	private int totalAmount;
+public record TossPaymentConfirmResponseDto(String orderId, String paymentKey, String status, String requestedAt,
+											String approvedAt, int totalAmount) {
 }

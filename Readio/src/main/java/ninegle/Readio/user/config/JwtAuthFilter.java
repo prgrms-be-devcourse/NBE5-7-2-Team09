@@ -18,8 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.user.adapter.UserDetail;
 import ninegle.Readio.user.dto.TokenBody;
-import ninegle.Readio.user.dto.UserDetail;
 import ninegle.Readio.user.repository.BlackListRepository;
 import ninegle.Readio.user.service.JwtTokenProvider;
 import ninegle.Readio.user.service.UserService;
@@ -72,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			UserDetail userDetail = userService.getDetails(tokenBody.getUserId());
 
 			if (userDetail == null) {
-				BaseResponse.error("사용자가 존재하지 않음", HttpStatus.UNAUTHORIZED);
+				BaseResponse.error("사용자가 존재하지 않음", null, HttpStatus.UNAUTHORIZED);
 			}
 
 			//사용자가 입력한 ID/PW를 UsernamePasswordAuthenticationToken으로 감쌈

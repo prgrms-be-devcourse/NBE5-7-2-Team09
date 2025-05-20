@@ -4,13 +4,12 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.library.domain.Library;
 import ninegle.Readio.library.dto.library.LibraryListResponseDto;
 import ninegle.Readio.library.dto.library.NewLibraryRequestDto;
@@ -34,14 +33,14 @@ public class LibraryService {
 
 	//라이브러리 생성
 	@Transactional
-	public ResponseEntity<BaseResponse<NewLibraryResponseDto>> newLibrary(NewLibraryRequestDto newLibraryRequestDto) {
+	public NewLibraryResponseDto newLibrary(NewLibraryRequestDto newLibraryRequestDto) {
 
 		//유저 정보를 꺼내고
 		Long userId = userContextService.getCurrentUserId();
 		Optional<User> finduser = userRepository.findById(userId);
 
 		if (finduser.isEmpty()) {
-			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+			throw new BusinessException(ErrorCode.USER_NOT_FOUND);
 		}
 		User user = finduser.get();
 
@@ -52,50 +51,47 @@ public class LibraryService {
 			library.getLibraryName(),
 			user.getId());
 
-		return BaseResponse.ok("라이브러리 추가가 정상적으로 수행되었습니다", responseDto, HttpStatus.CREATED); //201
+		return responseDto;
 	}
 
 	//라이브러리 전체 조회
-
 	@Transactional(readOnly = true)
-	public ResponseEntity<BaseResponse<LibraryListResponseDto>> getAllLibraries(Pageable pageable) {
+	public LibraryListResponseDto getAllLibraries(Pageable pageable) {
 		Long userId = userContextService.getCurrentUserId();
 		Optional<User> finduser = userRepository.findById(userId);
 
 		if (finduser.isEmpty()) {
-			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+			throw new BusinessException(ErrorCode.USER_NOT_FOUND);
 		}
-
 		Page<Library> libraries = libraryRepository.findAllByUserId(userId, pageable);
 		LibraryListResponseDto libraryListResponseDto = LibraryMapper.fromLibraryListResponseDto(libraries);
-		return BaseResponse.ok("전체 라이브러리 조회 완료", libraryListResponseDto, HttpStatus.OK);
+		return libraryListResponseDto;
 	}
 
 	//라이브러리 삭제
 	@Transactional
-	public ResponseEntity<BaseResponse<Void>> deleteLibrary(Long libraryId) {
+	public void deleteLibrary(Long libraryId) {
 		Long userId = userContextService.getCurrentUserId();
 		Optional<User> finduser = userRepository.findById(userId);
 
 		if (finduser.isEmpty()) {
-			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+			throw new BusinessException(ErrorCode.USER_NOT_FOUND); //404
 		}
 
 		Library library = libraryRepository.findByIdAndUserId(libraryId, userId);
 		libraryRepository.delete(library);
-		return BaseResponse.ok("라이브러리 삭제 완료", null, HttpStatus.OK);
 	}
 
 	//라이브러리 이름 수정
 	@Transactional
-	public ResponseEntity<BaseResponse<UpdateLibraryResponseDto>> updateLibrary(Long libraryId,
+	public UpdateLibraryResponseDto updateLibrary(Long libraryId,
 		UpdateLibraryRequestDto updateLibraryRequestDto) {
 		//param으로 들어온 id, body로 들어온 변경된 라이브러리 Name
 		Long userId = userContextService.getCurrentUserId();
 		Optional<User> finduser = userRepository.findById(userId);
 
 		if (finduser.isEmpty()) {
-			return BaseResponse.error("사용자가 존재하지 않습니다", null, HttpStatus.UNAUTHORIZED);
+			throw new BusinessException(ErrorCode.USER_NOT_FOUND);
 		}
 
 		//바꿀 라이브러리를 가져온다
@@ -109,6 +105,6 @@ public class LibraryService {
 		UpdateLibraryResponseDto responseDto = LibraryMapper.fromUpdateLibraryResponseDto(library.getId(),
 			library.getLibraryName());
 
-		return BaseResponse.ok("라이브러리 이름을 성공적으로 수정했습니다.", responseDto, HttpStatus.OK);
+		return responseDto;
 	}
 }

@@ -1,4 +1,4 @@
-package ninegle.Readio.user.dto;
+package ninegle.Readio.user.adapter;
 
 import java.util.Collection;
 import java.util.List;
