@@ -93,13 +93,12 @@ public class ReviewService {
 
 	// Review Update
 	@Transactional
-	public ResponseEntity<BaseResponse<Void>> update(ReviewRequestDto reviewRequestDto, Long reviewId) {
+	public void update(ReviewRequestDto reviewRequestDto, Long reviewId) {
 		Review review = getReviewById(reviewId);
 		reviewRepository.save(reviewMapper.updateEntity(review, reviewRequestDto));
 		reviewRepository.flush();
 
-		updateRatingInBookSearch(review.getBook().getId());
-		return BaseResponse.ok("후기 수정이 정상적으로 수행되었습니다.", null,HttpStatus.OK);
+		updateRatingInBookSearch(review.getBook().getId());;
 	}
 
 	public ReviewListResponseDto getReviewList(Long bookId, int page, int size) {

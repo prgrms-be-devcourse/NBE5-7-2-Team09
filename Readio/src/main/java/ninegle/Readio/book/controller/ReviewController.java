@@ -38,23 +38,24 @@ public class ReviewController {
 	private final UserContextService userContextService;
 
 	@PostMapping("/{book_id}/reviews")
-	public ResponseEntity<Void> save(@RequestBody @Valid ReviewRequestDto review,
+	public ResponseEntity<BaseResponse<Void>> save(@RequestBody @Valid ReviewRequestDto review,
 		@PathVariable("book_id") Long bookId) {
 		Long currentUserId = userContextService.getCurrentUserId();
 		reviewService.save(currentUserId,review, bookId);
-		return ResponseEntity.created(null).build();
+		return BaseResponse.okOnlyStatus(HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("/{book_id}/reviews/{review_id}")
-	public ResponseEntity<Void> delete(@PathVariable("review_id") Long reviewId) {
+	public ResponseEntity<BaseResponse<Void>> delete(@PathVariable("review_id") Long reviewId) {
 		reviewService.delete(reviewId);
-		return ResponseEntity.noContent().build();
+		return BaseResponse.okOnlyStatus(HttpStatus.NO_CONTENT);
 	}
 
 	@PutMapping("/{book_id}/reviews/{review_id}")
 	public ResponseEntity<BaseResponse<Void>> update(@RequestBody @Valid ReviewRequestDto review,
 		@PathVariable("review_id") Long reviewId) {
-		return reviewService.update(review, reviewId);
+		reviewService.update(review, reviewId);
+		return BaseResponse.okOnlyStatus(HttpStatus.OK);
 	}
 
 	@GetMapping("/{book_id}/reviews")
