@@ -1,6 +1,7 @@
 package ninegle.Readio.book.domain;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLDelete;
 
@@ -57,7 +58,7 @@ public class Book {
 
 	private Boolean expired = false;
 
-	private LocalDate expiredAt;
+	private LocalDateTime expiredAt;
 
 	@ManyToOne
 	@JoinColumn(name = "author_id")

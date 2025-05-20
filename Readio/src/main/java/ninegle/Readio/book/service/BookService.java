@@ -1,6 +1,7 @@
 package ninegle.Readio.book.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +57,7 @@ import ninegle.Readio.global.unit.BaseResponse;
 @Slf4j
 @Service
 @Transactional
+@EnableScheduling
 @RequiredArgsConstructor
 public class BookService {
 
@@ -181,17 +185,45 @@ public class BookService {
 
 		Book findBook = bookRepository.findByIdAndExpiredFalse(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
-
-		BookSearch findBookSearch = bookSearchRepository.findByIdAndExpiredFalse(id)
-			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
-
 		bookRepository.delete(findBook);
 
-		findBookSearch.softDelete();
-		bookSearchRepository.save(findBookSearch);
+		BookSearch findBookSearch = bookSearchRepository.findById(id)
+			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
+
+		if (findBookSearch.getExpired() == false) {
+			findBookSearch.softDelete();
+			bookSearchRepository.save(findBookSearch);
+		}
 
 		return BaseResponse.ok("책 삭제가 정상적으로 수행되었습니다.", null, HttpStatus.OK);
 	}
+
+	@Scheduled(cron = "0 1 22 * * ?")
+	public void deleteExpiredBooks() {
+		LocalDateTime threshold = LocalDateTime.now().minusHours(0);
+
+		// 삭제 id 목록 조회
+		List<Book> expiredBooks = bookRepository.findByExpiredTrueAndExpiredAtBefore(threshold);
+		if (expiredBooks.isEmpty()) {
+			return;
+		}
+		List<Long> ids = expiredBooks.stream().map(Book::getId).toList();
+
+		// JPA 물리 삭제
+		int deleteCount = bookRepository.deleteExpiredBefore(threshold);
+
+		// ES 물리 삭제
+		bookSearchRepository.deleteAllById(ids);
+
+		// ncp 파일 삭제
+		expiredBooks.forEach(book -> {
+			nCloudStorageService.deleteFileOnCloud(book.getName(),"epub",".epub");
+			nCloudStorageService.deleteFileOnCloud(book.getName(),"image",".jpg");
+		});
+		log.debug("deleteCount = {}", deleteCount);
+		log.debug("deleteBookIds = {}", ids);
+	}
+
 
 	public ResponseEntity<BaseResponse<BookListResponseDto>> getBookByCategory(String categoryMajor, int page, int size) {
 
