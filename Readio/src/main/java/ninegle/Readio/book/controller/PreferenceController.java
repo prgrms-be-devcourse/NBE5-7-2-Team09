@@ -46,10 +46,10 @@ public class PreferenceController {
 	}
 
 	@DeleteMapping("/{book_id}")
-	public ResponseEntity<Void> delete(@PathVariable("book_id") Long bookId){
+	public ResponseEntity<BaseResponse<Void>> delete(@PathVariable("book_id") Long bookId){
 		Long userId = userContextService.getCurrentUserId();
 		preferenceService.delete(userId, bookId);
-		return ResponseEntity.noContent().build();
+		return BaseResponse.okOnlyStatus(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping
