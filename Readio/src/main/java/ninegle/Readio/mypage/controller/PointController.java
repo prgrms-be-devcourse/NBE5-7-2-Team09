@@ -18,7 +18,6 @@ public class PointController {
 
 	@GetMapping("/points")
 	public ResponseEntity<BaseResponse<PointResponseDto>> getPoints() {
-
 		PointResponseDto responseDto = pointService.getUserPoints();
 
 		return BaseResponse.ok("포인트 조회 성공", responseDto, HttpStatus.OK);

@@ -1,6 +1,7 @@
 package ninegle.Readio.mypage.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.mypage.dto.response.PointResponseDto;
@@ -17,11 +18,12 @@ public class PointService {
 	private final UserContextService userContextService;
 	private final UserRepository userRepository;
 
+	@Transactional(readOnly = true)
 	public PointResponseDto getUserPoints() {
 		Long userId = userContextService.getCurrentUserId();
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new BusinessException(ErrorCode.AUTHENTICATION_REQUIRED));
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
 		return new PointResponseDto(user.getPoint());
 	}

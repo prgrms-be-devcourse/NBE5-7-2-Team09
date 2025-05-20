@@ -1,5 +1,6 @@
 package ninegle.Readio.category.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ public class CategoryController {
 
 	@GetMapping
 	public ResponseEntity<BaseResponse<CategoryGroupResponseDto>> getCategoryGroup() {
-		return categoryService.findCategoryGroup();
+		CategoryGroupResponseDto response = categoryService.findCategoryGroup();
+		return BaseResponse.ok("카테고리 그룹 조회가 성공적으로 수행되었습니다.", response, HttpStatus.OK);
 	}
 }

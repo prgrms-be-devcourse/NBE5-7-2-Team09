@@ -1,5 +1,6 @@
 package ninegle.Readio.book.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,8 @@ public class ViewerController {
 
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BaseResponse<ViewerResponseDto>> getBookDetail(@PathVariable Long bookId) {
-		return bookService.getViewerBook(bookId);
+		ViewerResponseDto response = bookService.getViewerBook(bookId);
+		return BaseResponse.ok("요청에 성공했습니다.", response, HttpStatus.OK);
 	}
 
 }

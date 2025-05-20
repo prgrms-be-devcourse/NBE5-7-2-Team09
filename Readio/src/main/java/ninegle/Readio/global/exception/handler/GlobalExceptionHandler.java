@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.global.exception.dto.ErrorResponse;
@@ -15,12 +16,10 @@ public class GlobalExceptionHandler {
 	 * 비즈니스 로직에서 발생한 예외 처리 (ErrorCode 기반)
 	 */
 	@ExceptionHandler(BusinessException.class)
-	public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+	public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e, HttpServletRequest request) {
 		ErrorCode code = e.getErrorCode();
 
-		StackTraceElement origin = e.getStackTrace()[0];
-		String path = origin.getClassName() + "." + origin.getMethodName()
-			+ "(" + origin.getFileName() + ":" + origin.getLineNumber() + ")";
+		String path = request.getMethod() + " " + request.getRequestURI();
 
 		return ResponseEntity.status(code.getStatus()).body(ErrorResponse.builder()
 			.status(code.getStatus().value())

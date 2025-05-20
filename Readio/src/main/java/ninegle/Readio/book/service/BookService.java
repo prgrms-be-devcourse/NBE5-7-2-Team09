@@ -11,10 +11,6 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -44,8 +40,6 @@ import ninegle.Readio.publisher.repository.PublisherRepository;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.book.dto.PaginationDto;
-import ninegle.Readio.global.unit.BaseResponse;
-
 
 /**
  * Readio - BookService
@@ -56,7 +50,6 @@ import ninegle.Readio.global.unit.BaseResponse;
  */
 @Slf4j
 @Service
-@Transactional
 @EnableScheduling
 @RequiredArgsConstructor
 public class BookService {
@@ -67,33 +60,33 @@ public class BookService {
 	private final PublisherRepository publisherRepository;
 	private final BookSearchRepository bookSearchRepository;
   	private final NCloudStorageService nCloudStorageService;
-	  private final BookSearchMapper bookSearchMapper;
-	  private final BookMapper bookMapper;
+   	private final BookSearchMapper bookSearchMapper;
+   	private final BookMapper bookMapper;
 
 
-	public ResponseEntity<BaseResponse<BookListResponseDto>> searchBooks(String keyword, int page, int size) {
+   	@Transactional(readOnly = true)
+	public BookListResponseDto searchBooks(String keyword, int page, int size) {
 
 		List<BookSearchResponseDto> findBooks = bookSearchMapper.toResponseDto(getBookSearchList(keyword, page, size));
 
 		long totalElements = findBooks.size();
 		PaginationDto paginationDto = bookMapper.toPaginationDto(totalElements, page, size);
-		BookListResponseDto response = bookMapper.toBookListResponseDto(findBooks, paginationDto);
 
-		return BaseResponse.ok("검색 결과입니다.", response, HttpStatus.OK);
+		return bookMapper.toBookListResponseDto(findBooks, paginationDto);
 	}
 
 	private List<BookSearch> getBookSearchList(String keyword, int page, int size) {
 		Set<BookSearch> result = new LinkedHashSet<>();
-
 		Pageable pageable = PageRequest.of(page-1, size);
+
 		result.addAll(bookSearchRepository.findByExpiredFalseAndAuthorContaining(keyword, pageable).getContent());
 		result.addAll(bookSearchRepository.findByExpiredFalseAndNameContaining(keyword, pageable).getContent());
 
 		return new ArrayList<>(result);
-  }
+  	}
 
-
-	public ResponseEntity<BaseResponse<Void>> save(BookRequestDto request) throws IOException {
+	@Transactional
+	public void save(BookRequestDto request) throws IOException {
 
 		// 1. S3에 업로드할 파일명 생성 ( 책 제목 기반 )
 		String fileKey = "epub/" + request.getName() + ".epub";
@@ -117,14 +110,12 @@ public class BookService {
 
 		// 5. ElasticSearch Repository에 저장
 		bookSearchRepository.save(bookSearchMapper.toEntity(savedBook));
+		}
 
-		return BaseResponse.ok("책 추가가 정상적으로 수행되었습니다.",null, HttpStatus.CREATED);
-	}
-
-	// 카테고리가 존재하면 Get, 존재하지 않다면 Throw 발생
-	private Category getCategory(String categorySub) {
-		return categoryRepository.findBySub(categorySub)
-			.orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+		// 카테고리가 존재하면 Get, 존재하지 않다면 Throw 발생
+		private Category getCategory(String categorySub) {
+			return categoryRepository.findBySub(categorySub)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
 	}
 
 	// 작가가 존재하면 해당 작가를 Get, 존재하지 않다면 새로운 작가 생성 후 Get
@@ -138,19 +129,20 @@ public class BookService {
 			.orElseGet(() -> publisherRepository.save(new Publisher(publisherName)));
 	}
 
-	public ResponseEntity<BaseResponse<BookResponseDto>> getBookDetail(Long id) {
+	@Transactional(readOnly = true)
+	public BookResponseDto getBookDetail(Long id) {
 
 		Book findBook = bookRepository.findByIdAndExpiredFalse(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 		if (findBook.getExpired() == true) {
-			// 만료된 책 Enum 추가 필요
 			throw new BusinessException(ErrorCode.BOOK_NOT_FOUND);
 		}
 
-		return BaseResponse.ok("정상적으로 조회가 완료되었습니다.", bookMapper.toDto(findBook) ,HttpStatus.OK);
+		return bookMapper.toDto(findBook);
 	}
 
-	public ResponseEntity<BaseResponse<BookResponseDto>> updateBook(Long id, BookRequestDto request) {
+	@Transactional
+	public BookResponseDto updateBook(Long id, BookRequestDto request) {
 
 		Book targetBook = bookRepository.findById(id)
 			.orElseThrow(()->new BusinessException(ErrorCode.BOOK_NOT_FOUND));
@@ -178,10 +170,11 @@ public class BookService {
 		bookRepository.save(updatedBook);
 		bookSearchRepository.save(updatedBookSearch);
 
-		return BaseResponse.ok("책 수정이 정상적으로 수행되었습니다.", bookMapper.toDto(updatedBook), HttpStatus.OK);
+		return bookMapper.toDto(updatedBook);
 	}
 
-	public ResponseEntity<BaseResponse<Void>> deleteBook(Long id) {
+	@Transactional
+	public void deleteBook(Long id) {
 
 		Book findBook = bookRepository.findByIdAndExpiredFalse(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
@@ -194,13 +187,13 @@ public class BookService {
 			findBookSearch.softDelete();
 			bookSearchRepository.save(findBookSearch);
 		}
-
-		return BaseResponse.ok("책 삭제가 정상적으로 수행되었습니다.", null, HttpStatus.OK);
 	}
 
-	@Scheduled(cron = "0 1 22 * * ?")
+	// 0시 0분 기준 만료된지 7일 지난 도서 삭제
+	@Scheduled(cron = "0 0 0 * * ?")
 	public void deleteExpiredBooks() {
-		LocalDateTime threshold = LocalDateTime.now().minusHours(0);
+
+		LocalDateTime threshold = LocalDateTime.now().minusDays(7);
 
 		// 삭제 id 목록 조회
 		List<Book> expiredBooks = bookRepository.findByExpiredTrueAndExpiredAtBefore(threshold);
@@ -224,8 +217,8 @@ public class BookService {
 		log.debug("deleteBookIds = {}", ids);
 	}
 
-
-	public ResponseEntity<BaseResponse<BookListResponseDto>> getBookByCategory(String categoryMajor, int page, int size) {
+	@Transactional(readOnly = true)
+	public BookListResponseDto getBookByCategory(String categoryMajor, int page, int size) {
 
 		Pageable pageable = PageRequest.of(page-1, size);
 		Page<BookSearch> findBooks = categoryMajor.equals("null")
@@ -239,35 +232,21 @@ public class BookService {
 		List<BookSearchResponseDto> responseDtos = bookSearchMapper.toResponseDto(books);
 		PaginationDto paginationDto = bookMapper.toPaginationDto(totalElements, page, size);
 
-		return BaseResponse.ok("카테고리별 조회가 정상적으로 수행되었습니다.", bookMapper.toBookListResponseDto(responseDtos, paginationDto), HttpStatus.OK);
+		return bookMapper.toBookListResponseDto(responseDtos, paginationDto);
 	}
 
-	public ResponseEntity<BaseResponse<ViewerResponseDto>> getViewerBook(Long id) {
+	@Transactional(readOnly = true)
+	public ViewerResponseDto getViewerBook(Long id) {
 		Book findBook = bookRepository.findByIdAndExpiredFalse(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
 
 		String epubUri = nCloudStorageService.generateObjectUrl("epub/" + findBook.getName() + ".epub");
 
-		ViewerResponseDto response = ViewerResponseDto.builder().epubUri(epubUri).build();
-
-		return BaseResponse.ok("요청에 성공했습니다.", response, HttpStatus.OK);
+		return ViewerResponseDto.builder().epubUri(epubUri).build();
 	}
 
 	public Book getBookById(long id) {
 		return bookRepository.findById(id).orElseThrow(
 			() -> new NoSuchElementException());
-	}
-
-	//파일 받아오기 예시코드
-	public ResponseEntity<byte[]> getBookFile(Long bookId) {
-		String bookName = getBookById(bookId).getName();
-		String bookFileName = bookName + ".epub";
-		byte[] downloadFile = nCloudStorageService.downloadFile(bookFileName);
-
-
-		return ResponseEntity.ok()
-			.contentType(MediaType.APPLICATION_OCTET_STREAM)
-			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + bookFileName + "\"")
-			.body(downloadFile);
 	}
 }

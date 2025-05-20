@@ -1,12 +1,12 @@
 package ninegle.Readio.global.unit;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder
