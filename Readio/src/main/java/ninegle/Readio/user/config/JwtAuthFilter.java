@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +16,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.global.exception.BusinessException;
+import ninegle.Readio.global.exception.domain.ErrorCode;
 import ninegle.Readio.user.adapter.UserDetail;
 import ninegle.Readio.user.dto.TokenBody;
 import ninegle.Readio.user.repository.BlackListRepository;
@@ -72,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			UserDetail userDetail = userService.getDetails(tokenBody.getUserId());
 
 			if (userDetail == null) {
-				BaseResponse.error("사용자가 존재하지 않음", null, HttpStatus.UNAUTHORIZED);
+				throw new BusinessException(ErrorCode.USER_NOT_FOUND); //404
 			}
 
 			//사용자가 입력한 ID/PW를 UsernamePasswordAuthenticationToken으로 감쌈
