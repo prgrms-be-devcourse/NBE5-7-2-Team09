@@ -1,5 +1,7 @@
 package ninegle.Readio.book.dto.preferencedto;
 
+import java.math.BigDecimal;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,5 +14,5 @@ import lombok.RequiredArgsConstructor;
  * purpose: 
  */
 @Builder
-public record PreferenceResponseDto(long id, String name, String image) {
+public record PreferenceResponseDto(long id, String name, String image, BigDecimal rating) {
 }

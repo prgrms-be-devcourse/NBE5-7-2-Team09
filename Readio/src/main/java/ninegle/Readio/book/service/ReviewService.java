@@ -22,6 +22,7 @@ import ninegle.Readio.book.dto.reviewdto.ReviewRequestDto;
 import ninegle.Readio.book.dto.reviewdto.ReviewResponseDto;
 import ninegle.Readio.book.dto.reviewdto.ReviewSummaryDto;
 import ninegle.Readio.book.mapper.ReviewMapper;
+import ninegle.Readio.book.repository.BookRepository;
 import ninegle.Readio.book.repository.BookSearchRepository;
 import ninegle.Readio.book.repository.ReviewRepository;
 import ninegle.Readio.global.exception.BusinessException;
@@ -42,13 +43,14 @@ import ninegle.Readio.user.service.UserService;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-	private final BookService bookService;
 
+	private final BookService bookService;
 	private final ReviewRepository reviewRepository;
 	private final ReviewMapper reviewMapper;
 	private final UserService userService;
 	private final UserContextService userContextService;
 	private final BookSearchRepository bookSearchRepository;
+	private final BookRepository bookRepository;
 
 
 	public Review getReviewById(long id) {
@@ -61,10 +63,16 @@ public class ReviewService {
 		if (rating == null) {
 			rating = BigDecimal.ZERO;
 		}
+
+		Book findBook = bookRepository.findById(bookId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
+
 		BookSearch bookSearch = bookSearchRepository.findById(bookId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
+
+		findBook.updateRating(rating);
 		bookSearch.updateRating(rating);
-		log.info("rating = {}", rating);
+
 		bookSearchRepository.save(bookSearch);
 	}
 

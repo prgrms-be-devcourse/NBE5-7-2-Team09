@@ -39,6 +39,7 @@ public class PreferenceMapper {
 			.id(preference.getBook().getId())
 			.name(preference.getBook().getName())
 			.image(nCloudStorageConfig.toImageUrl(preference.getBook().getImage()))
+			.rating(preference.getBook().getRating())
 			.build();
 	}
 	public List<PreferenceResponseDto> toPreferenceDto(List<Preference> preferences){

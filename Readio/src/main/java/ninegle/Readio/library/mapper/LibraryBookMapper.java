@@ -35,7 +35,9 @@ public class LibraryBookMapper {
 				.bookIsbn(book.getIsbn())
 				.bookEcn(book.getEcn())
 				.bookPubDate(book.getPubDate())
-				.bookUpdateAt(book.getUpdatedAt()).build()
+				.bookUpdateAt(book.getUpdatedAt())
+				.rating(book.getRating())
+				.build()
 			).toList();
 
 		LibraryDto libraryDto = LibraryDto.builder()

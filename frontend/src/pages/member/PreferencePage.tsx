@@ -84,7 +84,7 @@ const PreferencePage = () => {
           title: item.name,
           author: "저자 정보", // API 응답에 저자 정보가 없어서 임시로 설정
           category: "분류", // API 응답에 카테고리 정보가 없어서 임시로 설정
-          rating: 4.5, // API 응답에 평점 정보가 없어서 임시로 설정
+          rating: item.rating, // API 응답에 평점 정보가 없어서 임시로 설정
           addedDate: new Date().toISOString().split("T")[0], // 추가 날짜 정보 없음
           image: item.image,
         }));
