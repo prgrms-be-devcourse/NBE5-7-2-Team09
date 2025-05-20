@@ -102,10 +102,32 @@ public enum ErrorCode {
 	SUBSCRIPTION_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 구독입니다."),
 
 	/*
+	 * Auth : 로그인 / 인증 관련 예외 처리
+	 */
+
+	// 401 Unauthorized
+	INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
+	ACCESS_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Access Token이 만료되었습니다."),
+	REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Refresh Token이 만료되었습니다."),
+	INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 Access Token입니다."),
+	INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token입니다."),
+	TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "서버에 저장된 토큰과 일치하지 않습니다."),
+	BLACKLISTED_TOKEN(HttpStatus.UNAUTHORIZED, "로그아웃된 토큰입니다. 다시 로그인 해주세요."),
+	AUTH_HEADER_MISSING(HttpStatus.UNAUTHORIZED, "Authorization 헤더가 누락되었습니다."),
+
+	// 403 Forbidden
+	FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "해당 리소스에 접근할 권한이 없습니다."),
+
+	// 404 Not Found
+	LOGIN_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "로그인 정보와 일치하는 사용자가 존재하지 않습니다."),
+
+	
+  /*
 	 * 리뷰관련 예외처리
 	 */
 	//404
 	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND,"리뷰를 찾을수 없습니다." );
+
 
 	private final HttpStatus status;
 	private final String message;

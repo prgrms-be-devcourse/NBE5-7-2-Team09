@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import ninegle.Readio.user.dto.UserDetail;
+import ninegle.Readio.user.adapter.UserDetail;
 
 //알아서 admin 추출되게 만들어야 함
 
@@ -15,7 +15,7 @@ public class UserContextService {
 	public Long getCurrentUserId() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-		// Authentication이 null이거나, Principal이 AdminDetails가 아닌 경우 예외 처리
+		// Authentication이 null이거나, Principal이 UserDetails가 아닌 경우 예외 처리
 		if (auth == null || !(auth.getPrincipal() instanceof UserDetail)) {
 			throw new AccessDeniedException("인증되지 않았습니다.");
 		}

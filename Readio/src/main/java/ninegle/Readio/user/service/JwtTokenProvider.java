@@ -88,20 +88,20 @@ public class JwtTokenProvider {
 			return true; // 성공하면 유효한 토큰이다
 
 		} catch (ExpiredJwtException e) {
-			log.warn("토큰 만료됨: {}", token);
+			log.debug("토큰 만료됨: {}", maskToken(token));
 		} catch (UnsupportedJwtException e) {
-			log.warn("지원되지 않는 토큰 형식: {}", token);
+			log.warn("지원되지 않는 토큰 형식: {}", maskToken(token));
 		} catch (MalformedJwtException e) {
-			log.warn("구조가 잘못된 토큰: {}", token);
+			log.warn("구조가 잘못된 토큰: {}", maskToken(token));
 		} catch (SignatureException e) {
-			log.warn("서명 검증 실패: {}", token);
+			log.warn("서명 검증 실패: {}", maskToken(token));
 
 		} catch (JwtException e) { // try 과정에서 예외가 발생하면 유효하지 않은 토큰
-			log.error("{}", token);
+			log.error("{}", maskToken(token));
 			log.error("잘못된 토큰 입력됨");
 
 		} catch (Exception e) {
-			log.error("{}", token);
+			log.error("{}", maskToken(token));
 			log.error("더 이상한 오류인 상황");
 		}
 		return false;
@@ -127,4 +127,12 @@ public class JwtTokenProvider {
 			.getPayload()                     // Claims 객체 추출
 			.getExpiration();                 // 만료 시간 추출
 	}
+
+	//log에서 마스킹 후 출력용
+	public String maskToken(String token) {
+		if (token == null || token.length() < 10)
+			return "(short token)";
+		return token.substring(0, 10) + "...(masked)";
+	}
+
 }
