@@ -172,3 +172,7 @@ from book;
 
 select *
 from review;
+
+select *
+from preference;
+

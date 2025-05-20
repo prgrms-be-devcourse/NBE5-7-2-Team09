@@ -31,10 +31,16 @@ import ninegle.Readio.user.domain.User;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor //얘도
-@Builder(toBuilder = true)
+
 @Table(name = "review")
 public class Review {
+	@Builder(toBuilder = true)
+	public Review(BigDecimal rating, String text, User user, Book book) {
+		this.rating = rating;
+		this.text = text;
+		this.user = user;
+		this.book = book;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

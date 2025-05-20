@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import ninegle.Readio.book.dto.preferencedto.PreferenceResponseDto;
 import ninegle.Readio.book.dto.preferencedto.PreferenceListResponseDto;
 import ninegle.Readio.book.dto.PaginationDto;
@@ -33,6 +34,7 @@ import ninegle.Readio.user.service.UserService;
  * author:  gigol
  * purpose: 
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PreferenceService {
@@ -44,7 +46,8 @@ public class PreferenceService {
 	private final UserContextService userContextService;
 
 	public Preference getPreferenceByBookAndUser(Book book,User user){
-		return preferencesRepository.findByBookAndUser(book,user).getFirst();
+		return preferencesRepository.findPreferenceByBookAndUser(book,user)
+			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_ALREADY_IN_PREFERENCE));
 	}
 
 
@@ -54,16 +57,15 @@ public class PreferenceService {
 		Book book = bookService.getBookById(dto.getId());
 		User user = userService.getById(userId);
 
-		// 409 Conflict
-		if(getPreferenceByBookAndUser(book,user)!=null) {
-			throw new BusinessException(ErrorCode.BOOK_ALREADY_IN_PREFERENCE);
-		}
+
+
 
 		Preference preference = preferenceMapper.toEntity(user, book);
 		preferencesRepository.save(preference);
 		return preferenceMapper.toPreferenceDto(preference);
 	}
 
+	@Transactional
 	public ResponseEntity<BaseResponse<Void>> delete(Long userId,Long bookId) {
 		Book book =bookService.getBookById(bookId);
 		User user = userService.getById(userId);

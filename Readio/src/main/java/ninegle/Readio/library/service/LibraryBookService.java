@@ -38,7 +38,7 @@ public class LibraryBookService {
 		//라이브러리 가져오기
 		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
 		if (libraryOptional.isEmpty()) {
-			BaseResponse.error("라이브러리가 존재하지 않습니다", HttpStatus.BAD_REQUEST);
+			BaseResponse.error("라이브러리가 존재하지 않습니다",null,HttpStatus.BAD_REQUEST);
 		}
 		Library library = libraryOptional.get();
 

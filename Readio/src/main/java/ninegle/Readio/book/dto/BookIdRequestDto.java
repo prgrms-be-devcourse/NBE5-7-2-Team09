@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BookIdRequestDto {
 
+
 	@NotNull(message = "도서 ID는 필수입니다.")
 	@Min(value = 1, message = "도서 ID는 1 이상의 값이어야 합니다.")
 	private Long id;
-
 }

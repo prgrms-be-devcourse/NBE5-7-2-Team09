@@ -1,6 +1,7 @@
 package ninegle.Readio.book.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,7 @@ import ninegle.Readio.user.domain.User;
  * purpose: 
  */
 public interface PreferencesRepository extends JpaRepository<Preference,Long> {
-	List<Preference> findByBookAndUser(Book book, User user);
+	Optional<Preference> findPreferenceByBookAndUser(Book book, User user);
 
 	long countByUser(User user);
 	Page<Preference> findPreferencesByUser(User user, Pageable pageable);

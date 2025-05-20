@@ -72,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			UserDetail userDetail = userService.getDetails(tokenBody.getUserId());
 
 			if (userDetail == null) {
-				BaseResponse.error("사용자가 존재하지 않음", HttpStatus.UNAUTHORIZED);
+				BaseResponse.error("사용자가 존재하지 않음", null,HttpStatus.UNAUTHORIZED);
 			}
 
 			//사용자가 입력한 ID/PW를 UsernamePasswordAuthenticationToken으로 감쌈

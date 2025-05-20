@@ -37,11 +37,8 @@ public class PreferenceController {
 	private final PreferenceService preferenceService;
 	private final UserContextService userContextService;
 
-
-
-	@PostMapping("/")
+	@PostMapping
 	public ResponseEntity<BaseResponse<PreferenceResponseDto>> save(@RequestBody @Valid BookIdRequestDto dto){
-
 		Long userId = userContextService.getCurrentUserId();
 
 		PreferenceResponseDto saved = preferenceService.save(userId, dto);
@@ -55,7 +52,7 @@ public class PreferenceController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/")
+	@GetMapping
 	public ResponseEntity<BaseResponse<PreferenceListResponseDto>> getPreferences(
 		@RequestParam(defaultValue = "1") int page,
 		@RequestParam(defaultValue = "3") int size) {
