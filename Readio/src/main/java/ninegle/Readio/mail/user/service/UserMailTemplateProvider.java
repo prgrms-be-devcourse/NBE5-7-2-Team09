@@ -3,6 +3,8 @@ package ninegle.Readio.mail.user.service;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import ninegle.Readio.global.util.StringUtil;
+
 @Service
 public class UserMailTemplateProvider {
 
@@ -10,8 +12,8 @@ public class UserMailTemplateProvider {
 		// 닉네임이 null 또는 공백일 경우 "회원"으로 대체
 		String reNickname = StringUtils.hasText(nickname) ? nickname : "회원";
 
-		return String.format("""
-                안녕하세요, %s님!
+		return StringUtil.format("""
+                안녕하세요, {}님!
                 
                 ✨ Readio 회원가입을 진심으로 환영합니다! ✨
                 이제 다양한 전자책과 함께하는 새로운 독서 경험을 시작해보세요.

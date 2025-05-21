@@ -27,8 +27,8 @@ public class SubscriptionReminderScheduler {
 	 * 매일 오전 10시에 실행
 	 * 구독 종료 1일 전 또는 당일인 사용자에게 메일 발송
 	 */
-	//@Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시
-	@Scheduled(cron = "0 * * * * *") // 발표 시연용: 매 분 실행
+	//@Scheduled(cron = "0 * * * * *") // 발표 시연용: 매 분 실행
+	@Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시
 	public void sendSubscriptionReminders() {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDate today = now.toLocalDate();
