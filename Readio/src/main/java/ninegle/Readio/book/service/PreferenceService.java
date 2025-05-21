@@ -47,7 +47,7 @@ public class PreferenceService {
 
 	public Preference getPreferenceByBookAndUser(Book book,User user){
 		return preferencesRepository.findPreferenceByBookAndUser(book,user)
-			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_ALREADY_IN_PREFERENCE));
+			.orElseThrow(() -> new BusinessException(ErrorCode.PREFERENCE_NOT_FOUND));
 	}
 
 
@@ -57,8 +57,9 @@ public class PreferenceService {
 		Book book = bookService.getBookById(dto.getId());
 		User user = userService.getById(userId);
 
-
-
+		if (getPreferenceByBookAndUser(book, user) != null) {
+			throw new BusinessException(ErrorCode.BOOK_ALREADY_IN_PREFERENCE);
+		}
 
 		Preference preference = preferenceMapper.toEntity(user, book);
 		preferencesRepository.save(preference);
@@ -70,11 +71,6 @@ public class PreferenceService {
 		Book book =bookService.getBookById(bookId);
 		User user = userService.getById(userId);
 		Preference preference = getPreferenceByBookAndUser(book, user);
-
-		//404 Not Found
-		if(preference==null) {
-			throw new BusinessException(ErrorCode.PREFERENCE_NOT_FOUND);
-		}
 
 		preferencesRepository.delete(preference);
 		return BaseResponse.ok("삭제가 성공적으로 수행되었습니다.",null,HttpStatus.OK);
