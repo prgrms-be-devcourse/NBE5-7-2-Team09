@@ -32,6 +32,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 	int deleteExpiredBefore(@Param("threshold") LocalDateTime threshold);
 
 	boolean existsByIsbn(String isbn);
-
 	boolean existsByEcn(String ecn);
+
+	boolean existsByIsbnAndIdNot(String isbn, Long id);
+	boolean existsByEcnAndIdNot(String ecn, Long id);
 }
