@@ -25,5 +25,5 @@ public interface PreferencesRepository extends JpaRepository<Preference, Long> {
 
 	Page<Preference> findPreferencesByUser(User user, Pageable pageable);
 
-	List<Preference> findByUserId(Long userId);
+	List<Preference> findAllByUserId(Long userId);
 }

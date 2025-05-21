@@ -27,5 +27,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 	@Query(value = "SELECT ROUND(AVG(rating), 1) FROM review WHERE book_id = :bookId", nativeQuery = true)
 	BigDecimal findAverageRatingByBook(@Param("bookId") Long bookId);
 
-	List<Review> findByUserId(Long userId);
+	List<Review> findAllByUserId(Long userId);
 }

@@ -258,17 +258,18 @@ public class UserService {
 		libraryRepository.deleteAll(libraries);
 
 		//관심도서 삭제
-		List<Preference> preferences = preferencesRepository.findByUserId(userId);
+		List<Preference> preferences = preferencesRepository.findAllByUserId(userId);
 		preferencesRepository.deleteAll(preferences);
 
 		//리뷰 삭제
-		List<Review> reviews = reviewRepository.findByUserId(userId);
+		List<Review> reviews = reviewRepository.findAllByUserId(userId);
 		reviewRepository.deleteAll(reviews);
 
 		//구독 삭제
-		Optional<Subscription> subscription = subscriptionRepository.findByUserId(userId);
-		subscription.ifPresent(subscriptionRepository::delete);
+		List<Subscription> subscriptions = subscriptionRepository.findAllByUserId(userId);
+		subscriptionRepository.deleteAll(subscriptions);
 
+		//refresh token 삭제
 		List<RefreshToken> refreshTokens = tokenRepository.findAllByUserId(userId);
 		tokenRepository.deleteAll(refreshTokens);
 
