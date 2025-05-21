@@ -46,10 +46,10 @@ public class Book {
 
 	private String image;
 
-	@Column(length = 20)
+	@Column(length = 20, unique = true)
 	private String isbn;
 
-	@Column(length = 50)
+	@Column(length = 50, unique = true)
 	private String ecn;
 
 	@Column(nullable = false)
