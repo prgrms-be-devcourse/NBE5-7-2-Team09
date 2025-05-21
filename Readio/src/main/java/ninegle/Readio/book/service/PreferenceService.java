@@ -57,9 +57,9 @@ public class PreferenceService {
 		Book book = bookService.getBookById(dto.getId());
 		User user = userService.getById(userId);
 
-		if (getPreferenceByBookAndUser(book, user) != null) {
+		preferencesRepository.findPreferenceByBookAndUser(book,user).ifPresent((preference) -> {
 			throw new BusinessException(ErrorCode.BOOK_ALREADY_IN_PREFERENCE);
-		}
+		});
 
 		Preference preference = preferenceMapper.toEntity(user, book);
 		preferencesRepository.save(preference);
