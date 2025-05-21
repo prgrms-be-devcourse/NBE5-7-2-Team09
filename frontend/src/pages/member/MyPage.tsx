@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import PointChargeModal from "@/components/ui/PointChargeModal.tsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+
 
 import {
   Check,
@@ -26,6 +28,12 @@ import {
   cancelSubscription,
 } from "@/utils/api/userService";
 import { UserProfile, ProfileUpdateRequest, Subscription } from "@/types/user";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -71,6 +79,45 @@ const MyPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSubscribing, setIsSubscribing] = useState<boolean>(false);
   const [isCancelling, setIsCancelling] = useState<boolean>(false);
+
+
+  // 회원 탈퇴 관련 상태
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  const { email, logout } = useAuth();
+
+  const handleDeleteConfirm = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    try {
+      const response = await fetch("http://localhost:8080/user/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          email: emailInput,
+          password: passwordInput,
+          refreshToken: refreshToken,
+        }),
+      });
+
+      if (response.ok) {
+        alert("회원 탈퇴가 완료되었습니다.");
+        logout();
+      } else {
+        const result = await response.json();
+        alert(`오류: ${result.message || "회원 탈퇴 실패"}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("요청 중 오류가 발생했습니다.");
+    }
+  };
+
 
   // 회원 정보 조회
   useEffect(() => {
@@ -333,8 +380,54 @@ const MyPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-6">마이페이지</h1>
+      <>
+        {/* 탈퇴 확인 모달 */}
+        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>정말로 탈퇴하시겠어요?</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-2">
+              <div>
+                <Label>이메일</Label>
+                <Input
+                    type="email"
+                    placeholder="이메일"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>비밀번호</Label>
+                <Input
+                    type="password"
+                    placeholder="비밀번호"
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+                  취소
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteConfirm}>
+                  탈퇴
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* 마이페이지 콘텐츠 전체 */}
+        <div className="container mx-auto">
+          <h1 className="text-2xl font-bold mb-6">마이페이지</h1>
+          <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowDeleteModal(true)}
+          >
+            탈퇴
+          </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 회원 정보 섹션 - 왼쪽 */}
@@ -618,8 +711,9 @@ const MyPage: React.FC = () => {
         onSubmit={handleSubmitCharge}
         userPoint={userProfile.point}
       />
-    </div>
-  );
-};
+          </div>
+        </>
+        );
+        };
 
 export default MyPage;
