@@ -113,8 +113,8 @@ public class SubscriptionMailTemplateProvider {
                 Copyright © 2025 by Readio, Inc. All rights reserved.
                 """,
 			reNickname,
-			subscription.getExpDate().toLocalDate(),
-			subscription.getExpDate().toLocalDate()
+			subscription.getExpDate(),
+			subscription.getExpDate()
 		);
 	}
 
@@ -146,8 +146,8 @@ public class SubscriptionMailTemplateProvider {
                 Copyright © 2025 by Readio, Inc. All rights reserved.
                 """,
 			reNickname,
-			subscription.getExpDate().toLocalDate(),
-			subscription.getExpDate().toLocalDate()
+			subscription.getExpDate(),
+			subscription.getExpDate()
 		);
 	}
 }

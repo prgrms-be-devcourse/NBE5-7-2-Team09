@@ -1,7 +1,6 @@
 package ninegle.Readio.mail.subscription.scheduler;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,18 +29,17 @@ public class SubscriptionReminderScheduler {
 	//@Scheduled(cron = "0 * * * * *") // 발표 시연용: 매 분 실행
 	@Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시
 	public void sendSubscriptionReminders() {
-		LocalDateTime now = LocalDateTime.now();
-		LocalDate today = now.toLocalDate();
+		LocalDate today = LocalDate.now();
 
 		List<Subscription> subscriptions = subscriptionRepository.findAll().stream()
 			.filter(sub ->
-				isSameDay(sub.getExpDate(), today) || isSameDay(sub.getExpDate(), today.plusDays(1))
+				sub.getExpDate().isEqual(today) || sub.getExpDate().isEqual(today.plusDays(1))
 			)
 			.toList();
 
 		for (Subscription sub : subscriptions) {
 			userRepository.findById(sub.getUserId()).ifPresent(user -> {
-				if (isSameDay(sub.getExpDate(), today)) {
+				if (sub.getExpDate().isEqual(today)) {
 					mailSender.sendExpirationTodayMail(user, sub); // 종료 당일
 				} else {
 					mailSender.sendExpirationSoonMail(user, sub); // 하루 전
@@ -50,9 +48,5 @@ public class SubscriptionReminderScheduler {
 		}
 
 		log.info("구독 만료 알림 메일 작업 완료: 총 {}건", subscriptions.size());
-	}
-
-	private boolean isSameDay(LocalDateTime dateTime, LocalDate targetDate) {
-		return dateTime.toLocalDate().isEqual(targetDate);
 	}
 }
