@@ -58,8 +58,7 @@ public enum ErrorCode {
 	//409
 	BOOK_ALREADY_IN_PREFERENCE(HttpStatus.CONFLICT, "이미 관심 도서로 등록된 책입니다."),
 	//404
-	PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND,  "관심 도서로 등록되지 않은 책입니다."),
-
+	PREFERENCE_NOT_FOUND(HttpStatus.NOT_FOUND, "관심 도서로 등록되지 않은 책입니다."),
 
 	/*
 	 * Subscription : 구독 예외 처리
@@ -121,13 +120,17 @@ public enum ErrorCode {
 	// 404 Not Found
 	LOGIN_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "로그인 정보와 일치하는 사용자가 존재하지 않습니다."),
 
-	
-  /*
+	/*
 	 * 리뷰관련 예외처리
 	 */
 	//404
-	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND,"리뷰를 찾을수 없습니다." );
+	REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을수 없습니다."),
 
+	// 토스페이
+	// 400
+	ZERO_AMOUNT_PAYMENT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "0원 결제는 허용되지 않습니다."),
+
+	EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다.");
 
 	private final HttpStatus status;
 	private final String message;

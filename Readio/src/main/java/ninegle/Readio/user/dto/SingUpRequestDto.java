@@ -1,21 +1,13 @@
 package ninegle.Readio.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
-public class SingUpRequestDto {
-	@NotBlank(message = "닉네임은 필수 입력값입니다.")
-	private String email;
+public record SingUpRequestDto(
+	@NotBlank(message = "닉네임은 필수 입력값입니다.") String email,
 
-	@NotBlank(message = "닉네임은 필수 입력값입니다.")
-	private String password;
+	@NotBlank(message = "닉네임은 필수 입력값입니다.") String password,
 
-	@NotBlank(message = "닉네임은 필수 입력값입니다.")
-	private String nickname;
+	@NotBlank(message = "닉네임은 필수 입력값입니다.") String nickname,
 
-	@NotBlank(message = "전화번호는 필수 입력값입니다.")
-	private String phoneNumber;
+	@NotBlank(message = "전화번호는 필수 입력값입니다.") String phoneNumber) {
 }

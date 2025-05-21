@@ -1,6 +1,9 @@
 package ninegle.Readio.user.service;
 
+import static ninegle.Readio.global.exception.domain.ErrorCode.*;
+
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,17 +13,30 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ninegle.Readio.book.domain.Preference;
+import ninegle.Readio.book.domain.Review;
+import ninegle.Readio.book.repository.PreferencesRepository;
+import ninegle.Readio.book.repository.ReviewRepository;
 import ninegle.Readio.global.exception.BusinessException;
 import ninegle.Readio.global.exception.domain.ErrorCode;
+import ninegle.Readio.library.domain.Library;
+import ninegle.Readio.library.domain.LibraryBook;
+import ninegle.Readio.library.repository.LibraryBookRepository;
+import ninegle.Readio.library.repository.LibraryRepository;
 import ninegle.Readio.mail.user.service.UserMailSender;
+import ninegle.Readio.subscription.domain.Subscription;
+import ninegle.Readio.subscription.repository.SubscriptionRepository;
 import ninegle.Readio.user.adapter.UserDetail;
 import ninegle.Readio.user.domain.BlackList;
 import ninegle.Readio.user.domain.RefreshToken;
 import ninegle.Readio.user.domain.User;
+import ninegle.Readio.user.dto.Delete;
+import ninegle.Readio.user.dto.DeleteUserRequestDto;
 import ninegle.Readio.user.dto.LoginRequestDto;
 import ninegle.Readio.user.dto.LoginResponseDto;
 import ninegle.Readio.user.dto.RefreshTokenRequestDto;
 import ninegle.Readio.user.dto.SingUpRequestDto;
+import ninegle.Readio.user.mapper.UserMapper;
 import ninegle.Readio.user.repository.BlackListRepository;
 import ninegle.Readio.user.repository.TokenRepository;
 import ninegle.Readio.user.repository.UserRepository;
@@ -37,20 +53,21 @@ public class UserService {
 	private final BlackListRepository blackListRepository;
 	private final UserMailSender userMailSender;
 
+	private final ReviewRepository reviewRepository;
+	private final PreferencesRepository preferencesRepository;
+	private final SubscriptionRepository subscriptionRepository;
+	private final LibraryRepository libraryRepository;
+	private final LibraryBookRepository libraryBookRepository;
+
 	//암호화 후 db에 회원가입 정보 저장
 	//BaseResponse로 지정한 내용에 http 상태 코드를 수정 후 다시 ResponseEntity로 감싸서 보냄
 	@Transactional
 	public void signup(SingUpRequestDto dto) {
-		if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-			throw new BusinessException(ErrorCode.LOGIN_USER_NOT_FOUND);  //401 반환 (409 숨기기)
+		if (userRepository.findByEmail(dto.email()).isPresent()) {
+			throw new BusinessException(EMAIL_ALREADY_EXISTS);  //409
 		}
 
-		User user = User.builder()
-			.email(dto.getEmail())
-			.password(passwordEncoder.encode(dto.getPassword()))
-			.nickname(dto.getNickname())
-			.phoneNumber(dto.getPhoneNumber())
-			.build();
+		User user = UserMapper.toUser(dto, passwordEncoder);
 		userRepository.save(user);
 
 		// 회원가입 환영 메일 전송
@@ -81,7 +98,7 @@ public class UserService {
 	public void login(LoginRequestDto dto, HttpServletResponse response) {
 
 		//가입된 email과 password가 같은지 확인
-		Optional<User> findAdmin = userRepository.findByEmail(dto.getEmail());
+		Optional<User> findAdmin = userRepository.findByEmail(dto.email());
 
 		if (findAdmin.isEmpty()) {                                 //이메일이 존재하지 않다 반환 시 찾을 때까지 이메일 무한 입력 가능성
 			throw new BusinessException(ErrorCode.LOGIN_USER_NOT_FOUND); //404
@@ -89,14 +106,14 @@ public class UserService {
 
 		User user = findAdmin.get();
 
-		if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+		if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
 			throw new BusinessException(ErrorCode.LOGIN_USER_NOT_FOUND);  //404
 		}
 
 		//가입된 정보가 일치하고 db에 refresh token이 존재하고 있으면 기간이 만료된게 확인되면 다시 재발급
 		String refreshToken;
 		//null이든 뭐든 사용자 정보로 db에서 refresh token이 존재하는지 검색
-		Optional<RefreshToken> optionalSavedToken = tokenRepository.findByUserId(user.getId());
+		Optional<RefreshToken> optionalSavedToken = tokenRepository.findTop1ByUserIdOrderByIdDesc(user.getId());
 		if (optionalSavedToken.isPresent()) {
 			RefreshToken savedToken = optionalSavedToken.get();
 			if (!jwtTokenProvider.validate(savedToken.getRefreshToken())) {
@@ -114,12 +131,6 @@ public class UserService {
 		}
 
 		String accessToken = jwtTokenProvider.issueAccessToken(user.getId(), user.getRole(), user.getEmail());
-
-		// ✅ Spring Security 인증 컨텍스트 설정
-		//        UserDetail userDetail = UserDetail.UserDetailsMake(user);
-		//        Authentication authentication =
-		//                new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
-		//        SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		//재발급 후 다시헤더에 넣어서 반환
 		LoginResponseDto loginResponseDto = new LoginResponseDto(accessToken, refreshToken);
@@ -150,10 +161,10 @@ public class UserService {
 
 		// DB에 있는 RefreshToken과 일치 여부 확인
 		//클라이언트가 서버로 refresh token을 보냈을 때, 이 토큰이 "서버에서 발급한 것이 맞는지" 검증
-		if (tokenRepository.findByUserId(userId).isEmpty()) {
+		if (tokenRepository.findTop1ByUserIdOrderByIdDesc(userId).isEmpty()) {
 			throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);    //401 //401 반환
 		}
-		RefreshToken serverFindRefreshToken = tokenRepository.findByUserId(userId).get();
+		RefreshToken serverFindRefreshToken = tokenRepository.findTop1ByUserIdOrderByIdDesc(userId).get();
 
 		//위에서 가져온 admin에 맞는 토큰 정보와 클라이언트가 요청으로 가져온 refresh Token이 같은지 다른지 확인해 위조 가능성을 체크
 		if (!serverFindRefreshToken.getRefreshToken().equals(refreshToken)) {
@@ -161,7 +172,7 @@ public class UserService {
 		}
 
 		//Refresh token이 유효하지만 access token 재발급 용도로 사용 후
-		//Refresh Token이 노출되었을 수 있기 때문에, 사용 후에는 새로운 것으로 갱신하는 것이 안전하다 하는데 흠
+		//Refresh Token이 노출되었을 수 있기 때문에, 사용 후에는 새로운 것으로 갱신하는 것이 안전하다
 		String newAccessToken = jwtTokenProvider.issueAccessToken(user.getId(), user.getRole(), user.getEmail());
 		String newRefreshToken = jwtTokenProvider.issueRefreshToken(user.getId(), user.getRole(), user.getEmail());
 
@@ -185,13 +196,13 @@ public class UserService {
 
 		Long userId = jwtTokenProvider.parseJwt(accessToken).getUserId();
 
-		Optional<RefreshToken> findrefreshToken = tokenRepository.findByUserId(userId);
+		Optional<RefreshToken> findrefreshToken = tokenRepository.findTop1ByUserIdOrderByIdDesc(userId);
 		if (findrefreshToken.isEmpty()) {
 			throw new BusinessException(ErrorCode.INVALID_ACCESS_TOKEN);  // 401 반환
 		}
 		RefreshToken refreshToken = findrefreshToken.get();
 
-		if (!refreshToken.getRefreshToken().equals(requestrefreshToken.getRefreshToken())) {
+		if (!refreshToken.getRefreshToken().equals(requestrefreshToken.refreshToken())) {
 			throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);  // 401 반환
 		}
 
@@ -203,4 +214,66 @@ public class UserService {
 
 	}
 
+	@Transactional
+	public void deleteUser(String accessToken, DeleteUserRequestDto deleteUserRequestDto) {
+		//토큰 구조 먼저 확인
+		if (accessToken.startsWith("Bearer ")) {
+			accessToken = accessToken.substring(7);
+		}
+
+		Delete delete = UserMapper.toDelete(deleteUserRequestDto);
+
+		// 1. 토큰에서 유저 정보 추출
+		Long userId = jwtTokenProvider.parseJwt(accessToken).getUserId();
+
+		// 2. DB에서 유저 조회
+		User tokenUser = userRepository.findById(userId)
+			.orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
+
+		//이메일 비교
+		if (!delete.email().equals(tokenUser.getEmail())) {
+			throw new BusinessException(ErrorCode.LOGIN_USER_NOT_FOUND);  // 404
+		}
+
+		//refresh token 비교
+		Optional<RefreshToken> tokenOptional = tokenRepository.findTop1ByUserIdOrderByIdDesc(userId);
+		if (tokenOptional.isEmpty()) {
+			throw new BusinessException(INVALID_REFRESH_TOKEN);  //401
+		}
+		if (!tokenOptional.get().getRefreshToken().equals(delete.refreshToken())) {
+			throw new BusinessException(INVALID_REFRESH_TOKEN);  //401
+		}
+
+		//비밀번호 비교
+		if (!passwordEncoder.matches(delete.password(), tokenUser.getPassword())) {
+			throw new BusinessException(ErrorCode.LOGIN_USER_NOT_FOUND);  //404
+		}
+
+		// 라이브러리에 책, 라이브러리들 삭제
+		List<Library> libraries = libraryRepository.findAllByUserId(userId);
+		for (Library library : libraries) {
+			List<LibraryBook> libraryBooks = libraryBookRepository.findByLibraryId(library.getId());
+			libraryBookRepository.deleteAll(libraryBooks);
+		}
+		libraryRepository.deleteAll(libraries);
+
+		//관심도서 삭제
+		List<Preference> preferences = preferencesRepository.findAllByUserId(userId);
+		preferencesRepository.deleteAll(preferences);
+
+		//리뷰 삭제
+		List<Review> reviews = reviewRepository.findAllByUserId(userId);
+		reviewRepository.deleteAll(reviews);
+
+		//구독 삭제
+		List<Subscription> subscriptions = subscriptionRepository.findAllByUserId(userId);
+		subscriptionRepository.deleteAll(subscriptions);
+
+		//refresh token 삭제
+		List<RefreshToken> refreshTokens = tokenRepository.findAllByUserId(userId);
+		tokenRepository.deleteAll(refreshTokens);
+
+		//유저 삭제
+		userRepository.findById(userId).ifPresent(userRepository::delete);
+	}
 }

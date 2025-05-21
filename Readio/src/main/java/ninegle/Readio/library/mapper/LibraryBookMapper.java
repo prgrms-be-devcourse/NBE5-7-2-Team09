@@ -22,7 +22,7 @@ public class LibraryBookMapper {
 
 	//라이브러리에 책 추가
 	public Long toNewLibraryBook(NewLibraryBookRequestDto libraryBookRequestDto) {
-		return libraryBookRequestDto.getBookId();
+		return libraryBookRequestDto.bookId();
 	}
 
 	//라이브러리에 책 목록 가져오기

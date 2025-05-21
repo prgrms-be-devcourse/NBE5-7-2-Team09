@@ -7,10 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
 import ninegle.Readio.book.domain.Book;
 import ninegle.Readio.book.domain.Preference;
-import ninegle.Readio.book.domain.Review;
 import ninegle.Readio.user.domain.User;
 
 /**
@@ -20,9 +18,12 @@ import ninegle.Readio.user.domain.User;
  * author:  gigol
  * purpose: 
  */
-public interface PreferencesRepository extends JpaRepository<Preference,Long> {
+public interface PreferencesRepository extends JpaRepository<Preference, Long> {
 	Optional<Preference> findPreferenceByBookAndUser(Book book, User user);
 
 	long countByUser(User user);
+
 	Page<Preference> findPreferencesByUser(User user, Pageable pageable);
+
+	List<Preference> findAllByUserId(Long userId);
 }

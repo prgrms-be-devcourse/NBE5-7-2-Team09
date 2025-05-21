@@ -53,19 +53,19 @@ public class PaymentService {
 			throw new BusinessException(ErrorCode.INVALID_REQUEST_DATA); //400
 		}
 
-		User user1 = userOptional.get();
-		Long point = tossRequest.getAmount();
+		User user = userOptional.get();
+		Long point = tossRequest.amount();
 
 		if (point < 1) {
-			throw new BusinessException(ErrorCode.USER_NOT_FOUND); //404 0원 결제 시
+			throw new BusinessException(ErrorCode.ZERO_AMOUNT_PAYMENT_NOT_ALLOWED); // 0원 결제 시 400
 		}
-		user1.setPoint(user1.getPoint() + point);
+		user.setPoint(user.getPoint() + point);
 
 		//객체 생성 후 반환 코드 필요
-		PaymentSuccessResponseDto paymentSuccessResponseDto = PaymentSuccessResponseDto.builder()
-			.orderId(tossRequest.getOrderId())
-			.amount(tossRequest.getAmount()).build();
+		PaymentSuccessResponseDto ResponseDto = PaymentSuccessResponseDto.builder()
+			.orderId(tossRequest.orderId())
+			.amount(tossRequest.amount()).build();
 
-		return paymentSuccessResponseDto;
+		return ResponseDto;
 	}
 }

@@ -1,6 +1,7 @@
 package ninegle.Readio.book.repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 	@Query(value = "SELECT ROUND(AVG(rating), 1) FROM review WHERE book_id = :bookId", nativeQuery = true)
 	BigDecimal findAverageRatingByBook(@Param("bookId") Long bookId);
 
+	List<Review> findAllByUserId(Long userId);
 }
