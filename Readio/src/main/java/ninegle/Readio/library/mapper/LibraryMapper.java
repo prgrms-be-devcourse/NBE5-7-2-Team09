@@ -17,7 +17,7 @@ public class LibraryMapper {
 
 	//DTO에서 라이브러리로
 	public static Library toNewLibraryEntity(NewLibraryRequestDto newLibraryRequestDto, User user) {
-		return new Library(newLibraryRequestDto.getLibraryName(), user);
+		return new Library(newLibraryRequestDto.libraryName(), user);
 	}
 
 	//라이브러리에서 DTO로
@@ -48,7 +48,7 @@ public class LibraryMapper {
 
 	//라이브러리 이름 수정
 	public static String toLibraryName(UpdateLibraryRequestDto updateLibraryRequestDto) {
-		return updateLibraryRequestDto.getLibraryName();
+		return updateLibraryRequestDto.libraryName();
 	}
 
 	//라이브러리 이름 수정 후 Response

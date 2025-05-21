@@ -27,8 +27,8 @@ public class RefreshToken {
 	private String refreshToken;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "admin_id")
-	//단방향으로 어드민과 연결
+	@JoinColumn(name = "user_id")
+	//단방향으로 유저와 연결
 	private User user;
 
 	@UpdateTimestamp

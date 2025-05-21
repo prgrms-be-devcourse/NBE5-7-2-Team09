@@ -21,6 +21,7 @@ public class Subscription {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(unique = true) // 유저당 하나의 구독만 허용
 	private Long userId;
 
 	private LocalDateTime subDate;

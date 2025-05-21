@@ -1,4 +1,8 @@
 package ninegle.Readio.user.dto;
 
-public class Delete {
+import lombok.Builder;
+
+@Builder
+
+public record Delete(String refreshToken, String email, String password) {
 }

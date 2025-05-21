@@ -14,7 +14,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
@@ -54,7 +53,7 @@ public class JwtTokenProvider {
 
 	//멤버가 가진 RefreshToken 가져오기
 	public Optional<RefreshToken> findRefreshToken(Long adminId) {
-		return tokenRepository.findByUserId(adminId);
+		return tokenRepository.findTop1ByUserIdOrderByIdDesc(adminId);
 
 	}
 
@@ -88,21 +87,15 @@ public class JwtTokenProvider {
 			return true; // 성공하면 유효한 토큰이다
 
 		} catch (ExpiredJwtException e) {
-			log.debug("토큰 만료됨: {}", maskToken(token));
+			log.debug("토큰 만료됨: {} - {}", maskToken(token), e.getMessage());
 		} catch (UnsupportedJwtException e) {
-			log.warn("지원되지 않는 토큰 형식: {}", maskToken(token));
+			log.warn("지원되지 않는 토큰 형식: {} - {}", maskToken(token), e.getMessage());
 		} catch (MalformedJwtException e) {
-			log.warn("구조가 잘못된 토큰: {}", maskToken(token));
-		} catch (SignatureException e) {
-			log.warn("서명 검증 실패: {}", maskToken(token));
-
-		} catch (JwtException e) { // try 과정에서 예외가 발생하면 유효하지 않은 토큰
-			log.error("{}", maskToken(token));
-			log.error("잘못된 토큰 입력됨");
-
+			log.warn("구조가 잘못된 토큰: {} - {}", maskToken(token), e.getMessage());
+		} catch (JwtException e) {
+			log.error("잘못된 토큰 입력됨: {} - {}", maskToken(token), e.getMessage());
 		} catch (Exception e) {
-			log.error("{}", maskToken(token));
-			log.error("더 이상한 오류인 상황");
+			log.error("알 수 없는 오류: {} - {}", maskToken(token), e.getMessage(), e);
 		}
 		return false;
 	}

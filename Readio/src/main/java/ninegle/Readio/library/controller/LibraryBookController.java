@@ -52,11 +52,11 @@ public class LibraryBookController {
 	}
 
 	//라이브러리에 책 삭제
-	@DeleteMapping("/library/{libraryId}/library-books/{libraryBookId}")
+	@DeleteMapping("/library/{libraryId}/library-books/{bookId}")
 	public ResponseEntity<BaseResponse<Void>> deleteBook(
 		@PathVariable @NotNull @Max(5000) @Min(1) Long libraryId,
-		@PathVariable @NotNull @Max(5000) @Min(1) Long libraryBookId) {
-		libraryBookService.deleteLibraryBook(libraryId, libraryBookId);
+		@PathVariable @NotNull @Max(5000) @Min(1) Long bookId) {
+		libraryBookService.deleteLibraryBook(libraryId, bookId);
 		return BaseResponse.okOnlyStatus(HttpStatus.OK);
 	}
 

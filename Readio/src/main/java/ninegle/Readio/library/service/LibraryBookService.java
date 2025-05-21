@@ -35,11 +35,7 @@ public class LibraryBookService {
 	public void newLibraryBook(Long libraryId, NewLibraryBookRequestDto bookRequestDto) {
 
 		//라이브러리 가져오기
-		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
-		if (libraryOptional.isEmpty()) {
-			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND); //404
-		}
-		Library library = libraryOptional.get();
+		Library library = getLibrary(libraryId);
 
 		//라이브러리에 추가할 책
 		Long newLibraryBookId = libraryBookMapper.toNewLibraryBook(bookRequestDto);
@@ -48,6 +44,11 @@ public class LibraryBookService {
 			throw new BusinessException(ErrorCode.BOOK_NOT_FOUND); //404
 		}
 		Book book = findBook.get();
+
+		Optional<LibraryBook> optionalLibraryBook = libraryBookRepository.duplicateTest(library.getId(), book.getId());
+		if (optionalLibraryBook.isPresent()) {
+			throw new BusinessException(ErrorCode.BOOK_ALREADY_EXISTS); // 책이 이미 해당 라이브러리에 존재하는 경우 409
+		}
 
 		LibraryBook libraryBook = LibraryBook.builder()
 			.book(book)
@@ -61,12 +62,7 @@ public class LibraryBookService {
 	@Transactional(readOnly = true)
 	public LibraryBookListResponseDto getAllLibraryBooks(Long libraryId,
 		Pageable pageable) {
-		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
-		if (libraryOptional.isEmpty()) {
-			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND); //404
-		}
-		//조회한 라이브러리
-		Library library = libraryOptional.get();
+		Library library = getLibrary(libraryId);
 
 		//조회한 책들
 		Page<Book> books = libraryBookRepository.findBookByLibraryId(library.getId(), pageable);
@@ -77,17 +73,27 @@ public class LibraryBookService {
 
 	//라이브러리에 책 삭제
 	@Transactional
-	public void deleteLibraryBook(Long libraryId, Long libraryBookId) {
-		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
-		if (libraryOptional.isEmpty()) {
-			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND); //404
-		}
-		Optional<LibraryBook> libraryBoook = libraryBookRepository.findLibraryBoook(libraryId, libraryBookId);
+	public void deleteLibraryBook(Long libraryId, Long BookId) {
+		Library library = getLibrary(libraryId);
+		Optional<LibraryBook> libraryBoook = libraryBookRepository.findLibraryBoook(libraryId, BookId);
 		if (libraryBoook.isEmpty()) {
 			throw new BusinessException(ErrorCode.BOOK_NOT_FOUND); //404
 		}
 		LibraryBook libraryBook = libraryBoook.get();
 		libraryBookRepository.delete(libraryBook);
 
+	}
+
+	public Library getLibrary(Long libraryId) {
+		Optional<Library> libraryOptional = libraryRepository.findById(libraryId);
+		if (libraryOptional.isEmpty()) {
+			throw new BusinessException(ErrorCode.LIBRARY_NOT_FOUND);
+		}
+		Library library = libraryOptional.get();
+		Long currentUserId = userContextService.getCurrentUserId();
+		if (!library.getUser().getId().equals(currentUserId)) {
+			throw new BusinessException(ErrorCode.FORBIDDEN_ACCESS); // 403: 권한 없음
+		}
+		return libraryOptional.get();
 	}
 }

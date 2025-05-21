@@ -3,6 +3,7 @@ package ninegle.Readio.user.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -13,6 +14,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import ninegle.Readio.global.unit.BaseResponse;
+import ninegle.Readio.user.dto.DeleteUserRequestDto;
 import ninegle.Readio.user.dto.LoginRequestDto;
 import ninegle.Readio.user.dto.RefreshTokenRequestDto;
 import ninegle.Readio.user.dto.SingUpRequestDto;
@@ -56,6 +58,13 @@ public class UserController {
 		HttpServletResponse response) {
 		userService.reissue(refreshToken, response);
 		return BaseResponse.okOnlyStatus(HttpStatus.OK); //200
+	}
+
+	@DeleteMapping("/user/delete")
+	public ResponseEntity<BaseResponse<Void>> deleteUser(@RequestHeader("Authorization") @NotBlank String accessToken,
+		@RequestBody @Valid DeleteUserRequestDto deleteUserRequestDto) {
+		userService.deleteUser(accessToken, deleteUserRequestDto);
+		return BaseResponse.okOnlyStatus(HttpStatus.OK);
 	}
 
 }

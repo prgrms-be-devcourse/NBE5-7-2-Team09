@@ -1,5 +1,7 @@
 package ninegle.Readio.library.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +15,7 @@ public interface LibraryRepository extends JpaRepository<Library, Long> {
 	Page<Library> findAllByUserId(Long userId, Pageable pageable);
 
 	Library findByIdAndUserId(Long id, long userId);
+
+	List<Library> findAllByUserId(long userId);
 
 }

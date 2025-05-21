@@ -3,11 +3,9 @@ package ninegle.Readio.user.config;
 import java.io.IOException;
 import java.util.Date;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.JwtException;
@@ -45,17 +43,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		AntPathMatcher pathMatcher = new AntPathMatcher();
+		//나중에 쓸 일이 있을지?
+		// AntPathMatcher pathMatcher = new AntPathMatcher();
+		// String uri = request.getRequestURI();
+		// String method = request.getMethod();
 
-		String uri = request.getRequestURI();
-		String method = request.getMethod();
-		// 로그인, 회원가입은 필터에 걸리지 않게 그냥 넘긴다
-		// ("/login").equals(url) 형태로 쓰면 url에 null일 시 null 예외 발생 주의
-		if ("/user/login".equals(uri) || "/user/signup".equals(uri) || "/user/logout".equals(uri) ||
-			(HttpMethod.GET.matches(method) && pathMatcher.match("/books/**", uri))) {
-			filterChain.doFilter(request, response);
-			return;
-		}
 		String token = resolveToken(request); //헤더에서 토큰값 추출
 
 		// 블랙리스트에 등록된 토큰인지 먼저 검사
