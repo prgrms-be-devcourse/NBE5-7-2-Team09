@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -158,11 +159,22 @@ public class BookService {
 		return bookMapper.toDto(findBook);
 	}
 
+	private void validateUpdatedBook(BookRequestDto request, Long bookId) {
+		if (bookRepository.existsByIsbnAndIdNot(request.getIsbn(), bookId)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_ISBN);
+		}
+		if (request.getEcn() != null && bookRepository.existsByEcnAndIdNot(request.getEcn(), bookId)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_ECN);
+		}
+	}
 
 	@Transactional
 	public BookResponseDto updateBook(Long id, BookRequestDto request) {
 		Book targetBook = getBookById(id);
-		validateSavedBook(request);
+		if (!targetBook.getIsbn().equals(request.getIsbn()) ||
+			!Objects.equals(targetBook.getEcn(), request.getEcn())) {
+			validateUpdatedBook(request, id);
+		}
 
 		BookSearch targetBookSearch = bookSearchRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ErrorCode.BOOK_NOT_FOUND));
