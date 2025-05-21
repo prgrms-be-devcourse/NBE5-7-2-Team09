@@ -8,6 +8,7 @@ export interface BookPreference {
   id: number;
   name: string;
   image: string;
+  rating: number;
 }
 
 export interface PaginationInfo {
@@ -35,7 +36,7 @@ export const preferenceService = {
   ): Promise<PreferenceListResponse> => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      const response = await axios.get(`${API_URL}/preferences/`, {
+      const response = await axios.get(`${API_URL}/preferences`, {
         params: { page, size },
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -53,7 +54,7 @@ export const preferenceService = {
     const accessToken = localStorage.getItem("accessToken");
     try {
       const response = await axios.post(
-        `${API_URL}/preferences/`,
+        `${API_URL}/preferences`,
         { id: bookId },
         {
           headers: {
