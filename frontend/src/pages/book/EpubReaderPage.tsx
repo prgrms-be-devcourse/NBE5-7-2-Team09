@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react"
 import { Book } from "epubjs"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,6 +14,8 @@ import {
   Bookmark,
   BookmarkPlus,
 } from "lucide-react"
+import { getUserSubscription } from "@/utils/api/userService"
+import { toast } from "sonner"
 
 // 타입 정의
 interface BookApiResponse {
@@ -498,6 +500,7 @@ const IconButton = ({
 
 const EpubReaderPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [pages, setPages] = useState<EpubPage[]>([])
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
@@ -511,6 +514,36 @@ const EpubReaderPage: React.FC = () => {
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([])
   const pagesContainerRef = useRef<HTMLDivElement>(null)
+
+  // 구독 상태 확인 및 리다이렉트
+  useEffect(() => {
+    const checkSubscription = async () => {
+      try {
+        const subscriptionData = await getUserSubscription()
+
+        // 구독이 없거나 활성화되지 않은 경우 마이페이지로 리다이렉트
+        if (!subscriptionData || !subscriptionData.stillValid) {
+          toast.error("구독권이 필요합니다", {
+            description: "이 콘텐츠를 이용하려면 구독이 필요합니다.",
+            duration: 5000,
+          })
+
+          // 마이페이지로 리다이렉트
+          navigate("/my-page")
+        }
+      } catch (error) {
+        console.error("구독 정보 확인 실패:", error)
+        toast.error("구독 정보 확인 실패", {
+          description: "구독 정보를 확인하는 중 오류가 발생했습니다.",
+        })
+
+        // 오류 발생 시에도 마이페이지로 리다이렉트
+        navigate("/my-page")
+      }
+    }
+
+    checkSubscription()
+  }, [id, navigate])
 
   // 북마크 로드
   useEffect(() => {
